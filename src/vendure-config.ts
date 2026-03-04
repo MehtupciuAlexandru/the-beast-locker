@@ -4,7 +4,9 @@ import {
     DefaultSchedulerPlugin,
     DefaultSearchPlugin,
     VendureConfig,
+    LanguageCode,
 } from '@vendure/core';
+
 import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader } from '@vendure/email-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
 import { DashboardPlugin } from '@vendure/dashboard/plugin';
@@ -14,6 +16,8 @@ import path from 'path';
 
 const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
+import { ProductCustomizationPlugin } from './plugins/product-customization/product-customization.plugin';
+import {BeastLockerPlugin} from "./plugins/product-customization/beast-locker.plugin";
 
 export const config: VendureConfig = {
     apiOptions: {
@@ -58,9 +62,29 @@ export const config: VendureConfig = {
     },
     // When adding or altering custom field definitions, the database will
     // need to be updated. See the "Migrations" section in README.md.
-    customFields: {},
+    customFields: {
+
+        Product: [
+            {
+                name: 'seoTitle',
+                type: 'string',
+                nullable: true,
+                label: [{languageCode: LanguageCode.en, value: 'SEO Title'}],
+            },
+
+            {
+                name: 'seoDescription',
+                type: 'text',
+                nullable: true,
+                label: [{languageCode: LanguageCode.en, value: 'SEO Description'}],
+            }
+        ],
+    },
+
     plugins: [
         GraphiqlPlugin.init(),
+        ProductCustomizationPlugin,
+        BeastLockerPlugin,
         AssetServerPlugin.init({
             route: 'assets',
             assetUploadDir: path.join(__dirname, '../static/assets'),

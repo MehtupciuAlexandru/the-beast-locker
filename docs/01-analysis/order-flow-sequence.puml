@@ -1,0 +1,67 @@
+@startuml
+
+actor Customer
+
+participant "Next.js Frontend" as Frontend
+participant "Shop GraphQL API" as ShopAPI
+participant "Vendure Backend" as Vendure
+database "PostgreSQL Database" as DB
+
+Customer -> Frontend : Browse products
+
+Frontend -> ShopAPI : query products
+ShopAPI -> Vendure : resolve products
+Vendure -> DB : fetch products
+DB --> Vendure : product data
+Vendure --> ShopAPI : products
+ShopAPI --> Frontend : products
+
+Customer -> Frontend : Add product to cart
+
+Frontend -> ShopAPI : addItemToOrder
+ShopAPI -> Vendure : create/update active order
+Vendure -> DB : store order line
+DB --> Vendure : confirmation
+Vendure --> ShopAPI : updated order
+ShopAPI --> Frontend : updated cart
+
+Customer -> Frontend : Provide customer information
+
+Frontend -> ShopAPI : setCustomerForOrder
+ShopAPI -> Vendure : attach customer to order
+Vendure -> DB : update order
+DB --> Vendure : confirmation
+Vendure --> ShopAPI : updated order
+
+Customer -> Frontend : Provide shipping address
+
+Frontend -> ShopAPI : setOrderShippingAddress
+ShopAPI -> Vendure : validate address
+Vendure -> DB : store address
+DB --> Vendure : confirmation
+Vendure --> ShopAPI : updated order
+
+Customer -> Frontend : Select shipping method
+
+Frontend -> ShopAPI : setOrderShippingMethod
+ShopAPI -> Vendure : apply shipping method
+Vendure -> DB : update order totals
+DB --> Vendure : confirmation
+Vendure --> ShopAPI : updated order
+
+Customer -> Frontend : Confirm order
+
+Frontend -> ShopAPI : transitionOrderToState
+ShopAPI -> Vendure : transition state
+Vendure -> DB : update order status
+DB --> Vendure : confirmation
+Vendure --> ShopAPI : order state updated
+
+Frontend -> ShopAPI : addPaymentToOrder
+ShopAPI -> Vendure : record payment
+Vendure -> DB : store payment
+DB --> Vendure : confirmation
+Vendure --> ShopAPI : order completed
+ShopAPI --> Frontend : order confirmation
+
+@enduml

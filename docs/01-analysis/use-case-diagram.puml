@@ -1,0 +1,26 @@
+@startuml
+
+left to right direction
+
+actor Visitor
+actor Customer
+actor Admin
+
+rectangle "Beast Locker System" {
+
+  Visitor --> (Browse Products)
+  Visitor --> (View Product Details)
+  Visitor --> (Browse Collections)
+  Visitor --> (Search / Filter Products)
+  Visitor --> (Add Product to Cart)
+
+  Customer --> (Manage Cart)
+  Customer --> (Checkout)
+
+  Admin --> (Manage Products)
+  Admin --> (Manage Collections)
+  Admin --> (Process Orders)
+
+}
+
+@enduml
