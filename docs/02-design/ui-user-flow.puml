@@ -1,0 +1,95 @@
+@startuml E-commerce Site User Flow Diagram
+
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+
+skinparam state {
+  BackgroundColor #F8F9FA
+  BorderColor #2C3E50
+  BorderThickness 2
+  FontColor #2C3E50
+  FontSize 12
+  FontStyle bold
+  ArrowColor #34495E
+  ArrowFontColor #2C3E50
+  ArrowThickness 2
+}
+
+title E-commerce Website User Flow Diagram
+header University Project - User Navigation Flow
+footer Page 1 of 1
+
+state "Homepage" as home
+state "Product Listing" as listing
+state "Search Results" as search
+state "Product Detail" as detail
+state "Shopping Cart" as cart
+state "Customer Information" as customer
+state "Shipping Address" as shipping
+state "Shipping Method" as method
+state "Order Summary" as summary
+state "Order Confirmation" as confirmation
+
+note top of home
+  **Entry Point**
+  Global navigation available:
+  - Category selection (header)
+  - Search functionality
+end note
+
+[*] --> home : User enters site
+
+home --> listing : Browse Category\n(via header)
+home --> search : Search Product
+home --> detail : Featured Product
+
+search --> listing : View Results
+search --> home : Clear Search
+
+listing --> detail : Select Product
+listing --> listing : Filter/Sort\nChange Category
+listing --> home : Return Home
+
+detail --> cart : Add to Cart
+detail --> listing : Back to Listing
+detail --> detail : View Recommended\nProduct
+detail --> home : Return Home
+
+note right of detail
+  **Product Actions**
+  - View details
+  - Add to cart
+  - Browse recommendations
+end note
+
+cart --> customer : Proceed to\nCheckout
+cart --> listing : Continue\nShopping
+cart --> cart : Update\nQuantities
+
+note top of customer
+  **Checkout Process**
+  Sequential flow - all steps required
+end note
+
+customer --> shipping : Continue
+shipping --> method : Continue
+method --> summary : Continue
+summary --> confirmation : Confirm\nOrder
+
+confirmation --> home : Return Home
+confirmation --> [*] : Exit Site
+
+legend right
+  |= Symbol |= Meaning |
+  | → | User navigation |
+  | State | Page/Screen |
+
+  **Navigation Notes:**
+  • Categories accessible globally via header
+  • Multiple paths to Product Detail
+  • Checkout is linear process
+endlegend
+
+@enduml
