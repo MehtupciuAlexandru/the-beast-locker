@@ -1,95 +1,53 @@
-@startuml E-commerce Site User Flow Diagram
+@startuml
 
-skinparam backgroundColor #FFFFFF
-skinparam shadowing false
-skinparam defaultFontName Arial
-skinparam defaultFontSize 12
+title BeastLocker E-commerce Platform - User Flow Diagram
+header Internship Project | Academic Year 2025-2026
+footer Page 1/1
 
-skinparam state {
-  BackgroundColor #F8F9FA
-  BorderColor #2C3E50
-  BorderThickness 2
-  FontColor #2C3E50
-  FontSize 12
-  FontStyle bold
-  ArrowColor #34495E
-  ArrowFontColor #2C3E50
-  ArrowThickness 2
-}
+[*] --> Homepage
 
-title E-commerce Website User Flow Diagram
-header University Project - User Navigation Flow
-footer Page 1 of 1
+state Homepage
+state ProductListing
+state ProductDetail
+state Checkout
+state OrderConfirmation
 
-state "Homepage" as home
-state "Product Listing" as listing
-state "Search Results" as search
-state "Product Detail" as detail
-state "Shopping Cart" as cart
-state "Customer Information" as customer
-state "Shipping Address" as shipping
-state "Shipping Method" as method
-state "Order Summary" as summary
-state "Order Confirmation" as confirmation
+Homepage --> ProductListing : Browse Category\n(header menu)
+Homepage --> ProductListing : Search Product\n(filters listing)
+Homepage --> ProductDetail : Click Featured Product
 
-note top of home
-  **Entry Point**
-  Global navigation available:
-  - Category selection (header)
-  - Search functionality
+ProductListing --> ProductListing : Search/Filter/Sort
+ProductListing --> ProductDetail : Select Product
+ProductListing --> Checkout : Quick Add to Cart
+ProductListing --> Homepage : Return Home
+
+ProductDetail --> ProductDetail : View Recommended Product
+ProductDetail --> Checkout : Add to Cart
+ProductDetail --> ProductListing : Back to Listing
+ProductDetail --> Homepage : Return Home
+
+Checkout --> OrderConfirmation : Complete Order
+Checkout --> ProductListing : Continue Shopping
+
+OrderConfirmation --> Homepage : Return Home
+OrderConfirmation --> ProductListing : Browse More Products
+OrderConfirmation --> [*] : Exit Site
+
+note right of Homepage
+  **Global Header (all pages):**
+  • Logo → Home
+  • Category Menu
+  • Search Bar → filters Product Listing
+  • Cart Icon → opens side panel
 end note
 
-[*] --> home : User enters site
-
-home --> listing : Browse Category\n(via header)
-home --> search : Search Product
-home --> detail : Featured Product
-
-search --> listing : View Results
-search --> home : Clear Search
-
-listing --> detail : Select Product
-listing --> listing : Filter/Sort\nChange Category
-listing --> home : Return Home
-
-detail --> cart : Add to Cart
-detail --> listing : Back to Listing
-detail --> detail : View Recommended\nProduct
-detail --> home : Return Home
-
-note right of detail
-  **Product Actions**
-  - View details
-  - Add to cart
-  - Browse recommendations
+note right of Checkout
+  **Cart Side Panel:**
+  • View cart items
+  • Update quantities
+  • Remove products
+  • View subtotal
+  • Proceed to Checkout
 end note
-
-cart --> customer : Proceed to\nCheckout
-cart --> listing : Continue\nShopping
-cart --> cart : Update\nQuantities
-
-note top of customer
-  **Checkout Process**
-  Sequential flow - all steps required
-end note
-
-customer --> shipping : Continue
-shipping --> method : Continue
-method --> summary : Continue
-summary --> confirmation : Confirm\nOrder
-
-confirmation --> home : Return Home
-confirmation --> [*] : Exit Site
-
-legend right
-  |= Symbol |= Meaning |
-  | → | User navigation |
-  | State | Page/Screen |
-
-  **Navigation Notes:**
-  • Categories accessible globally via header
-  • Multiple paths to Product Detail
-  • Checkout is linear process
-endlegend
 
 @enduml
