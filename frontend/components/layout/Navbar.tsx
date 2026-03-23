@@ -25,13 +25,13 @@ export default function Navbar() {
                 <span aria-hidden="true">→</span>
             </div>
 
-            <div className="grid h-[76px] grid-cols-3 items-center bg-[#f3f3f3] px-4 sm:px-6 lg:grid-cols-[auto_1fr_auto]">
+            <div className="grid h-[76px] grid-cols-[auto_1fr_auto] items-center bg-[#f3f3f3] px-4 sm:px-6">
                 <div className="flex items-center justify-start lg:hidden">
                     <button
                         type="button"
                         aria-label="Open menu"
                         onClick={() => setIsMenuOpen(true)}
-                        className="flex h-10 w-10 items-center justify-center"
+                        className="flex h-10 w-10 items-center justify-center mr-14"
                     >
                         <Image
                             src="/icons/menuButton.svg"
