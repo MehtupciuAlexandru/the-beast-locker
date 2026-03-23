@@ -25,7 +25,7 @@ export default function Navbar() {
                 <span aria-hidden="true">→</span>
             </div>
 
-            <div className="grid h-[76px] grid-cols-[auto_1fr_auto] items-center bg-[#f3f3f3] px-4 sm:px-6">
+            <div className="grid h-[76px] grid-cols-[auto_1fr_auto] items-center bg-[#f3f3f3] pl-4 sm:px-6">
                 <div className="flex items-center justify-start lg:hidden">
                     <button
                         type="button"
