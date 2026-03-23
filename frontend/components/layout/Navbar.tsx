@@ -9,7 +9,7 @@ import SearchOverlay from "@/components/layout/SearchOverlay";
 const desktopLinks = [
     { label: "Echipamente", href: "/products?category=echipamente" },
     { label: "Îmbrăcăminte", href: "/products?category=imbracaminte" },
-    { label: "Explorează", href: "/products?category=exploreaza" },
+    { label: "Explorează", href: "/products" },
 ];
 
 export default function Navbar() {
@@ -74,7 +74,7 @@ export default function Navbar() {
                         <Link
                             key={link.label}
                             href={link.href}
-                            className="text-xl font-semibold text-black transition hover:opacity-70"
+                            className="text-3xl font-GemunuRegular text-black transition hover:opacity-70"
                         >
                             {link.label}
                         </Link>

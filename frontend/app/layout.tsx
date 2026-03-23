@@ -17,6 +17,8 @@ export const metadata: Metadata = {
     description: "Premium athletic wear for the relentless. Sport, street and competition equipment. Coming 2025.",
 };
 
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
