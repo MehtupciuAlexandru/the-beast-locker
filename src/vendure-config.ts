@@ -88,25 +88,30 @@ export const config: VendureConfig = {
         GraphiqlPlugin.init(),
         ProductCustomizationPlugin,
         BeastLockerPlugin,
-        AssetServerPlugin.init({
-            route: 'assets',
-            assetUploadDir: path.join(__dirname, '../static/assets'),
-
-            storageStrategyFactory: useS3
-                ? configureS3AssetStorage({
-                    bucket: process.env.S3_BUCKET!,
-                    credentials: {
-                        accessKeyId: process.env.S3_ACCESS_KEY_ID!,
-                        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
-                    },
-                    nativeS3Configuration: {
-                        endpoint: process.env.S3_ENDPOINT,
-                        region: process.env.S3_REGION,
-                        forcePathStyle: true,
-                    },
-                })
-                : undefined,
-        }),
+        AssetServerPlugin.init(
+            useS3
+                ? {
+                    route: 'assets',
+                    assetUploadDir: path.join(__dirname, '../static/assets'),
+                    storageStrategyFactory: configureS3AssetStorage({
+                        bucket: process.env.S3_BUCKET!,
+                        credentials: {
+                            accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+                            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
+                        },
+                        nativeS3Configuration: {
+                            endpoint: process.env.S3_ENDPOINT!,
+                            region: process.env.S3_REGION!,
+                            forcePathStyle: true,
+                            signatureVersion: 'v4',
+                        },
+                    }),
+                }
+                : {
+                    route: 'assets',
+                    assetUploadDir: path.join(__dirname, '../static/assets'),
+                }
+        ),
         DefaultSchedulerPlugin.init(),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
         DefaultSearchPlugin.init({ bufferUpdates: false, indexStockStatus: true }),
