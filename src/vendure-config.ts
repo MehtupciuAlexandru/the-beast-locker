@@ -18,6 +18,7 @@ const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
 import { ProductCustomizationPlugin } from './plugins/product-customization/product-customization.plugin';
 import {BeastLockerPlugin} from "./plugins/product-customization/beast-locker.plugin";
+const useS3 = process.env.APP_ENV !== 'dev';
 
 
 export const config: VendureConfig = {
@@ -89,23 +90,21 @@ export const config: VendureConfig = {
         AssetServerPlugin.init({
             route: 'assets',
             assetUploadDir: path.join(__dirname, '../static/assets'),
-            assetUrlPrefix: process.env.APP_URL
-                ? `${process.env.APP_URL}/assets`
-                : undefined,
 
-            storageStrategyFactory: configureS3AssetStorage({
-                bucket: process.env.S3_BUCKET!,
-                credentials: {
-                    accessKeyId: process.env.S3_ACCESS_KEY_ID!,
-                    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
-                },
-                nativeS3Configuration: {
-                    endpoint: process.env.S3_ENDPOINT,
-                    region: process.env.S3_REGION,
-                    forcePathStyle: true,
-                    signatureVersion: 'v4',
-                },
-            }),
+            storageStrategyFactory: useS3
+                ? configureS3AssetStorage({
+                    bucket: process.env.S3_BUCKET!,
+                    credentials: {
+                        accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+                        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
+                    },
+                    nativeS3Configuration: {
+                        endpoint: process.env.S3_ENDPOINT,
+                        region: process.env.S3_REGION,
+                        forcePathStyle: true,
+                    },
+                })
+                : undefined,
         }),
         DefaultSchedulerPlugin.init(),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
