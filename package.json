@@ -9,6 +9,7 @@
     "dev": "concurrently --kill-others npm:dev:*",
 
     "build": "tsc",
+    "build:dashboard": "vite build",
 
     "start": "node ./dist/index.js"
   },

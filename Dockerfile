@@ -9,7 +9,6 @@ RUN npm install --production
 COPY . .
 
 RUN npm run build && npm run build:dashboard
-
 EXPOSE 3000
 
 CMD ["npm", "run", "start"]
