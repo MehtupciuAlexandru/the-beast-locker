@@ -15,11 +15,10 @@ export default function ProductCardCompact({ product }: Props) {
             {/* Image */}
             <div className="bg-white p-2">
                 <div className="relative aspect-square w-full">
-                    <Image
+                    <img
                         src={product.image}
                         alt={product.name}
-                        fill
-                        className="object-contain"
+                        className="absolute inset-0 w-full h-full object-contain"
                     />
                 </div>
             </div>

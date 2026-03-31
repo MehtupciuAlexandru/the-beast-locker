@@ -25,7 +25,7 @@ export default function ProductsLayout({ products }: ProductsLayoutProps) {
     const [inStockOnly, setInStockOnly] = useState(false);
     const [sort, setSort] = useState<SortOption>("featured");
 
-    const [data, setData] = useState<ProductPreview[]>(products);
+    const [data, setData] = useState<ProductPreview[]>([]);
 
     const [columns, setColumns] = useState<1 | 2>(2);
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -61,7 +61,7 @@ export default function ProductsLayout({ products }: ProductsLayoutProps) {
 
     useEffect(() => {
         const fetchData = async () => {
-            const result = await getProducts(query);
+            const result = await getProducts();
             setData(result);
         };
 

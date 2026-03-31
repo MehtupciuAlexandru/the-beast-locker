@@ -1,38 +1,40 @@
-import { ProductPreview } from "@/types/product";
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
-type ProductsQuery = {
-    sizes: string[];
-    colors: string[];
-    inStock: boolean;
-    sort: string;
-};
-
-export async function getProducts(query: ProductsQuery): Promise<ProductPreview[]> {
-    console.log("QUERY →", query);
-
-    return [
-        {
-            id: "1",
-            name: "Tank Top Black",
-            slug: "tank-top-black",
-            image: "/images/products/tankTopProduct.jpeg",
-            price: 259,
+export async function getProducts() {
+    const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+            query: `
+        query {
+          products {
+            items {
+              id
+              name
+              slug
+              featuredAsset {
+                preview
+              }
+              variants {
+                price
+              }
+            }
+          }
+        }
+      `,
+        }),
+    });
 
-        {
-            id: "2",
-            name: "Gloves",
-            slug: "gloves",
-            image: "/images/products/glovesProduct.jpeg",
-            price: 259,
-        },
+    const json = await res.json();
 
-        {
-            id: "3",
-            name: "Tank Top Black",
-            slug: "tank-top-black",
-            image: "/images/products/tankTopProduct.jpeg",
-            price: 259,
-        },
-    ];
+    return json.data.products.items.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        image: p.featuredAsset?.preview || "",
+        price: p.variants[0]?.price || 0,
+    }));
+    console.log("FETCHING FROM VENDURE");
 }

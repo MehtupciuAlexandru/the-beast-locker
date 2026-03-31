@@ -16,7 +16,7 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                     isOpen ? "opacity-100 visible" : "opacity-0 invisible"
                 }`}
             />
-            
+
             {/* Sidebar */}
             <div
                 className={`fixed top-0 left-0 h-full w-[280px] bg-white z-50 transform transition-transform duration-300 ${

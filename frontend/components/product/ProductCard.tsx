@@ -15,11 +15,10 @@ export default function ProductCard({ product, className = "" }: ProductCardProp
             className={`block text-left ${className}`}
         >
             <div className="relative aspect-[3/4] w-full overflow-hidden bg-white">
-                <Image
+                <img
                     src={product.image}
                     alt={product.name}
-                    fill
-                    className="object-cover"
+                    className="absolute inset-0 w-full h-full object-cover"
                 />
             </div>
 
