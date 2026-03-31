@@ -19,7 +19,8 @@ const serverPort = +process.env.PORT || 3000;
 import { ProductCustomizationPlugin } from './plugins/product-customization/product-customization.plugin';
 import {BeastLockerPlugin} from "./plugins/product-customization/beast-locker.plugin";
 const useS3 = process.env.APP_ENV !== 'dev';
-
+console.log("APP_ENV:", process.env.APP_ENV);
+console.log("S3_BUCKET:", process.env.S3_BUCKET);
 
 export const config: VendureConfig = {
     apiOptions: {
