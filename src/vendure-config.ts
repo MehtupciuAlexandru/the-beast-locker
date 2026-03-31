@@ -8,7 +8,7 @@ import {
 } from '@vendure/core';
 
 import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader } from '@vendure/email-plugin';
-import { AssetServerPlugin } from '@vendure/asset-server-plugin';
+import {AssetServerPlugin, configureS3AssetStorage} from '@vendure/asset-server-plugin';
 import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
 import 'dotenv/config';
@@ -18,6 +18,7 @@ const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
 import { ProductCustomizationPlugin } from './plugins/product-customization/product-customization.plugin';
 import {BeastLockerPlugin} from "./plugins/product-customization/beast-locker.plugin";
+
 
 export const config: VendureConfig = {
     apiOptions: {
@@ -88,10 +89,23 @@ export const config: VendureConfig = {
         AssetServerPlugin.init({
             route: 'assets',
             assetUploadDir: path.join(__dirname, '../static/assets'),
-            // For local dev, the correct value for assetUrlPrefix should
-            // be guessed correctly, but for production it will usually need
-            // to be set manually to match your production url.
-            assetUrlPrefix: IS_DEV ? undefined : 'https://www.my-shop.com/assets/',
+            assetUrlPrefix: process.env.APP_URL
+                ? `${process.env.APP_URL}/assets`
+                : undefined,
+
+            storageStrategyFactory: configureS3AssetStorage({
+                bucket: process.env.S3_BUCKET!,
+                credentials: {
+                    accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+                    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
+                },
+                nativeS3Configuration: {
+                    endpoint: process.env.S3_ENDPOINT,
+                    region: process.env.S3_REGION,
+                    forcePathStyle: true,
+                    signatureVersion: 'v4',
+                },
+            }),
         }),
         DefaultSchedulerPlugin.init(),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),

@@ -7,13 +7,12 @@
     "dev:worker": "ts-node ./src/index-worker.ts",
     "dev:dashboard": "vite --clearScreen false",
     "dev": "concurrently --kill-others npm:dev:*",
-
     "build": "tsc",
     "build:dashboard": "vite build",
-
     "start": "node ./dist/index.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.101.0",
     "@vendure/asset-server-plugin": "3.5.3",
     "@vendure/core": "3.5.3",
     "@vendure/dashboard": "3.5.3",
