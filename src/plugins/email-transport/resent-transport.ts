@@ -1,6 +1,16 @@
 import { Resend } from 'resend';
 
-export function createResendTransport(apiKey: string) {
+export function createResendTransport(apiKey: string | undefined) {
+    if (!apiKey) {
+        return {
+            name: 'resend',
+            version: '1.0.0',
+            send: async (mail: any, callback: any) => {
+                callback(new Error('Resend API key not configured'));
+            }
+        };
+    }
+
     const resend = new Resend(apiKey);
 
     return {
@@ -17,14 +27,13 @@ export function createResendTransport(apiKey: string) {
 
                 console.log('Email sent via Resend:', result);
 
-                // Check if the response has an error
                 if (result.error) {
                     callback(result.error);
                 } else {
                     callback(null, { messageId: result.data?.id });
                 }
             } catch (error) {
-                console.error('Resend email error:', error);
+                console.error(' Resend email error:', error);
                 callback(error);
             }
         }
