@@ -45,6 +45,7 @@ export const config: VendureConfig = {
         } : {}),
     },
     authOptions: {
+        requireVerification: true,
         tokenMethod: 'cookie',
         superadminCredentials: {
             identifier: process.env.SUPERADMIN_USERNAME,
