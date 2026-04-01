@@ -9,7 +9,7 @@ export async function register(
 ) {
     const query = `
         mutation Register($input: RegisterCustomerInput!) {
-            registerCustomerAccount(input: $input) {
+            validatedRegisterCustomerAccount(input: $input) {
                 __typename
                 ... on Success {
                     success

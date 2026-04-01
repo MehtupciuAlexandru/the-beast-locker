@@ -14,7 +14,7 @@ export class AuthValidationResolver {
     constructor(private customerService: CustomerService) {}
 
     @Mutation()
-    async registerCustomerAccount(
+    async validatedRegisterCustomerAccount(
         @Args('input') input: any,
         @Ctx() ctx: RequestContext,
     ) {
