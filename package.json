@@ -9,7 +9,7 @@
     "dev": "concurrently --kill-others npm:dev:*",
     "build": "tsc",
     "build:dashboard": "vite build",
-    "start": "node ./dist/index.js"
+    "start": "node ./dist/index.js & node ./dist/index-worker.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1020.0",

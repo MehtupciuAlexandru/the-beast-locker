@@ -35,4 +35,6 @@ export class AuthValidationResolver {
         // Call Vendure's internal logic
         return this.customerService.registerCustomerAccount(ctx, input);
     }
+
+
 }
