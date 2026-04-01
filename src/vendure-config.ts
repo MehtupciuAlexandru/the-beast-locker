@@ -24,6 +24,15 @@ console.log("S3_BUCKET:", process.env.S3_BUCKET);
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const ADMIN_UI_URL = process.env.ADMIN_UI_URL;
 
+console.log("=== EMAIL CONFIG DEBUG ===");
+console.log("APP_ENV:", process.env.APP_ENV);
+console.log("IS_DEV:", IS_DEV);
+console.log("RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY);
+console.log("RESEND_API_KEY (first 10 chars):", process.env.RESEND_API_KEY?.substring(0, 10));
+console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
+console.log("Email mode:", IS_DEV ? "DEV MAILBOX" : "PRODUCTION SMTP");
+console.log("========================");
+
 export const config: VendureConfig = {
     apiOptions: {
         port: serverPort,
@@ -151,15 +160,15 @@ export const config: VendureConfig = {
                             user: 'resend',
                             pass: process.env.RESEND_API_KEY!,
                         },
-                        from: 'onboarding@resend.dev',
-                        logging: true, // for debugging
+                        from: 'onboarding@resend.dev', // ADD THIS
+                        logging: true, // ADD THIS for debugging
                     },
                     handlers: defaultEmailHandlers,
                     templateLoader: new FileBasedTemplateLoader(
                         path.join(__dirname, '../static/email/templates')
                     ),
                     globalTemplateVars: {
-                        fromAddress: 'The Beast Locker <onboarding@resend.dev>',
+                        fromAddress: 'The Beast Locker <onboarding@resend.dev>', // UPDATE THIS
                         verifyEmailAddressUrl: `${FRONTEND_URL}/verify`,
                         passwordResetUrl: `${FRONTEND_URL}/password-reset`,
                         changeEmailAddressUrl: `${FRONTEND_URL}/verify-email-address-change`,
