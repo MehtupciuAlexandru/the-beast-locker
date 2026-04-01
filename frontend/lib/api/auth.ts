@@ -32,7 +32,7 @@ export async function register(
 
     const data = await graphqlRequest(query, variables);
 
-    const result = data.registerCustomerAccount;
+    const result = data.validatedRegisterCustomerAccount;
 
     if (result.__typename !== "Success") {
         throw new Error(result.message || "Înregistrare eșuată");
