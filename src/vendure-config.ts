@@ -146,7 +146,7 @@ export const config: VendureConfig = {
                     transport: {
                         type: 'smtp',
                         host: 'smtp.resend.com',
-                        port: 587,
+                        port: 2525,
                         secure: false,
                         auth: {
                             user: 'resend',
