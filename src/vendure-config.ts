@@ -146,8 +146,8 @@ export const config: VendureConfig = {
                     transport: {
                         type: 'smtp',
                         host: 'smtp.resend.com',
-                        port: 2525,
-                        secure: false,
+                        port: 465,
+                        secure: true,
                         auth: {
                             user: 'resend',
                             pass: process.env.RESEND_API_KEY!,
