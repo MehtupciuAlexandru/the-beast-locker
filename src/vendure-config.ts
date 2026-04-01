@@ -18,20 +18,12 @@ const serverPort = +process.env.PORT || 3000;
 import { ProductCustomizationPlugin } from './plugins/product-customization/product-customization.plugin';
 import {BeastLockerPlugin} from "./plugins/product-customization/beast-locker.plugin";
 import {AuthValidationPlugin} from "./plugins/auth-validation/auth-validation-plugin";
+import {createResendTransport} from "./plugins/email-transport/resent-transport";
 const useS3 = process.env.APP_ENV !== 'dev';
 console.log("APP_ENV:", process.env.APP_ENV);
 console.log("S3_BUCKET:", process.env.S3_BUCKET);
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const ADMIN_UI_URL = process.env.ADMIN_UI_URL;
-
-console.log("=== EMAIL CONFIG DEBUG ===");
-console.log("APP_ENV:", process.env.APP_ENV);
-console.log("IS_DEV:", IS_DEV);
-console.log("RESEND_API_KEY exists:", !!process.env.RESEND_API_KEY);
-console.log("RESEND_API_KEY (first 10 chars):", process.env.RESEND_API_KEY?.substring(0, 10));
-console.log("FRONTEND_URL:", process.env.FRONTEND_URL);
-console.log("Email mode:", IS_DEV ? "DEV MAILBOX" : "PRODUCTION SMTP");
-console.log("========================");
 
 export const config: VendureConfig = {
     apiOptions: {
@@ -152,23 +144,13 @@ export const config: VendureConfig = {
                     },
                 }
                 : {
-                    transport: {
-                        type: 'smtp',
-                        host: 'smtp.resend.com',
-                        port: 587,
-                        auth: {
-                            user: 'resend',
-                            pass: process.env.RESEND_API_KEY!,
-                        },
-                        from: 'onboarding@resend.dev', // ADD THIS
-                        logging: true, // ADD THIS for debugging
-                    },
+                    transport: createResendTransport(process.env.RESEND_API_KEY!) as any,
                     handlers: defaultEmailHandlers,
                     templateLoader: new FileBasedTemplateLoader(
                         path.join(__dirname, '../static/email/templates')
                     ),
                     globalTemplateVars: {
-                        fromAddress: 'The Beast Locker <onboarding@resend.dev>', // UPDATE THIS
+                        fromAddress: 'The Beast Locker <onboarding@resend.dev>',
                         verifyEmailAddressUrl: `${FRONTEND_URL}/verify`,
                         passwordResetUrl: `${FRONTEND_URL}/password-reset`,
                         changeEmailAddressUrl: `${FRONTEND_URL}/verify-email-address-change`,
