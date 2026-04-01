@@ -125,20 +125,45 @@ export const config: VendureConfig = {
         DefaultSchedulerPlugin.init(),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
         DefaultSearchPlugin.init({ bufferUpdates: false, indexStockStatus: true }),
-        EmailPlugin.init({
-            devMode: true,
-            outputPath: path.join(__dirname, '../static/email/test-emails'),
-            route: 'mailbox',
-            handlers: defaultEmailHandlers,
-            templateLoader: new FileBasedTemplateLoader(path.join(__dirname, '../static/email/templates')),
-            globalTemplateVars: {
-
-                fromAddress: '"example" <noreply@example.com>',
-                verifyEmailAddressUrl: `${FRONTEND_URL}/verify`,
-                passwordResetUrl: `${FRONTEND_URL}/password-reset`,
-                changeEmailAddressUrl: `${FRONTEND_URL}/verify-email-address-change`,
-            },
-        }),
+        EmailPlugin.init(
+            IS_DEV
+                ? {
+                    devMode: true,
+                    outputPath: path.join(__dirname, '../static/email/test-emails'),
+                    route: 'mailbox',
+                    handlers: defaultEmailHandlers,
+                    templateLoader: new FileBasedTemplateLoader(
+                        path.join(__dirname, '../static/email/templates')
+                    ),
+                    globalTemplateVars: {
+                        fromAddress: '"example" <noreply@example.com>',
+                        verifyEmailAddressUrl: `${FRONTEND_URL}/verify`,
+                        passwordResetUrl: `${FRONTEND_URL}/password-reset`,
+                        changeEmailAddressUrl: `${FRONTEND_URL}/verify-email-address-change`,
+                    },
+                }
+                : {
+                    transport: {
+                        type: 'smtp',
+                        host: 'smtp.resend.com',
+                        port: 587,
+                        auth: {
+                            user: 'resend',
+                            pass: process.env.RESEND_API_KEY!,
+                        },
+                    },
+                    handlers: defaultEmailHandlers,
+                    templateLoader: new FileBasedTemplateLoader(
+                        path.join(__dirname, '../static/email/templates')
+                    ),
+                    globalTemplateVars: {
+                        fromAddress: 'onboarding@resend.dev',
+                        verifyEmailAddressUrl: `${FRONTEND_URL}/verify`,
+                        passwordResetUrl: `${FRONTEND_URL}/password-reset`,
+                        changeEmailAddressUrl: `${FRONTEND_URL}/verify-email-address-change`,
+                    },
+                }
+        ),
         DashboardPlugin.init({
             route: 'dashboard',
             appDir: IS_DEV

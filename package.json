@@ -18,10 +18,11 @@
     "@vendure/asset-server-plugin": "3.5.3",
     "@vendure/core": "3.5.3",
     "@vendure/dashboard": "3.5.3",
-    "@vendure/email-plugin": "3.5.3",
+    "@vendure/email-plugin": "^3.5.3",
     "@vendure/graphiql-plugin": "3.5.3",
     "dotenv": "17.2.4",
-    "pg": "8.18.0"
+    "pg": "8.18.0",
+    "resend": "^6.10.0"
   },
   "devDependencies": {
     "@vendure/cli": "3.5.3",
