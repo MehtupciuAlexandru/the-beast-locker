@@ -18,7 +18,6 @@ const serverPort = +process.env.PORT || 3000;
 import { ProductCustomizationPlugin } from './plugins/product-customization/product-customization.plugin';
 import {BeastLockerPlugin} from "./plugins/product-customization/beast-locker.plugin";
 import {AuthValidationPlugin} from "./plugins/auth-validation/auth-validation-plugin";
-import {createResendTransport} from "./plugins/email-transport/resent-transport";
 const useS3 = process.env.APP_ENV !== 'dev';
 console.log("APP_ENV:", process.env.APP_ENV);
 console.log("S3_BUCKET:", process.env.S3_BUCKET);
@@ -144,13 +143,22 @@ export const config: VendureConfig = {
                     },
                 }
                 : {
-                    transport: createResendTransport(process.env.RESEND_API_KEY!) as any,
+                    transport: {
+                        type: 'smtp',
+                        host: 'smtp.resend.com',
+                        port: 587,
+                        secure: false,
+                        auth: {
+                            user: 'resend',
+                            pass: process.env.RESEND_API_KEY!,
+                        },
+                    },
                     handlers: defaultEmailHandlers,
                     templateLoader: new FileBasedTemplateLoader(
                         path.join(__dirname, '../static/email/templates')
                     ),
                     globalTemplateVars: {
-                        fromAddress: 'The Beast Locker <onboarding@resend.dev>',
+                        fromAddress: 'Beast Locker <noreply@beast-locker.ro>',
                         verifyEmailAddressUrl: `${FRONTEND_URL}/verify`,
                         passwordResetUrl: `${FRONTEND_URL}/password-reset`,
                         changeEmailAddressUrl: `${FRONTEND_URL}/verify-email-address-change`,
