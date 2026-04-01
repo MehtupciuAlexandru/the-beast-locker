@@ -151,13 +151,15 @@ export const config: VendureConfig = {
                             user: 'resend',
                             pass: process.env.RESEND_API_KEY!,
                         },
+                        from: 'onboarding@resend.dev',
+                        logging: true, // for debugging
                     },
                     handlers: defaultEmailHandlers,
                     templateLoader: new FileBasedTemplateLoader(
                         path.join(__dirname, '../static/email/templates')
                     ),
                     globalTemplateVars: {
-                        fromAddress: 'onboarding@resend.dev',
+                        fromAddress: 'The Beast Locker <onboarding@resend.dev>',
                         verifyEmailAddressUrl: `${FRONTEND_URL}/verify`,
                         passwordResetUrl: `${FRONTEND_URL}/password-reset`,
                         changeEmailAddressUrl: `${FRONTEND_URL}/verify-email-address-change`,
