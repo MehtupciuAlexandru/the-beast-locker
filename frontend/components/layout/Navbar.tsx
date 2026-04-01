@@ -97,8 +97,8 @@ export default function Navbar() {
                         />
                     </button>
 
-                    <button
-                        type="button"
+                    <Link
+                        href="/account"
                         aria-label="Account"
                         className="flex h-10 w-10 items-center justify-center"
                     >
@@ -109,10 +109,10 @@ export default function Navbar() {
                             height={22}
                             className="h-[22px] w-[22px]"
                         />
-                    </button>
+                    </Link>
 
-                    <button
-                        type="button"
+                    <Link
+                        href="/cart"
                         aria-label="Cart"
                         className="flex h-10 w-10 items-center justify-center"
                     >
@@ -123,7 +123,7 @@ export default function Navbar() {
                             height={22}
                             className="h-[22px] w-[22px]"
                         />
-                    </button>
+                    </Link>
                 </div>
             </div>
 

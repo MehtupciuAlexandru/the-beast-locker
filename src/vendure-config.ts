@@ -13,14 +13,16 @@ import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
 import 'dotenv/config';
 import path from 'path';
-
 const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
 import { ProductCustomizationPlugin } from './plugins/product-customization/product-customization.plugin';
 import {BeastLockerPlugin} from "./plugins/product-customization/beast-locker.plugin";
+import {AuthValidationPlugin} from "./plugins/auth-validation/auth-validation-plugin";
 const useS3 = process.env.APP_ENV !== 'dev';
 console.log("APP_ENV:", process.env.APP_ENV);
 console.log("S3_BUCKET:", process.env.S3_BUCKET);
+const FRONTEND_URL = process.env.FRONTEND_URL;
+const ADMIN_UI_URL = process.env.ADMIN_UI_URL;
 
 export const config: VendureConfig = {
     apiOptions: {
@@ -28,22 +30,29 @@ export const config: VendureConfig = {
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
         trustProxy: IS_DEV ? false : 1,
-        // The following options are useful in development mode,
-        // but are best turned off for production for security
-        // reasons.
+
+        cors: {
+            origin: IS_DEV
+                ? ['http://localhost:3001']
+                : [FRONTEND_URL!],
+            credentials: true,
+        },
+
         ...(IS_DEV ? {
             adminApiDebug: true,
             shopApiDebug: true,
         } : {}),
     },
     authOptions: {
-        tokenMethod: ['bearer', 'cookie'],
+        tokenMethod: 'cookie',
         superadminCredentials: {
             identifier: process.env.SUPERADMIN_USERNAME,
             password: process.env.SUPERADMIN_PASSWORD,
         },
         cookieOptions: {
-          secret: process.env.COOKIE_SECRET,
+            secret: process.env.COOKIE_SECRET,
+            sameSite: IS_DEV ? 'lax' : 'none',
+            secure: !IS_DEV,
         },
     },
     dbConnectionOptions: {
@@ -88,6 +97,7 @@ export const config: VendureConfig = {
         GraphiqlPlugin.init(),
         ProductCustomizationPlugin,
         BeastLockerPlugin,
+        AuthValidationPlugin,
         AssetServerPlugin.init(
             useS3
                 ? {
@@ -122,12 +132,11 @@ export const config: VendureConfig = {
             handlers: defaultEmailHandlers,
             templateLoader: new FileBasedTemplateLoader(path.join(__dirname, '../static/email/templates')),
             globalTemplateVars: {
-                // The following variables will change depending on your storefront implementation.
-                // Here we are assuming a storefront running at http://localhost:8080.
+
                 fromAddress: '"example" <noreply@example.com>',
-                verifyEmailAddressUrl: 'http://localhost:8080/verify',
-                passwordResetUrl: 'http://localhost:8080/password-reset',
-                changeEmailAddressUrl: 'http://localhost:8080/verify-email-address-change'
+                verifyEmailAddressUrl: `${FRONTEND_URL}/verify`,
+                passwordResetUrl: `${FRONTEND_URL}/password-reset`,
+                changeEmailAddressUrl: `${FRONTEND_URL}/verify-email-address-change`,
             },
         }),
         DashboardPlugin.init({
