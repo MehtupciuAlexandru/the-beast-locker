@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { verifyCustomerAccount } from "@/lib/api/auth";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/footer";
+export const dynamic = "force-dynamic";
 
 export default function VerifyPage() {
     const searchParams = useSearchParams();
