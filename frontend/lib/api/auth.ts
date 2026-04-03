@@ -88,11 +88,30 @@ export async function logout() {
 
 // ACTIVE CUSTOMER
 export async function getActiveCustomer() {
+
     const query = `
-        query {
+        query GetActiveCustomer {
             activeCustomer {
                 id
                 emailAddress
+                firstName
+                lastName
+                addresses {
+                    id
+                    fullName
+                    streetLine1
+                    streetLine2
+                    city
+                    province
+                    postalCode
+                    phoneNumber
+                    defaultShippingAddress
+                    defaultBillingAddress
+                    country {
+                        code
+                        name
+                    }
+                }
             }
         }
     `;

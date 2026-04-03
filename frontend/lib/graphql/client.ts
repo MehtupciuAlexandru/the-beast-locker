@@ -10,7 +10,7 @@ export async function graphqlRequest(
         headers: {
             "Content-Type": "application/json",
         },
-        credentials: withAuth ? "include" : "omit",
+        credentials: "include",
         body: JSON.stringify({
             query,
             variables,
