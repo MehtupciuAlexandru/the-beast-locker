@@ -32,7 +32,7 @@ export class AuthValidationResolver {
             );
         }
 
-        // Call Vendure's internal logic
+        // Call Vendure internal
         return this.customerService.registerCustomerAccount(ctx, input);
     }
 
