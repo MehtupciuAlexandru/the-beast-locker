@@ -10,6 +10,7 @@ import {deleteCustomerAddress, setDefaultAddress, updateCustomerAddress} from "@
 import { updateCustomerDetails } from "@/lib/api/customer";
 import { updatePassword } from "@/lib/api/customer";
 import { createCustomerAddress } from "@/lib/api/customer";
+import {getAvailableCountries} from "@/lib/api/shop";
 
 
 export default function AccountPage() {
@@ -46,6 +47,8 @@ export default function AccountPage() {
     const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
 
     const [deleteAddressId, setDeleteAddressId] = useState<string | null>(null);
+
+    const [countries, setCountries] = useState<any[]>([]);
 
     const [newAddress, setNewAddress] = useState({
         fullName: "",
@@ -130,13 +133,27 @@ export default function AccountPage() {
         return () => clearTimeout(timer);
     }, [message]);
 
+    useEffect(() => {
+        const fetchCountries = async () => {
+            try {
+                const data = await getAvailableCountries();
+                setCountries(data.availableCountries || []);
+            } catch (err) {
+                console.error("Failed to fetch countries", err);
+            }
+        };
+
+        fetchCountries();
+    }, []);
+
     const handleAddAddress = async () => {
 
         if (
             !newAddress.fullName.trim() ||
             !newAddress.streetLine1.trim() ||
             !newAddress.city.trim() ||
-            !newAddress.postalCode.trim()
+            !newAddress.postalCode.trim() ||
+            !newAddress.countryCode.trim()
         ) {
             setMessage("Completează câmpurile obligatorii");
             setMessageType("error");
@@ -748,7 +765,7 @@ export default function AccountPage() {
                         />
 
                         <input
-                            placeholder="Adresă secundară"
+                            placeholder="Adresă secundară (opțional)"
                             value={newAddress.streetLine2}
                             onChange={(e) => setNewAddress({ ...newAddress, streetLine2: e.target.value })}
                             className="w-full border px-3 py-2 mb-3"
@@ -762,7 +779,7 @@ export default function AccountPage() {
                         />
 
                         <input
-                            placeholder="Județ"
+                            placeholder="Județ (opțional)"
                             value={newAddress.province}
                             onChange={(e) => setNewAddress({ ...newAddress, province: e.target.value })}
                             className="w-full border px-3 py-2 mb-3"
@@ -776,11 +793,27 @@ export default function AccountPage() {
                         />
 
                         <input
-                            placeholder="Telefon"
+                            placeholder="Telefon (opțional)"
                             value={newAddress.phoneNumber}
                             onChange={(e) => setNewAddress({ ...newAddress, phoneNumber: e.target.value })}
                             className="w-full border px-3 py-2 mb-4"
                         />
+
+                        <select
+                            value={newAddress.countryCode}
+                            onChange={(e) =>
+                                setNewAddress({ ...newAddress, countryCode: e.target.value })
+                            }
+                            className="w-full border px-3 py-2 mb-3"
+                        >
+                            <option value="">Selectează țara *</option>
+
+                            {countries.map((country) => (
+                                <option key={country.id} value={country.code}>
+                                    {country.name}
+                                </option>
+                            ))}
+                        </select>
 
                         <div className="flex justify-between">
                             <button
