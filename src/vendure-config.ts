@@ -35,11 +35,7 @@ export const config: VendureConfig = {
         cors: {
             origin: IS_DEV
                 ? ['http://localhost:3001']
-                : [
-                    'https://the-beast-locker.vercel.app',
-                    'https://beast-locker.ro',
-                    'https://www.beast-locker.ro',
-                ],
+                : [FRONTEND_URL!],
             credentials: true,
         },
 
@@ -59,7 +55,6 @@ export const config: VendureConfig = {
             secret: process.env.COOKIE_SECRET,
             sameSite: IS_DEV ? 'lax' : 'none',
             secure: !IS_DEV,
-            ...(IS_DEV ? {} : { domain: '.beast-locker.ro' }),
         },
     },
     dbConnectionOptions: {
