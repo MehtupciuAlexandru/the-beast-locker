@@ -738,7 +738,7 @@ export default function AccountPage() {
                     <div className="relative bg-white text-black w-full max-w-md p-6 rounded-md">
 
                         <h2 className="text-xl font-semibold mb-4">
-                            Adaugă adresă nouă
+                            Detalii adresă
                         </h2>
 
                         <input
