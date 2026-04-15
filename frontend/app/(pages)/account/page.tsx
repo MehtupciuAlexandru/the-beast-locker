@@ -557,9 +557,6 @@ export default function AccountPage() {
 
 
                         <div className="flex flex-col sm:flex-row gap-4 mt-6">
-                            <button className="rounded-lg flex-1 bg-black text-white px-6 py-3 hover:opacity-60 cursor-pointer">
-                                EDITEAZĂ ADRESA SELECTATĂ
-                            </button>
 
                             <button
                                 onClick={() => setIsEditOpen(true)}
