@@ -1,2 +1,2 @@
 // app/page.tsx
-export { default } from "./(pages)/comingsoon/page";
+export { default } from "./(pages)/home/page";
