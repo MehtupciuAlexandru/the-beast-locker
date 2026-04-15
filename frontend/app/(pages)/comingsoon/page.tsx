@@ -28,11 +28,12 @@ export default function Page() {
             {/* Content */}
             <div className="relative z-40 flex flex-col items-center justify-center h-screen gap-4 px-4">
                 <div>
-                    <img
+
+                        <img
                         src="/svg/beastLocker.svg"
                         alt="Logo"
                         className="w-[95vw] sm:w-[55vw] lg:w-[45vw] max-w-[900px] h-auto pr-5"
-                    />
+                        />
                 </div>
 
                 <div className="text-center mb-2 md:mb-3">
@@ -42,11 +43,11 @@ export default function Page() {
 
                     <div className="w-28 h-1 bg-[#27F2EB] mx-auto mt-4 animate-expand"></div>
                 </div>
-
-                <p className="text-sm md:text-base text-gray-300 mb-4 md:mb-6 animate-fade-in-up animation-delay-800">
-                    2026
-                </p>
-
+                <a href="/home">
+                    <p className="text-sm md:text-base text-gray-300 mb-4 md:mb-6 animate-fade-in-up animation-delay-800">
+                        2026
+                    </p>
+                </a>
                 <div className="flex gap-4 justify-center animate-fade-in-up animation-delay-1000 mb-2 md:mb-4">
                     <a href="#" className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/30 rounded-full text-white hover:bg-[#27F2EB] hover:text-black hover:scale-110 hover:-translate-y-1 transition-all">
                         <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24">

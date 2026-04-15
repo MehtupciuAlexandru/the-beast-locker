@@ -44,7 +44,7 @@ export default function Navbar() {
                 </div>
 
                 <div className="hidden lg:flex lg:items-center lg:justify-start">
-                    <Link href="/" aria-label="Go to homepage" className="flex items-center">
+                    <Link href="/home" aria-label="Go to homepage" className="flex items-center">
                         <Image
                             src="/logos/beastLockerLogo.svg"
                             alt="Beast Locker"
@@ -57,7 +57,7 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex items-center justify-center lg:hidden">
-                    <Link href="/" aria-label="Go to homepage" className="flex items-center justify-center">
+                    <Link href="/home" aria-label="Go to homepage" className="flex items-center justify-center">
                         <Image
                             src="/logos/beastLockerLogo.svg"
                             alt="Beast Locker"

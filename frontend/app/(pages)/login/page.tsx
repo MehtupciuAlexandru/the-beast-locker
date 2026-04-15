@@ -23,7 +23,7 @@ export default function LoginPage() {
 
         try {
             await login(email, password);
-            router.push("/");
+            router.push("/home");
         } catch (err: any) {
             const message = err.message || "";
 
