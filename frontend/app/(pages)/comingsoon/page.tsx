@@ -1,16 +1,16 @@
 'use client';
 
-export default function ComingSoon() {
+export default function Page() {
     return (
         <div className="fixed inset-0 bg-black overflow-hidden">
             {/* Background image layer */}
             <div className="absolute inset-0 -z-10 grid grid-cols-2 grid-rows-3 md:grid-cols-3 md:grid-rows-1 opacity-30">
-                <div className="bg-[url('/dancingMan.jpeg')] bg-cover bg-no-repeat bg-[position:30%_50%] md:bg-center" />
-                <div className="bg-[url('/blurryMan.jpeg')] bg-cover bg-no-repeat bg-[position:60%_35%] md:bg-center" />
-                <div className="bg-[url('/boxers.jpeg')] bg-cover bg-no-repeat bg-[position:50%_65%] md:bg-center" />
-                <div className="bg-[url('/boyOnWall.jpeg')] bg-cover bg-no-repeat bg-[position:55%_45%] md:bg-center" />
-                <div className="bg-[url('/armUpMan.jpeg')] bg-cover bg-no-repeat bg-[position:45%_35%] md:bg-center" />
-                <div className="bg-[url('/grafittiMan.jpeg')] bg-cover bg-no-repeat bg-[position:55%_40%] md:bg-center" />
+                <div className="bg-[url('/images/comingSoon/dancingMan.jpeg')] bg-cover bg-no-repeat bg-[position:30%_50%] md:bg-center" />
+                <div className="bg-[url('/images/comingSoon/blurryMan.jpeg')] bg-cover bg-no-repeat bg-[position:60%_35%] md:bg-center" />
+                <div className="bg-[url('/images/comingSoon/boxers.jpeg')] bg-cover bg-no-repeat bg-[position:50%_65%] md:bg-center" />
+                <div className="bg-[url('/images/comingSoon/boyOnWall.jpeg')] bg-cover bg-no-repeat bg-[position:55%_45%] md:bg-center" />
+                <div className="bg-[url('/images/comingSoon/armUpMan.jpeg')] bg-cover bg-no-repeat bg-[position:45%_35%] md:bg-center" />
+                <div className="bg-[url('/images/comingSoon/grafittiMan.jpeg')] bg-cover bg-no-repeat bg-[position:55%_40%] md:bg-center" />
             </div>
 
             {/* Top Rip */}
@@ -29,7 +29,7 @@ export default function ComingSoon() {
             <div className="relative z-40 flex flex-col items-center justify-center h-screen gap-4 px-4">
                 <div>
                     <img
-                        src="/beastLockerLogo.svg"
+                        src="/svg/beastLocker.svg"
                         alt="Logo"
                         className="w-[95vw] sm:w-[55vw] lg:w-[45vw] max-w-[900px] h-auto pr-5"
                     />
