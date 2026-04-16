@@ -43,7 +43,7 @@ export default function Page() {
 
                     <div className="w-28 h-1 bg-[#27F2EB] mx-auto mt-4 animate-expand"></div>
                 </div>
-                <a href="/home">
+                <a href="/">
                     <p className="text-sm md:text-base text-gray-300 mb-4 md:mb-6 animate-fade-in-up animation-delay-800">
                         2026
                     </p>
