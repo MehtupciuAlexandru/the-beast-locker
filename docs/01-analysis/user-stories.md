@@ -1,4 +1,4 @@
-# The Beast Locker — User Stories
+# The Beast Locker — User Stories (Updated)
 
 ---
 
@@ -14,10 +14,10 @@ As a visitor, I want to browse available products so that I can discover items o
 
 - Products are retrieved through the Shop GraphQL API.
 - Each product entry displays:
-    - product name
-    - primary image
-    - price
-    - slug (URL identifier).
+  - product name
+  - primary image
+  - price
+  - slug (URL identifier).
 - Product list supports pagination.
 
 ---
@@ -31,13 +31,13 @@ As a visitor, I want to view detailed product information so that I can evaluate
 **Acceptance Criteria**
 
 - Product page displays:
-    - product description
-    - product variants
-    - product assets (images)
-    - price information.
+  - product description
+  - product variants
+  - product assets (images)
+  - price information.
 - SEO metadata fields are available:
-    - `seoTitle`
-    - `seoDescription`.
+  - `seoTitle`
+  - `seoDescription`.
 
 ---
 
@@ -55,6 +55,21 @@ As a visitor, I want to browse collections so that I can discover themed product
 
 ---
 
+## US-A4 — Search and Filter Products
+
+**User Story**
+
+As a visitor, I want to search and filter products so that I can quickly find items that match my needs.
+
+**Acceptance Criteria**
+
+- Users can search products by keyword.
+- Users can apply filters (e.g., price, category, collection).
+- Results update dynamically based on filters.
+- Empty state is displayed when no results are found.
+
+---
+
 # Epic B — Cart and Checkout
 
 ## US-B1 — Add Product to Cart
@@ -66,7 +81,7 @@ As a visitor, I want to add products to a cart so that I can purchase them later
 **Acceptance Criteria**
 
 - When a product variant is added:
-    - an active order is created automatically if none exists.
+  - an active order is created automatically if none exists.
 - Cart contents are updated immediately.
 - Cart totals are recalculated.
 
@@ -76,7 +91,7 @@ As a visitor, I want to add products to a cart so that I can purchase them later
 
 **User Story**
 
-As a visitor, I want to modify the contents of my cart so that I can adjust my purchase.
+As a user, I want to modify the contents of my cart so that I can adjust my purchase.
 
 **Acceptance Criteria**
 
@@ -86,11 +101,11 @@ As a visitor, I want to modify the contents of my cart so that I can adjust my p
 
 ---
 
-## US-B3 — Checkout Preparation
+## US-B3 — Checkout
 
 **User Story**
 
-As a visitor, I want to provide my shipping and customer details so that I can place an order.
+As a user, I want to provide my shipping and customer details so that I can place an order.
 
 **Acceptance Criteria**
 
@@ -116,9 +131,9 @@ As a visitor, I want to create an account so that I can manage my orders and per
 **Acceptance Criteria**
 
 - User can register with:
-    - name
-    - email
-    - password.
+  - name
+  - email
+  - password.
 - Account is stored in the backend through the Vendure Customer entity.
 
 ---
@@ -127,7 +142,7 @@ As a visitor, I want to create an account so that I can manage my orders and per
 
 **User Story**
 
-As a customer, I want to log into my account so that I can access my order history.
+As a customer, I want to log into my account so that I can access my order history and personal data.
 
 **Acceptance Criteria**
 
@@ -136,7 +151,50 @@ As a customer, I want to log into my account so that I can access my order histo
 
 ---
 
-## US-C3 — View Order History
+## US-C3 — View Account Details
+
+**User Story**
+
+As a customer, I want to view my account details so that I can verify my personal information.
+
+**Acceptance Criteria**
+
+- Customer can access account page.
+- Personal information (name, email) is displayed.
+
+---
+
+## US-C4 — Update Account Details
+
+**User Story**
+
+As a customer, I want to update my account details so that my personal information remains accurate.
+
+**Acceptance Criteria**
+
+- Customer can edit name and email.
+- Input validation is performed.
+- Changes are saved in the backend.
+
+---
+
+## US-C5 — Manage Addresses
+
+**User Story**
+
+As a customer, I want to manage my saved addresses so that I can use them during checkout.
+
+**Acceptance Criteria**
+
+- Customer can view a list of saved addresses.
+- Customer can add a new address.
+- Customer can update an existing address.
+- Customer can delete an address.
+- Validation is applied to address fields.
+
+---
+
+## US-C6 — View Order History
 
 **User Story**
 
@@ -146,10 +204,10 @@ As a customer, I want to view my previous orders so that I can track my purchase
 
 - Customer can retrieve a list of their orders.
 - Each order shows:
-    - order number
-    - items
-    - totals
-    - order status.
+  - order number
+  - items
+  - totals
+  - order status.
 
 ---
 
@@ -164,9 +222,9 @@ As an administrator, I want to manage products so that the catalog remains accur
 **Acceptance Criteria**
 
 - Admin can:
-    - create products
-    - update products
-    - delete products.
+  - create products
+  - update products
+  - delete products.
 - Product information includes assets and variants.
 
 ---

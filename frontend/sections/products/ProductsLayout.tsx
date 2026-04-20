@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ProductPreview } from "@/types/product";
 import ProductCardCompact from "@/components/product/ProductCardCompact";
 import FiltersSidebar from "@/components/filters/FiltersSidebar";
 import SortDropdown from "@/components/sort/SortDropdown";
-import { getProducts } from "@/lib/api/products";
 
 type SortOption =
     | "featured"
@@ -25,17 +24,8 @@ export default function ProductsLayout({ products }: ProductsLayoutProps) {
     const [inStockOnly, setInStockOnly] = useState(false);
     const [sort, setSort] = useState<SortOption>("featured");
 
-    const [data, setData] = useState<ProductPreview[]>([]);
-
     const [columns, setColumns] = useState<1 | 2>(2);
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-
-    const query = {
-        sizes: selectedSizes,
-        colors: selectedColors,
-        inStock: inStockOnly,
-        sort,
-    };
 
     const toggleSize = (size: string) => {
         setSelectedSizes((prev) =>
@@ -58,15 +48,6 @@ export default function ProductsLayout({ products }: ProductsLayoutProps) {
         setSelectedColors([]);
         setInStockOnly(false);
     };
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const result = await getProducts();
-            setData(result);
-        };
-
-        fetchData();
-    }, [selectedSizes, selectedColors, inStockOnly, sort]);
 
     return (
         <section className="w-full bg-[#f3f3f3] px-6 lg:px-12 py-8">
@@ -139,7 +120,7 @@ export default function ProductsLayout({ products }: ProductsLayoutProps) {
                             columns === 1 ? "grid-cols-1" : "grid-cols-2"
                         } md:grid-cols-3 gap-x-8 gap-y-12`}
                     >
-                        {data.map((product) => (
+                        {products.map((product) => (
                             <ProductCardCompact
                                 key={product.id}
                                 product={product}
@@ -152,7 +133,6 @@ export default function ProductsLayout({ products }: ProductsLayoutProps) {
 
             {/* Mobile Filters Modal */}
             <>
-                {/* Overlay */}
                 <div
                     onClick={() => setMobileFiltersOpen(false)}
                     className={`fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 ${
@@ -160,7 +140,6 @@ export default function ProductsLayout({ products }: ProductsLayoutProps) {
                     }`}
                 />
 
-                {/* Drawer */}
                 <div
                     className={`fixed top-0 left-0 h-full w-[280px] bg-white z-50 p-6 overflow-y-auto transform transition-transform duration-300 ${
                         mobileFiltersOpen ? "translate-x-0" : "-translate-x-full"

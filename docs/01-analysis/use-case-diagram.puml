@@ -1,26 +1,57 @@
 @startuml
-
 left to right direction
 
 actor Visitor
 actor Customer
 actor Admin
 
-rectangle "Beast Locker System" {
+Customer --|> Visitor
 
-  Visitor --> (Browse Products)
-  Visitor --> (View Product Details)
-  Visitor --> (Browse Collections)
-  Visitor --> (Search / Filter Products)
-  Visitor --> (Add Product to Cart)
+rectangle "The Beast Locker System" {
 
-  Customer --> (Manage Cart)
-  Customer --> (Checkout)
+    package "Shopping" {
+        (Browse Products) as UC1
+        (View Product Details) as UC2
+        (Browse Collections) as UC3
+        (Search / Filter Products) as UC4
+        (Add to Cart) as UC5
+        (Update Cart) as UC6
+        (Checkout) as UC7
+    }
 
-  Admin --> (Manage Products)
-  Admin --> (Manage Collections)
-  Admin --> (Process Orders)
+    package "Account Management" {
+        (View Account Details) as UC11
+        (Update Account Details) as UC12
+        (View Addresses) as UC13
+        (Add Address) as UC14
+        (Update Address) as UC15
+        (Delete Address) as UC16
+    }
 
+    package "Administration" {
+        (Manage Products) as UC8
+        (Manage Collections) as UC9
+        (Process Orders) as UC10
+    }
 }
+
+Visitor --> UC1
+Visitor --> UC2
+Visitor --> UC3
+Visitor --> UC4
+Visitor --> UC5
+Visitor --> UC6
+Visitor --> UC7
+
+Customer --> UC11
+Customer --> UC12
+Customer --> UC13
+Customer --> UC14
+Customer --> UC15
+Customer --> UC16
+
+Admin --> UC8
+Admin --> UC9
+Admin --> UC10
 
 @enduml

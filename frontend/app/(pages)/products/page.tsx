@@ -6,13 +6,17 @@ import { mockProducts } from "@/lib/mocks/products";
 import Navbar from "@/components/layout/Navbar";
 import RecentlyViewed from "@/sections/products/RecentlyViewed";
 import Footer from "@/components/layout/footer";
+import { getProducts } from "@/lib/api/products";
 
-export default function ProductsPage() {
+
+export default async function ProductsPage() {
+    const products = await getProducts();
+
     return (
         <>
             <Navbar />
-            <ProductsLayout products={mockProducts} />
-            <RecentlyViewed products={mockProducts} />
+            <ProductsLayout products={products} />
+            <RecentlyViewed products={products} />
             <Footer />
         </>
         );
