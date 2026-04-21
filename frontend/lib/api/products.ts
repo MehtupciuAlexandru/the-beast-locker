@@ -49,7 +49,7 @@ export async function getProducts() {
         name: p.name,
         slug: p.slug,
         image: p.featuredAsset?.preview || "",
-        price: p.variants[0]?.price || 0,
+        price: (p.variants[0]?.price || 0) / 100,
     }));
 }
 
@@ -110,6 +110,6 @@ export async function getProductBySlug(slug: string) {
         description: p.description,
         image: p.featuredAsset?.preview || "",
         gallery: p.assets?.map((a: any) => a.preview) || [],
-        price: p.variants?.[0]?.price || 0,
+        price: (p.variants[0]?.price || 0) / 100,
     };
 }

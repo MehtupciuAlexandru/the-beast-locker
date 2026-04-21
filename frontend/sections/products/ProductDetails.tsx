@@ -198,7 +198,7 @@ export default function ProductDetails({ product }: Props) {
 
                         {/* Price */}
                         <p className="text-lg font-medium mb-6 text-black">
-                            {product.price} lei
+                            {product.price.toFixed(2)} RON
                         </p>
 
                         {/* Color Selection */}
@@ -385,7 +385,7 @@ export default function ProductDetails({ product }: Props) {
 
                         {/* Price */}
                         <p className="text-2xl font-medium mb-8 text-black">
-                            {product.price} lei
+                            {product.price.toFixed(2)} RON
                         </p>
 
                         {/* Color Selection */}
