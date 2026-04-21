@@ -52,3 +52,64 @@ export async function getProducts() {
         price: p.variants[0]?.price || 0,
     }));
 }
+
+
+export async function getProductBySlug(slug: string) {
+    if (!API_URL) {
+        throw new Error("NEXT_PUBLIC_API_URL is not defined");
+    }
+
+    const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            query: `
+                query GetProduct($slug: String!) {
+                    products(
+                        options: {
+                            filter: { slug: { eq: $slug } }
+                            take: 1
+                        }
+                    ) {
+                        items {
+                            id
+                            name
+                            slug
+                            description
+                            featuredAsset {
+                                preview
+                            }
+                            assets {
+                                preview
+                            }
+                            variants {
+                                id
+                                price
+                            }
+                        }
+                    }
+                }
+            `,
+            variables: { slug },
+        }),
+        cache: "no-store",
+    });
+
+    const json = await res.json();
+
+    const p = json?.data?.products?.items?.[0];
+
+    if (!p) return null;
+
+    return {
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        description: p.description,
+        image: p.featuredAsset?.preview || "",
+        gallery: p.assets?.map((a: any) => a.preview) || [],
+        price: p.variants?.[0]?.price || 0,
+    };
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ProductPreview } from "@/types/product";
 import ProductCardCompact from "@/components/product/ProductCardCompact";
 import FiltersSidebar from "@/components/filters/FiltersSidebar";
@@ -49,6 +49,20 @@ export default function ProductsLayout({ products }: ProductsLayoutProps) {
         setInStockOnly(false);
     };
 
+    const sortedProducts = useMemo(() => {
+        const result = [...products];
+
+        if (sort === "price_low") {
+            result.sort((a, b) => a.price - b.price);
+        }
+
+        if (sort === "price_high") {
+            result.sort((a, b) => b.price - a.price);
+        }
+
+        return result;
+    }, [products, sort]);
+
     return (
         <section className="w-full bg-[#f3f3f3] px-6 lg:px-12 py-8">
 
@@ -58,7 +72,28 @@ export default function ProductsLayout({ products }: ProductsLayoutProps) {
                     EXPLORE
                 </h1>
 
-                <div className="hidden lg:block">
+                {/* Desktop Sort */}
+                <div className="hidden lg:flex items-center gap-4">
+
+                    {/* Quick buttons for price sorting */}
+                    <button
+                        onClick={() => setSort("price_low")}
+                        className={`text-xs ${
+                            sort === "price_low" ? "font-bold" : ""
+                        }`}
+                    >
+                        PRICE ↑
+                    </button>
+
+                    <button
+                        onClick={() => setSort("price_high")}
+                        className={`text-xs ${
+                            sort === "price_high" ? "font-bold" : ""
+                        }`}
+                    >
+                        PRICE ↓
+                    </button>
+
                     <SortDropdown value={sort} onChange={setSort} />
                 </div>
             </div>
@@ -120,7 +155,7 @@ export default function ProductsLayout({ products }: ProductsLayoutProps) {
                             columns === 1 ? "grid-cols-1" : "grid-cols-2"
                         } md:grid-cols-3 gap-x-8 gap-y-12`}
                     >
-                        {products.map((product) => (
+                        {sortedProducts.map((product) => (
                             <ProductCardCompact
                                 key={product.id}
                                 product={product}
