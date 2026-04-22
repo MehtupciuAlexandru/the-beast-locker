@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useState } from "react";
 import SidebarMenu from "@/components/layout/SidebarMenu";
 import SearchOverlay from "@/components/layout/SearchOverlay";
+import CartDrawer from "@/components/cart/CartDrawer";
+import { useCartUI } from "@/lib/context/CartUIContext";
 
 const desktopLinks = [
     { label: "Echipamente", href: "/products?category=echipamente" },
@@ -15,6 +17,9 @@ const desktopLinks = [
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+
+    const { isOpen, openCart, closeCart } = useCartUI();
 
     return (
         <header className="w-full">
@@ -111,9 +116,9 @@ export default function Navbar() {
                         />
                     </Link>
 
-                    <Link
-                        href="/cart"
+                    <button
                         aria-label="Cart"
+                        onClick={openCart}
                         className="flex h-10 w-10 items-center justify-center"
                     >
                         <Image
@@ -123,7 +128,7 @@ export default function Navbar() {
                             height={22}
                             className="h-[22px] w-[22px]"
                         />
-                    </Link>
+                    </button>
                 </div>
             </div>
 
@@ -136,6 +141,9 @@ export default function Navbar() {
                 isOpen={isSearchOpen}
                 onClose={() => setIsSearchOpen(false)}
             />
+
+            <CartDrawer isOpen={isOpen} onClose={closeCart} />
+
         </header>
     );
 }

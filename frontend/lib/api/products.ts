@@ -22,7 +22,7 @@ export async function getProducts() {
                                 preview
                             }
                             variants {
-                                price
+                                priceWithTax
                             }
                         }
                     }
@@ -49,7 +49,7 @@ export async function getProducts() {
         name: p.name,
         slug: p.slug,
         image: p.featuredAsset?.preview || "",
-        price: (p.variants[0]?.price || 0) / 100,
+        price: (p.variants[0]?.priceWithTax || 0) / 100,
     }));
 }
 
@@ -86,7 +86,7 @@ export async function getProductBySlug(slug: string) {
                             }
                             variants {
                                 id
-                                price
+                                priceWithTax
                             }
                         }
                     }
@@ -103,13 +103,16 @@ export async function getProductBySlug(slug: string) {
 
     if (!p) return null;
 
+    const variant = p.variants?.[0];
+
     return {
         id: p.id,
+        variantId: variant?.id,
         name: p.name,
         slug: p.slug,
         description: p.description,
         image: p.featuredAsset?.preview || "",
         gallery: p.assets?.map((a: any) => a.preview) || [],
-        price: (p.variants[0]?.price || 0) / 100,
+        price: (variant?.priceWithTax || 0) / 100,
     };
 }

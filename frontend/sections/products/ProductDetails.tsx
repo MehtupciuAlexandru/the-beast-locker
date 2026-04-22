@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
+import { addToCart } from "@/lib/api/cart";
+import { useCartUI } from "@/lib/context/CartUIContext";
 
 type Props = {
     product: any;
@@ -62,21 +64,31 @@ export default function ProductDetails({ product }: Props) {
     ];
     const [selectedColor, setSelectedColor] = useState(colors[0].name);
 
+    const { openCart } = useCartUI();
+
+    const handleAddToCart = async () => {
+        if (!product.variantId) return;
+
+        await addToCart(product.variantId);
+
+        openCart();
+    };
+
     return (
         <>
             {/* Size Guide Modal */}
             {isSizeGuideOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+                    className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 cursor-pointer"
                     onClick={() => setIsSizeGuideOpen(false)}
                 >
                     <div
-                        className="bg-white max-w-2xl w-full max-h-[80vh] overflow-y-auto p-6 relative"
+                        className="bg-white max-w-2xl w-full max-h-[80vh] overflow-y-auto p-6 relative cursor-default"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button
                             onClick={() => setIsSizeGuideOpen(false)}
-                            className="absolute top-4 right-4 p-2 hover:bg-gray-100"
+                            className="absolute top-4 right-4 p-2 hover:bg-gray-100 cursor-pointer"
                             aria-label="Close size guide"
                         >
                             <X className="w-5 h-5" />
@@ -137,7 +149,7 @@ export default function ProductDetails({ product }: Props) {
 
                     {/* Mobile Image Carousel */}
                     <div
-                        className="relative w-full aspect-[3/4] bg-white"
+                        className="relative w-full aspect-[3/4] bg-white cursor-pointer"
                         onTouchStart={handleTouchStart}
                         onTouchMove={handleTouchMove}
                         onTouchEnd={handleTouchEnd}
@@ -151,7 +163,7 @@ export default function ProductDetails({ product }: Props) {
                         {/* Navigation Arrows */}
                         <button
                             onClick={prevImage}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white transition-colors"
+                            className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white transition-colors cursor-pointer"
                             aria-label="Previous image"
                         >
                             <ChevronLeft className="w-5 h-5 text-black" />
@@ -159,7 +171,7 @@ export default function ProductDetails({ product }: Props) {
 
                         <button
                             onClick={nextImage}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white transition-colors"
+                            className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-white/90 hover:bg-white transition-colors cursor-pointer"
                             aria-label="Next image"
                         >
                             <ChevronRight className="w-5 h-5 text-black" />
@@ -171,7 +183,7 @@ export default function ProductDetails({ product }: Props) {
                                 <button
                                     key={i}
                                     onClick={() => setCurrentIndex(i)}
-                                    className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                                    className={`w-1.5 h-1.5 rounded-full transition-colors cursor-pointer ${
                                         currentIndex === i ? "bg-black" : "bg-gray-400"
                                     }`}
                                     aria-label={`Go to image ${i + 1}`}
@@ -211,7 +223,7 @@ export default function ProductDetails({ product }: Props) {
                                     <button
                                         key={color.name}
                                         onClick={() => setSelectedColor(color.name)}
-                                        className={`w-14 h-14 border-2 transition-colors ${
+                                        className={`w-14 h-14 border-2 transition-colors cursor-pointer ${
                                             selectedColor === color.name
                                                 ? "border-black"
                                                 : "border-gray-300"
@@ -239,7 +251,7 @@ export default function ProductDetails({ product }: Props) {
                                     <button
                                         key={size}
                                         onClick={() => setSelectedSize(size)}
-                                        className={`flex-1 py-2.5 text-sm border transition-colors ${
+                                        className={`flex-1 py-2.5 text-sm border transition-colors cursor-pointer ${
                                             selectedSize === size
                                                 ? "border-black bg-black text-white"
                                                 : "border-gray-300 bg-white text-black hover:border-black"
@@ -251,14 +263,17 @@ export default function ProductDetails({ product }: Props) {
                             </div>
                             <button
                                 onClick={() => setIsSizeGuideOpen(true)}
-                                className="text-xs underline text-black hover:no-underline"
+                                className="text-xs underline text-black hover:no-underline cursor-pointer"
                             >
                                 SIZE GUIDE
                             </button>
                         </div>
 
                         {/* Add to Cart Button */}
-                        <button className="w-full bg-black text-white py-4 text-sm font-medium uppercase tracking-wider mb-6 hover:bg-gray-800 transition-colors">
+                        <button
+                            onClick={handleAddToCart}
+                            className="w-full bg-black text-white py-4 text-sm font-medium uppercase tracking-wider mb-6 hover:bg-gray-800 transition-colors cursor-pointer"
+                        >
                             ADAUGĂ ÎN COȘ
                         </button>
 
@@ -268,7 +283,7 @@ export default function ProductDetails({ product }: Props) {
                             {/* Description */}
                             <button
                                 onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
-                                className="w-full flex items-center justify-between py-4 text-sm font-medium uppercase border-b border-gray-300 text-black"
+                                className="w-full flex items-center justify-between py-4 text-sm font-medium uppercase border-b border-gray-300 text-black cursor-pointer"
                             >
                                 DESCRIERE
                                 {isDescriptionOpen ? (
@@ -289,7 +304,7 @@ export default function ProductDetails({ product }: Props) {
                             {/* Composition & Care */}
                             <button
                                 onClick={() => setIsCompositionOpen(!isCompositionOpen)}
-                                className="w-full flex items-center justify-between py-4 text-sm font-medium uppercase border-b border-gray-300 text-black"
+                                className="w-full flex items-center justify-between py-4 text-sm font-medium uppercase border-b border-gray-300 text-black cursor-pointer"
                             >
                                 COMPOZIȚIE ȘI ÎNTREȚINERE
                                 {isCompositionOpen ? (
@@ -327,7 +342,7 @@ export default function ProductDetails({ product }: Props) {
                                 <button
                                     key={i}
                                     onClick={() => setCurrentIndex(i)}
-                                    className={`w-16 h-20 border-2 overflow-hidden transition-colors bg-white ${
+                                    className={`w-16 h-20 border-2 overflow-hidden transition-colors bg-white cursor-pointer ${
                                         currentIndex === i ? "border-black" : "border-gray-300"
                                     }`}
                                 >
@@ -351,7 +366,7 @@ export default function ProductDetails({ product }: Props) {
                             {/* Navigation Arrows */}
                             <button
                                 onClick={prevImage}
-                                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white/90 hover:bg-white shadow-md transition-colors"
+                                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white/90 hover:bg-white shadow-md transition-colors cursor-pointer"
                                 aria-label="Previous image"
                             >
                                 <ChevronLeft className="w-6 h-6 text-black" />
@@ -359,7 +374,7 @@ export default function ProductDetails({ product }: Props) {
 
                             <button
                                 onClick={nextImage}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white/90 hover:bg-white shadow-md transition-colors"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white/90 hover:bg-white shadow-md transition-colors cursor-pointer"
                                 aria-label="Next image"
                             >
                                 <ChevronRight className="w-6 h-6 text-black" />
@@ -398,7 +413,7 @@ export default function ProductDetails({ product }: Props) {
                                     <button
                                         key={color.name}
                                         onClick={() => setSelectedColor(color.name)}
-                                        className={`w-16 h-16 border-2 transition-colors ${
+                                        className={`w-16 h-16 border-2 transition-colors cursor-pointer ${
                                             selectedColor === color.name
                                                 ? "border-black"
                                                 : "border-gray-300"
@@ -426,7 +441,7 @@ export default function ProductDetails({ product }: Props) {
                                     <button
                                         key={size}
                                         onClick={() => setSelectedSize(size)}
-                                        className={`w-16 h-12 text-sm border transition-colors ${
+                                        className={`w-16 h-12 text-sm border transition-colors cursor-pointer ${
                                             selectedSize === size
                                                 ? "border-black bg-black text-white"
                                                 : "border-gray-300 bg-white text-black hover:border-black"
@@ -438,14 +453,17 @@ export default function ProductDetails({ product }: Props) {
                             </div>
                             <button
                                 onClick={() => setIsSizeGuideOpen(true)}
-                                className="text-xs underline hover:no-underline text-black"
+                                className="text-xs underline hover:no-underline text-black cursor-pointer"
                             >
                                 SIZE GUIDE
                             </button>
                         </div>
 
                         {/* Add to Cart Button */}
-                        <button className="w-full bg-black text-white py-4 text-sm font-medium uppercase tracking-wider mb-8 hover:bg-gray-800 transition-colors">
+                        <button
+                            onClick={handleAddToCart}
+                            className="w-full bg-black text-white py-4 text-sm font-medium uppercase tracking-wider mb-8 hover:bg-gray-800 transition-colors cursor-pointer"
+                        >
                             ADAUGĂ ÎN COȘ
                         </button>
 
@@ -455,7 +473,7 @@ export default function ProductDetails({ product }: Props) {
                             {/* Description */}
                             <button
                                 onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
-                                className="w-full flex items-center justify-between py-5 text-sm font-medium uppercase text-black"
+                                className="w-full flex items-center justify-between py-5 text-sm font-medium uppercase text-black cursor-pointer"
                             >
                                 DESCRIERE
                                 {isDescriptionOpen ? (
@@ -477,7 +495,7 @@ export default function ProductDetails({ product }: Props) {
                             <div className="border-t border-gray-300">
                                 <button
                                     onClick={() => setIsCompositionOpen(!isCompositionOpen)}
-                                    className="w-full flex items-center justify-between py-5 text-sm font-medium uppercase text-black"
+                                    className="w-full flex items-center justify-between py-5 text-sm font-medium uppercase text-black cursor-pointer"
                                 >
                                     COMPOZIȚIE ȘI ÎNTREȚINERE
                                     {isCompositionOpen ? (
