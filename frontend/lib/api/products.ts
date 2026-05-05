@@ -1,6 +1,6 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function getProducts(collectionSlug?: string) {
+export async function getProducts(collectionSlug?: string, searchTerm?: string) {
     if (!API_URL) {
         throw new Error("NEXT_PUBLIC_API_URL is not defined");
     }
@@ -12,9 +12,10 @@ export async function getProducts(collectionSlug?: string) {
         },
         body: JSON.stringify({
             query: `
-                query GetProducts($collectionSlug: String) {
+                query GetProducts($collectionSlug: String, $term: String) {
                     search(input: {
                         collectionSlug: $collectionSlug
+                        term: $term
                         groupByProduct: true
                     }) {
                         items {
@@ -38,6 +39,7 @@ export async function getProducts(collectionSlug?: string) {
             `,
             variables: {
                 collectionSlug: collectionSlug || undefined,
+                term: searchTerm || undefined,
             },
         }),
         cache: "no-store",

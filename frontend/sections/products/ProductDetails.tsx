@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import { addToCart } from "@/lib/api/cart";
 import { useCartUI } from "@/lib/context/CartUIContext";
+import { addRecentlyViewedProduct } from "@/lib/recentlyViewed";
 
 type Props = {
     product: any;
@@ -73,6 +74,18 @@ export default function ProductDetails({ product }: Props) {
 
         openCart();
     };
+
+    useEffect(() => {
+        if (!product?.id) return;
+
+        addRecentlyViewedProduct({
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            image: product.image,
+            price: product.price,
+        });
+    }, [product]);
 
     return (
         <>
