@@ -1,6 +1,6 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function getProducts() {
+export async function getProducts(collectionSlug?: string) {
     if (!API_URL) {
         throw new Error("NEXT_PUBLIC_API_URL is not defined");
     }
@@ -12,22 +12,33 @@ export async function getProducts() {
         },
         body: JSON.stringify({
             query: `
-                query {
-                    products {
+                query GetProducts($collectionSlug: String) {
+                    search(input: {
+                        collectionSlug: $collectionSlug
+                        groupByProduct: true
+                    }) {
                         items {
-                            id
-                            name
+                            productId
+                            productName
                             slug
-                            featuredAsset {
+                            productAsset {
                                 preview
                             }
-                            variants {
-                                priceWithTax
+                            priceWithTax {
+                                ... on SinglePrice {
+                                    value
+                                }
+                                ... on PriceRange {
+                                    min
+                                }
                             }
                         }
                     }
                 }
             `,
+            variables: {
+                collectionSlug: collectionSlug || undefined,
+            },
         }),
         cache: "no-store",
     });
@@ -38,21 +49,29 @@ export async function getProducts() {
 
     const json = await res.json();
 
-    if (!json?.data?.products?.items) {
+    if (json.errors) {
+        throw new Error(json.errors[0].message);
+    }
+
+    if (!json?.data?.search?.items) {
         throw new Error("Invalid products response");
     }
 
-    console.log("FETCHING FROM VENDURE");
+    return json.data.search.items.map((p: any) => {
+        const price =
+            p.priceWithTax?.value ??
+            p.priceWithTax?.min ??
+            0;
 
-    return json.data.products.items.map((p: any) => ({
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        image: p.featuredAsset?.preview || "",
-        price: (p.variants[0]?.priceWithTax || 0) / 100,
-    }));
+        return {
+            id: p.productId,
+            name: p.productName,
+            slug: p.slug,
+            image: p.productAsset?.preview || "",
+            price: price / 100,
+        };
+    });
 }
-
 
 export async function getProductBySlug(slug: string) {
     if (!API_URL) {

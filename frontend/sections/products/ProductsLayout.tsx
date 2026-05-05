@@ -16,9 +16,10 @@ type SortOption =
 
 type ProductsLayoutProps = {
     products: ProductPreview[];
+    title?: string;
 };
 
-export default function ProductsLayout({ products }: ProductsLayoutProps) {
+export default function ProductsLayout({ products, title = "Explorează" }: ProductsLayoutProps) {
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
     const [selectedColors, setSelectedColors] = useState<string[]>([]);
     const [inStockOnly, setInStockOnly] = useState(false);
@@ -68,8 +69,8 @@ export default function ProductsLayout({ products }: ProductsLayoutProps) {
 
             {/* Header */}
             <div className="mb-6 flex items-center justify-between">
-                <h1 className="text-xs tracking-widest text-black">
-                    EXPLORE
+                <h1 className="text-xs tracking-widest text-black uppercase">
+                    {title}
                 </h1>
 
                 {/* Desktop Sort */}
