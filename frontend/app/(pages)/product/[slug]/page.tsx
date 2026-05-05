@@ -20,7 +20,7 @@ export default async function ProductPage(
         <>
             <Navbar />
             <ProductDetails product={product} />
-            <RecentlyViewed products={products} />
+            <RecentlyViewed />
             <Footer />
         </>
     );
