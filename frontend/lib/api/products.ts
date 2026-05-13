@@ -1,78 +1,9 @@
+import { getProductsForListing } from "@/lib/api/search";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function getProducts(collectionSlug?: string, searchTerm?: string) {
-    if (!API_URL) {
-        throw new Error("NEXT_PUBLIC_API_URL is not defined");
-    }
-
-    const res = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            query: `
-                query GetProducts($collectionSlug: String, $term: String) {
-                    search(input: {
-                        collectionSlug: $collectionSlug
-                        term: $term
-                        groupByProduct: true
-                    }) {
-                        items {
-                            productId
-                            productName
-                            slug
-                            productAsset {
-                                preview
-                            }
-                            priceWithTax {
-                                ... on SinglePrice {
-                                    value
-                                }
-                                ... on PriceRange {
-                                    min
-                                }
-                            }
-                        }
-                    }
-                }
-            `,
-            variables: {
-                collectionSlug: collectionSlug || undefined,
-                term: searchTerm || undefined,
-            },
-        }),
-        cache: "no-store",
-    });
-
-    if (!res.ok) {
-        throw new Error(`Failed to fetch products: ${res.status}`);
-    }
-
-    const json = await res.json();
-
-    if (json.errors) {
-        throw new Error(json.errors[0].message);
-    }
-
-    if (!json?.data?.search?.items) {
-        throw new Error("Invalid products response");
-    }
-
-    return json.data.search.items.map((p: any) => {
-        const price =
-            p.priceWithTax?.value ??
-            p.priceWithTax?.min ??
-            0;
-
-        return {
-            id: p.productId,
-            name: p.productName,
-            slug: p.slug,
-            image: p.productAsset?.preview || "",
-            price: price / 100,
-        };
-    });
+    return getProductsForListing(collectionSlug, searchTerm);
 }
 
 export async function getProductBySlug(slug: string) {
@@ -109,6 +40,11 @@ export async function getProductBySlug(slug: string) {
                                 id
                                 priceWithTax
                             }
+                            customFields {
+                                seoTitle
+                                seoDescription
+                                searchKeywords
+                            }
                         }
                     }
                 }
@@ -118,7 +54,15 @@ export async function getProductBySlug(slug: string) {
         cache: "no-store",
     });
 
+    if (!res.ok) {
+        throw new Error(`Failed to fetch product: ${res.status}`);
+    }
+
     const json = await res.json();
+
+    if (json.errors) {
+        throw new Error(json.errors[0].message);
+    }
 
     const p = json?.data?.products?.items?.[0];
 
@@ -135,5 +79,8 @@ export async function getProductBySlug(slug: string) {
         image: p.featuredAsset?.preview || "",
         gallery: p.assets?.map((a: any) => a.preview) || [],
         price: (variant?.priceWithTax || 0) / 100,
+        seoTitle: p.customFields?.seoTitle || "",
+        seoDescription: p.customFields?.seoDescription || "",
+        searchKeywords: p.customFields?.searchKeywords || "",
     };
 }

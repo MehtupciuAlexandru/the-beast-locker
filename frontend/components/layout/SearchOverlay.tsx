@@ -1,68 +1,16 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Search, X, ArrowRight } from "lucide-react";
-
-// Types and API function are identical and preserved
-type SearchSuggestion = {
-    id: string;
-    name: string;
-    slug: string;
-    image: string;
-    price: number;
-};
+import { getSearchSuggestions, SearchSuggestion } from "@/lib/api/search";
 
 type SearchOverlayProps = {
     isOpen: boolean;
     onClose: () => void;
 };
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-async function searchProductSuggestions(term: string): Promise<SearchSuggestion[]> {
-    if (!API_URL) throw new Error("NEXT_PUBLIC_API_URL is not defined");
-
-    const res = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            query: `
-                query SearchSuggestions($term: String!) {
-                    search(input: { term: $term, groupByProduct: true, take: 5 }) {
-                        items {
-                            productId
-                            productName
-                            slug
-                            productAsset { preview }
-                            priceWithTax {
-                                ... on SinglePrice { value }
-                                ... on PriceRange { min }
-                            }
-                        }
-                    }
-                }
-            `,
-            variables: { term },
-        }),
-    });
-
-    if (!res.ok) throw new Error("Failed to fetch search suggestions");
-
-    const json = await res.json();
-
-    if (json.errors) throw new Error(json.errors[0].message);
-
-    return json.data.search.items.map((item: any) => ({
-        id: item.productId,
-        name: item.productName,
-        slug: item.slug,
-        image: item.productAsset?.preview || "",
-        price: (item.priceWithTax?.value ?? item.priceWithTax?.min ?? 0) / 100,
-    }));
-}
 
 export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     const [query, setQuery] = useState("");
@@ -96,7 +44,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         const timeout = setTimeout(async () => {
             try {
                 setIsLoading(true);
-                const results = await searchProductSuggestions(trimmedQuery);
+                const results = await getSearchSuggestions(trimmedQuery);
 
                 if (!cancelled) setSuggestions(results);
             } catch (error) {
@@ -192,7 +140,6 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
                             {!isLoading && suggestions.length > 0 && (
                                 <div>
-                                    {/* Section Header */}
                                     <div className="flex items-center justify-between bg-zinc-50 px-8 py-4 border-b border-zinc-100">
                                         <span className="text-[11px] font-black uppercase tracking-widest text-zinc-400">Sugestii Produse</span>
                                         <button
@@ -210,8 +157,8 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                                                 key={product.id}
                                                 href={`/product/${product.slug}`}
                                                 onClick={closeSearch}
-                                                className={`group flex items-center gap-6 px-6 py-5 transition-colors hover:bg-zinc-50/50 rounded-xl animate-in slide-in-from-top-2 duration-300`}
-                                                style={{ animationDelay: `${index * 80}ms`, animationFillMode: 'both' }}
+                                                className="group flex items-center gap-6 px-6 py-5 transition-colors hover:bg-zinc-50/50 rounded-xl animate-in slide-in-from-top-2 duration-300"
+                                                style={{ animationDelay: `${index * 80}ms`, animationFillMode: "both" }}
                                             >
                                                 <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-xl bg-zinc-100 shadow-inner group-hover:shadow-lg transition-shadow">
                                                     {product.image && (

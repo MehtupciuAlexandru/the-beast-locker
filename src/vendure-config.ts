@@ -95,6 +95,19 @@ export const config: VendureConfig = {
                 type: 'text',
                 nullable: true,
                 label: [{languageCode: LanguageCode.en, value: 'SEO Description'}],
+            },
+
+            {
+                name: 'searchKeywords',
+                type: 'text',
+                nullable: true,
+                label: [{languageCode: LanguageCode.en, value: 'Search Keywords'}],
+                description: [
+                    {
+                        languageCode: LanguageCode.en,
+                        value: 'Internal search terms and synonyms used to improve product search.',
+                    },
+                ],
             }
         ],
     },
