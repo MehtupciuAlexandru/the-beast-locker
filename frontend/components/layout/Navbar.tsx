@@ -10,8 +10,8 @@ import { useCartUI } from "@/lib/context/CartUIContext";
 
 const desktopLinks = [
     { label: "Echipamente", href: "/products?collection=equipment" },
-    { label: "Îmbrăcăminte", href: "/products?collection=clothes" },
-    { label: "Accesorii", href: "/products" },
+    { label: "Îmbrăcăminte", href: "/countdown" },
+    { label: "Accesorii", href: "/countdown" },
 ];
 
 export default function Navbar() {

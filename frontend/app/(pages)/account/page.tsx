@@ -197,7 +197,6 @@ export default function AccountPage() {
             setIsAddAddressOpen(false);
             resetAddressForm();
 
-            // reset form
             setNewAddress({
                 fullName: "",
                 company: "",
@@ -277,7 +276,7 @@ export default function AccountPage() {
     };
     if (loading || isAuthenticated === null) {
         return (
-            <section className="min-h-[80vh] flex items-center justify-center bg-white text-black">
+            <section className="min-h-[80vh] flex items-center justify-center bg-white text-neutral-800">
             </section>
         );
     }
@@ -364,7 +363,6 @@ export default function AccountPage() {
                 router.push("/login");
             }, 1500);
 
-            // reset fields
             setEditFirstName("");
             setEditLastName("");
             setNewPassword("");
@@ -384,58 +382,58 @@ export default function AccountPage() {
         <>
             <Navbar />
 
-            <section className="min-h-[80vh] px-4 py-10 bg-white text-black">
-                <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-12">
+            <section className="min-h-[80vh] px-8 md:px-16 py-12 bg-white text-neutral-800 font-sans">
+                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12 md:gap-20">
 
-                    <div className="flex-1">
+                    <div className="w-full md:w-3/5 flex flex-col">
+                        <button
+                            onClick={handleLogout}
+                            className="text-xs text-neutral-400 underline hover:text-neutral-800 mb-3 w-fit bg-transparent border-none p-0 cursor-pointer text-left normal-case tracking-normal font-normal shadow-none"
+                        >
+                            Logout
+                        </button>
 
-                        <h1 className="text-3xl font-semibold mb-2">
+                        <h1 className="text-xl font-normal text-neutral-800 mb-1">
                             Contul meu
                         </h1>
 
                         {loading ? (
-                            <p>Se încarcă...</p>
+                            <p className="text-xs text-neutral-400 mb-10">Se încarcă...</p>
                         ) : (
-                            <p className="text-gray-600 mb-8">
-                                Bine te-am regăsit, {firstName}!
+                            <p className="text-xs text-neutral-400 mb-10">
+                                Bine te-am regăsit, {firstName} {lastName}!
                             </p>
                         )}
 
-                        <div className="mb-8">
-                            <p className="text-sm text-gray-500 mb-2">
+                        <div className="mb-10">
+                            <p className="text-xs text-neutral-400 tracking-wide">
                                 Comenzile mele
                             </p>
-                            <div className="border-b mb-2"></div>
-                            <p className="text-gray-500">
+                            <div className="border-b border-neutral-200 mt-1.5 mb-3"></div>
+                            <p className="text-xs text-neutral-400 font-light">
                                 Încă nu aveți nicio comandă
                             </p>
                         </div>
 
-                        <div className="mb-8">
-                            <p className="text-sm text-gray-500 mb-2">
+                        <div className="mb-10">
+                            <p className="text-xs text-neutral-400 tracking-wide">
                                 Retururile mele
                             </p>
-                            <div className="border-b mb-2"></div>
-                            <p className="text-gray-500">
+                            <div className="border-b border-neutral-200 mt-1.5 mb-3"></div>
+                            <p className="text-xs text-neutral-400 font-light">
                                 Încă nu aveți niciun retur
                             </p>
                         </div>
-
-                        <button
-                            onClick={handleLogout}
-                            className="rounded-lg bg-black text-white px-6 py-3 mt-4 w-fit  hover:bg-red-500 cursor-pointer"
-                        >
-                            Logout
-                        </button>
                     </div>
 
-                    <div className="flex-1">
-                        <p className="text-sm text-gray-500 mb-4">
-                            Adresele mele
+                    <div className="w-full md:w-1/3 flex flex-col">
+                        <p className="text-xs text-neutral-400 tracking-wide">
+                            Adresa principală
                         </p>
+                        <div className="border-b border-neutral-200 mt-1.5 mb-4"></div>
 
                         {addresses.length > 0 ? (
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-6">
                                 {addresses.map((addr) => {
                                     const isSelected = selectedAddressId === addr.id;
                                     const isDefault = addr.defaultShippingAddress;
@@ -444,57 +442,40 @@ export default function AccountPage() {
                                         <div
                                             key={addr.id}
                                             onClick={() => setSelectedAddressId(addr.id)}
-                                            className={`border rounded-md p-5 flex flex-col justify-between cursor-pointer ${
-                                                isSelected ? "border-black" : "border-gray-300"
+                                            className={`text-sm text-neutral-600 flex flex-col gap-0.5 cursor-pointer transition-opacity ${
+                                                isSelected ? "opacity-100" : "opacity-60"
                                             }`}
                                         >
-
-                                            {/* TOP ROW: name + badge + radio */}
-                                            <div className="flex justify-between items-start">
-
-                                                <div>
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <p className="font-semibold">
-                                                            {addr.fullName || `${firstName ?? ""} ${lastName ?? ""}`.trim()}
-                                                        </p>
-
-                                                        {isDefault && (
-                                                            <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
-                        Adresă principală activă
-                    </span>
-                                                        )}
-                                                    </div>
+                                            <div className="flex justify-between items-center mb-1">
+                                                <p className="font-medium text-neutral-800">
+                                                    {addr.fullName || `${firstName ?? ""} ${lastName ?? ""}`.trim()}
+                                                </p>
+                                                <div className="flex items-center gap-2">
+                                                    {isDefault && (
+                                                        <span className="text-[10px] uppercase tracking-wider bg-neutral-100 text-neutral-600 px-2 py-0.5">
+                                                            Principală
+                                                        </span>
+                                                    )}
+                                                    <input
+                                                        type="radio"
+                                                        checked={isSelected}
+                                                        readOnly
+                                                        className="accent-neutral-800 pointer-events-none w-3 h-3"
+                                                    />
                                                 </div>
-
-                                                <input
-                                                    type="radio"
-                                                    checked={isSelected}
-                                                    readOnly
-                                                    className="mt-1 accent-black pointer-events-none"
-                                                />
                                             </div>
 
-                                            {/* address content */}
-                                            <div className="mt-2 text-gray-700">
-                                                <p>{addr.streetLine1}</p>
+                                            <p className="font-light">{addr.streetLine1}</p>
+                                            {addr.streetLine2 && <p className="font-light">{addr.streetLine2}</p>}
+                                            <p className="font-light">{addr.postalCode} {addr.city}</p>
+                                            {addr.province && <p className="font-light">{addr.province}</p>}
+                                            <p className="font-light">{addr.country?.name}</p>
 
-                                                {addr.streetLine2 && <p>{addr.streetLine2}</p>}
-
-                                                <p>{addr.postalCode} {addr.city}</p>
-
-                                                {addr.province && <p>{addr.province}</p>}
-
-                                                <p>{addr.country?.name}</p>
-                                            </div>
-
-                                            {/* bottom row buttons */}
-                                            <div className="flex justify-end items-center gap-3 mt-4">
+                                            <div className="flex items-center gap-4 mt-2">
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-
                                                         setEditingAddressId(addr.id);
-
                                                         setNewAddress({
                                                             fullName: addr.fullName || "",
                                                             company: addr.company || "",
@@ -506,38 +487,35 @@ export default function AccountPage() {
                                                             phoneNumber: addr.phoneNumber || "",
                                                             countryCode: addr.country?.code || "RO",
                                                         });
-
                                                         setIsAddAddressOpen(true);
                                                     }}
-                                                    className="text-sm underline cursor-pointer"
+                                                    className="text-xs underline text-neutral-400 hover:text-neutral-800 cursor-pointer bg-transparent border-none p-0 normal-case tracking-normal font-normal shadow-none"
                                                 >
                                                     Editează
                                                 </button>
 
                                                 <button
                                                     onClick={(e) => handleDeleteAddress(e, addr.id)}
-                                                    className="flex items-center justify-center hover:opacity-70 cursor-pointer"
+                                                    className="text-xs underline text-neutral-400 hover:text-red-600 cursor-pointer bg-transparent border-none p-0 normal-case tracking-normal font-normal shadow-none flex items-center justify-center"
                                                 >
-                                                    <img src="/svg/trash.svg" alt="Delete" className="w-12 h-12" />
+                                                    Șterge
                                                 </button>
-
                                             </div>
-
                                         </div>
                                     );
                                 })}
 
                             </div>
                         ) : (
-                            <p className="text-gray-500">
+                            <p className="text-xs text-neutral-400 font-light">
                                 Nu aveți adrese salvate
                             </p>
                         )}
 
-                        <div className="flex flex-col sm:flex-row gap-4 mt-6">
+                        <div className="flex flex-col gap-2 mt-6">
                             <button
                                 onClick={handleSetDefaultAddress}
-                                className="rounded-lg flex-1 bg-black text-white px-6 py-3 hover:opacity-60 disabled:opacity-40 cursor-pointer"
+                                className="bg-neutral-800 text-white text-xs uppercase tracking-widest py-3 px-6 rounded-none hover:bg-neutral-700 transition-colors cursor-pointer w-full text-center font-medium shadow-none border-none outline-none block"
                                 disabled={!selectedAddressId}
                             >
                                 SETEAZĂ ADRESA SELECTATĂ CA ACTIVĂ
@@ -548,19 +526,14 @@ export default function AccountPage() {
                                     resetAddressForm();
                                     setIsAddAddressOpen(true);
                                 }}
-                                className="rounded-lg flex-1 bg-black text-white px-6 py-3 hover:opacity-60 cursor-pointer"
+                                className="bg-neutral-800 text-white text-xs uppercase tracking-widest py-3 px-6 rounded-none hover:bg-neutral-700 transition-colors cursor-pointer w-full text-center font-medium shadow-none border-none outline-none block"
                             >
                                 ADAUGĂ ADRESĂ
                             </button>
 
-                        </div>
-
-
-                        <div className="flex flex-col sm:flex-row gap-4 mt-6">
-
                             <button
                                 onClick={() => setIsEditOpen(true)}
-                                className="rounded-lg flex-1 bg-black text-white px-6 py-3 hover:opacity-60 cursor-pointer"
+                                className="bg-neutral-800 text-white text-xs uppercase tracking-widest py-3 px-6 rounded-none hover:bg-neutral-700 transition-colors cursor-pointer w-full text-center font-medium shadow-none border-none outline-none block"
                             >
                                 EDITEAZĂ DETALIILE CONTULUI
                             </button>
@@ -571,100 +544,100 @@ export default function AccountPage() {
             </section>
 
             {isEditOpen && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-
-                    {/* Background overlay */}
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
                     <div
-                        className="absolute inset-0 bg-black/50"
+                        className="absolute inset-0 bg-neutral-800/50 backdrop-blur-xs transition-opacity"
                         onClick={() => setIsEditOpen(false)}
                     />
 
-                    {/* Modal */}
-                    <div className="relative bg-white text-black w-full max-w-md p-6 rounded-md shadow-lg">
-
-                        <h2 className="text-xl font-semibold mb-4">
-                            Editează detaliile contului
-                        </h2>
-
-                        <div className="mb-4">
-                            <label className="block text-sm mb-1">Prenume</label>
-                            <input
-                                type="text"
-                                value={editFirstName}
-                                onChange={(e) => setEditFirstName(e.target.value)}
-                                className="w-full border px-3 py-2"
-                                placeholder={firstName || ""}
-                            />
+                    <div className="relative bg-white text-neutral-800 w-full max-w-lg p-8 rounded-none border border-neutral-100 shadow-2xl overflow-y-auto max-h-[90vh]">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-sm font-semibold uppercase tracking-widest text-neutral-800">
+                                Editează detaliile contului
+                            </h2>
+                            <button
+                                onClick={() => setIsEditOpen(false)}
+                                className="text-neutral-400 hover:text-neutral-800 bg-transparent border-none p-0 cursor-pointer text-sm font-light"
+                            >
+                                ✕
+                            </button>
                         </div>
 
-                        <div className="mb-4">
-                            <label className="block text-sm mb-1">Nume</label>
-                            <input
-                                type="text"
-                                value={editLastName}
-                                onChange={(e) => setEditLastName(e.target.value)}
-                                className="w-full border px-3 py-2"
-                                placeholder={lastName || ""}
-                            />
+                        <div className="grid grid-cols-2 gap-4 mb-5">
+                            <div>
+                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Prenume</label>
+                                <input
+                                    type="text"
+                                    value={editFirstName}
+                                    onChange={(e) => setEditFirstName(e.target.value)}
+                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                    placeholder={firstName || ""}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Nume</label>
+                                <input
+                                    type="text"
+                                    value={editLastName}
+                                    onChange={(e) => setEditLastName(e.target.value)}
+                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                    placeholder={lastName || ""}
+                                />
+                            </div>
                         </div>
 
-                        <div className="mb-4">
-                            <label className="block text-sm mb-1">Parola curentă</label>
-
+                        <div className="mb-5">
+                            <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Parola curentă</label>
                             <div className="relative">
                                 <input
                                     type={showCurrentPassword ? "text" : "password"}
                                     value={currentPassword}
                                     onChange={(e) => setCurrentPassword(e.target.value)}
-                                    className="w-full border px-3 py-2 pr-12"
+                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs pr-16 outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200"
                                 />
-
                                 <button
                                     type="button"
                                     onClick={() => setShowCurrentPassword((prev) => !prev)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider text-neutral-400 hover:text-neutral-800 font-medium bg-transparent border-none cursor-pointer"
                                 >
                                     {showCurrentPassword ? "Ascunde" : "Arată"}
                                 </button>
                             </div>
                         </div>
 
-                        <div className="mb-4">
-                            <label className="block text-sm mb-1">Parolă nouă</label>
-
+                        <div className="mb-5">
+                            <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Parolă nouă</label>
                             <div className="relative">
                                 <input
                                     type={showNewPassword ? "text" : "password"}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full border px-3 py-2 pr-12"
+                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs pr-16 outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200"
                                 />
-
                                 <button
                                     type="button"
                                     onClick={() => setShowNewPassword((prev) => !prev)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider text-neutral-400 hover:text-neutral-800 font-medium bg-transparent border-none cursor-pointer"
                                 >
                                     {showNewPassword ? "Ascunde" : "Arată"}
                                 </button>
                             </div>
                         </div>
 
-                        <div className="mb-4">
-                            <label className="block text-sm mb-1">Confirmă parola</label>
-
+                        <div className="mb-5">
+                            <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Confirmă parola</label>
                             <div className="relative">
                                 <input
                                     type={showConfirmPassword ? "text" : "password"}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full border px-3 py-2 pr-12"
+                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs pr-16 outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200"
                                 />
-
                                 <button
                                     type="button"
                                     onClick={() => setShowConfirmPassword((prev) => !prev)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider text-neutral-400 hover:text-neutral-800 font-medium bg-transparent border-none cursor-pointer"
                                 >
                                     {showConfirmPassword ? "Ascunde" : "Arată"}
                                 </button>
@@ -672,20 +645,19 @@ export default function AccountPage() {
                         </div>
 
                         {newPassword && (
-                            <div className="mt-4 mb-4">
-                                <div className="h-2 w-full bg-gray-200 rounded">
+                            <div className="mt-4 mb-6">
+                                <div className="h-1 w-full bg-neutral-100 rounded-none">
                                     <div
-                                        className={`h-2 rounded ${
+                                        className={`h-1 rounded-none transition-all duration-300 ${
                                             getPasswordStrength(newPassword) === "weak"
-                                                ? "bg-red-500 w-1/3"
+                                                ? "bg-red-400 w-1/3"
                                                 : getPasswordStrength(newPassword) === "medium"
-                                                    ? "bg-yellow-500 w-2/3"
-                                                    : "bg-green-500 w-full"
+                                                    ? "bg-yellow-400 w-2/3"
+                                                    : "bg-emerald-500 w-full"
                                         }`}
                                     />
                                 </div>
-
-                                <p className="text-xs mt-1 text-gray-600">
+                                <p className="text-[10px] mt-1.5 uppercase tracking-wider text-neutral-400 font-medium">
                                     {getPasswordStrength(newPassword) === "weak" && "Parolă slabă"}
                                     {getPasswordStrength(newPassword) === "medium" && "Parolă medie"}
                                     {getPasswordStrength(newPassword) === "strong" && "Parolă puternică"}
@@ -693,17 +665,18 @@ export default function AccountPage() {
                             </div>
                         )}
 
-                        <div className="flex justify-between">
+                        <div className="flex justify-between gap-4 mt-8 pt-4 border-t border-neutral-100">
                             <button
                                 onClick={() => setIsEditOpen(false)}
-                                className="px-4 py-2 border hover:bg-black hover:text-white cursor-pointer"
+                                className="flex-1 px-4 py-3 border border-neutral-200 text-[11px] font-medium uppercase tracking-widest rounded-none text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800 transition-all cursor-pointer bg-white"
                             >
                                 Anulează
                             </button>
 
                             <button
                                 onClick={handleSaveAccount}
-                                className="bg-black text-white px-6 py-2 hover:opacity-60 cursor-pointer">
+                                className="flex-1 bg-neutral-800 text-white text-[11px] font-medium uppercase tracking-widest py-3 px-6 rounded-none hover:bg-neutral-700 transition-all cursor-pointer border-none"
+                            >
                                 Salvează
                             </button>
                         </div>
@@ -715,8 +688,8 @@ export default function AccountPage() {
             {message && (
                 <div className="fixed top-6 right-6 z-[9999]">
                     <div
-                        className={`px-4 py-3 rounded-md shadow-md text-white ${
-                            messageType === "success" ? "bg-green-600" : "bg-red-600"
+                        className={`px-5 py-3 rounded-none shadow-xl text-xs uppercase tracking-wider text-white font-medium ${
+                            messageType === "success" ? "bg-neutral-800" : "bg-red-600"
                         }`}
                     >
                         {message}
@@ -725,107 +698,149 @@ export default function AccountPage() {
             )}
 
             {isAddAddressOpen && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
                     <div
-                        className="absolute inset-0 bg-black/50"
+                        className="absolute inset-0 bg-neutral-800/50 backdrop-blur-xs transition-opacity"
                         onClick={() => setIsAddAddressOpen(false)}
                     />
 
-                    <div className="relative bg-white text-black w-full max-w-md p-6 rounded-md">
-
-                        <h2 className="text-xl font-semibold mb-4">
-                            Detalii adresă
-                        </h2>
-
-                        <input
-                            placeholder="Nume complet"
-                            value={newAddress.fullName}
-                            onChange={(e) => setNewAddress({ ...newAddress, fullName: e.target.value })}
-                            className="w-full border px-3 py-2 mb-3"
-                        />
-
-                        <input
-                            placeholder="Companie (opțional)"
-                            value={newAddress.company}
-                            onChange={(e) =>
-                                setNewAddress({ ...newAddress, company: e.target.value })
-                            }
-                            className="w-full border px-3 py-2 mb-3"
-                        />
-
-                        <input
-                            placeholder="Adresă"
-                            value={newAddress.streetLine1}
-                            onChange={(e) => setNewAddress({ ...newAddress, streetLine1: e.target.value })}
-                            className="w-full border px-3 py-2 mb-3"
-                        />
-
-                        <input
-                            placeholder="Adresă secundară (opțional)"
-                            value={newAddress.streetLine2}
-                            onChange={(e) => setNewAddress({ ...newAddress, streetLine2: e.target.value })}
-                            className="w-full border px-3 py-2 mb-3"
-                        />
-
-                        <input
-                            placeholder="Oraș"
-                            value={newAddress.city}
-                            onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
-                            className="w-full border px-3 py-2 mb-3"
-                        />
-
-                        <input
-                            placeholder="Județ (opțional)"
-                            value={newAddress.province}
-                            onChange={(e) => setNewAddress({ ...newAddress, province: e.target.value })}
-                            className="w-full border px-3 py-2 mb-3"
-                        />
-
-                        <input
-                            placeholder="Cod poștal"
-                            value={newAddress.postalCode}
-                            onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })}
-                            className="w-full border px-3 py-2 mb-3"
-                        />
-
-                        <input
-                            placeholder="Telefon (opțional)"
-                            value={newAddress.phoneNumber}
-                            onChange={(e) => setNewAddress({ ...newAddress, phoneNumber: e.target.value })}
-                            className="w-full border px-3 py-2 mb-4"
-                        />
-
-                        <select
-                            value={newAddress.countryCode}
-                            onChange={(e) =>
-                                setNewAddress({ ...newAddress, countryCode: e.target.value })
-                            }
-                            className="w-full border px-3 py-2 mb-3"
-                        >
-                            <option value="">Selectează țara *</option>
-
-                            {countries.map((country) => (
-                                <option key={country.id} value={country.code}>
-                                    {country.name}
-                                </option>
-                            ))}
-                        </select>
-
-                        <div className="flex justify-between">
+                    <div className="relative bg-white text-neutral-800 w-full max-w-xl p-8 rounded-none shadow-2xl overflow-y-auto max-h-[90vh]">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-sm font-semibold uppercase tracking-widest text-neutral-800">
+                                Detalii adresă
+                            </h2>
                             <button
                                 onClick={() => {
                                     setIsAddAddressOpen(false);
                                     resetAddressForm();
                                 }}
-                                className="px-4 py-2 border cursor-pointer hover:bg-black hover:text-white"
+                                className="text-neutral-400 hover:text-neutral-800 bg-transparent border-none p-0 cursor-pointer text-sm font-light"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Nume complet *</label>
+                                <input
+                                    placeholder="ex: Popescu Andrei"
+                                    value={newAddress.fullName}
+                                    onChange={(e) => setNewAddress({ ...newAddress, fullName: e.target.value })}
+                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Companie (opțional)</label>
+                                <input
+                                    placeholder="Numele companiei"
+                                    value={newAddress.company}
+                                    onChange={(e) => setNewAddress({ ...newAddress, company: e.target.value })}
+                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Adresă *</label>
+                                <input
+                                    placeholder="Strada, numărul, blocul, apartamentul"
+                                    value={newAddress.streetLine1}
+                                    onChange={(e) => setNewAddress({ ...newAddress, streetLine1: e.target.value })}
+                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Adresă secundară (opțional)</label>
+                                <input
+                                    placeholder="Alte detalii despre adresă"
+                                    value={newAddress.streetLine2}
+                                    onChange={(e) => setNewAddress({ ...newAddress, streetLine2: e.target.value })}
+                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Oraș *</label>
+                                    <input
+                                        placeholder="Oraș"
+                                        value={newAddress.city}
+                                        onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                                        className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Județ (opțional)</label>
+                                    <input
+                                        placeholder="Județ"
+                                        value={newAddress.province}
+                                        onChange={(e) => setNewAddress({ ...newAddress, province: e.target.value })}
+                                        className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Cod poștal *</label>
+                                    <input
+                                        placeholder="Cod poștal"
+                                        value={newAddress.postalCode}
+                                        onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })}
+                                        className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Telefon (opțional)</label>
+                                    <input
+                                        placeholder="Număr de telefon"
+                                        value={newAddress.phoneNumber}
+                                        onChange={(e) => setNewAddress({ ...newAddress, phoneNumber: e.target.value })}
+                                        className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Țară *</label>
+                                <div className="relative">
+                                    <select
+                                        value={newAddress.countryCode}
+                                        onChange={(e) => setNewAddress({ ...newAddress, countryCode: e.target.value })}
+                                        className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 appearance-none text-neutral-800"
+                                    >
+                                        <option value="">Selectează țara *</option>
+                                        {countries.map((country) => (
+                                            <option key={country.id} value={country.code}>
+                                                {country.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-neutral-400 text-xs">
+                                        ▼
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-between gap-4 mt-8 pt-4 border-t border-neutral-100">
+                            <button
+                                onClick={() => {
+                                    setIsAddAddressOpen(false);
+                                    resetAddressForm();
+                                }}
+                                className="flex-1 px-4 py-3 border border-neutral-200 text-[11px] font-medium uppercase tracking-widest rounded-none text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800 transition-all cursor-pointer bg-white"
                             >
                                 Anulează
                             </button>
 
                             <button
                                 onClick={handleAddAddress}
-                                className="bg-black text-white px-6 py-2 hover:opacity-60 cursor-pointer"
+                                className="flex-1 bg-neutral-800 text-white text-[11px] font-medium uppercase tracking-widest py-3 px-6 rounded-none hover:bg-neutral-700 transition-all cursor-pointer border-none"
                             >
                                 Salvează
                             </button>
@@ -836,36 +851,32 @@ export default function AccountPage() {
             )}
 
             {deleteAddressId && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-
-                    {/* overlay */}
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
                     <div
-                        className="absolute inset-0 bg-black/50"
+                        className="absolute inset-0 bg-neutral-800/50 backdrop-blur-xs transition-opacity"
                         onClick={cancelDeleteAddress}
                     />
 
-                    {/* modal */}
-                    <div className="relative bg-white text-black w-full max-w-sm p-6 rounded-md">
-
-                        <h2 className="text-lg font-semibold mb-3">
+                    <div className="relative bg-white text-neutral-800 w-full max-w-sm p-6 rounded-none shadow-2xl border border-neutral-100">
+                        <h2 className="text-xs font-semibold uppercase tracking-widest mb-2 text-neutral-800">
                             Șterge adresa
                         </h2>
 
-                        <p className="text-sm text-gray-600 mb-6">
-                            Sigur doriți să ștergeți această adresă?
+                        <p className="text-xs text-neutral-400 font-light mb-6 leading-relaxed">
+                            Sigur doriți să ștergeți această adresă? Această acțiune este ireversibilă.
                         </p>
 
                         <div className="flex justify-end gap-3">
                             <button
                                 onClick={cancelDeleteAddress}
-                                className="px-4 py-2 border cursor-pointer hover:bg-black hover:text-white"
+                                className="px-4 py-2 border border-neutral-200 text-[10px] font-medium uppercase tracking-wider rounded-none text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800 transition-all cursor-pointer bg-white"
                             >
                                 Anulează
                             </button>
 
                             <button
                                 onClick={confirmDeleteAddress}
-                                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 cursor-pointer"
+                                className="bg-red-600 text-white text-[10px] font-medium uppercase tracking-wider px-4 py-2 rounded-none hover:bg-red-700 transition-all cursor-pointer border-none"
                             >
                                 Șterge
                             </button>

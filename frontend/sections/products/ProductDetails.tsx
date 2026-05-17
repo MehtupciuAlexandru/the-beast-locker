@@ -228,7 +228,6 @@ export default function ProductDetails({ product }: Props) {
                     </div>
 
                     <div className="px-4 py-6 bg-white">
-                        <p className="text-[11px] text-neutral-400 mb-2 tracking-wide">050225</p>
 
                         <h1 className="text-lg font-medium mb-4 uppercase tracking-wider text-[#1a1a1a]">
                             {product.name}

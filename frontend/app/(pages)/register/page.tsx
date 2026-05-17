@@ -46,7 +46,7 @@ export default function RegisterPage() {
 
                         <input
                             type="text"
-                            placeholder="Nume Familie"
+                            placeholder="Nume"
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
                             className="border p-3 w-full"
