@@ -221,11 +221,15 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                                     <span className="text-xs font-black uppercase tracking-[0.2em]">Îmbrăcăminte</span>
                                     <ChevronDown
                                         className={`h-4 w-4 text-zinc-400 transition-transform duration-300 ${
-                                            openSection === "clothes" ? "rotate-180 text-black" : ""
+                                            openSection === "clothes" ? "rotate-180 text-neutral-800" : ""
                                         }`}
                                     />
                                 </button>
-                                {openSection === "clothes" && renderProducts(clothesProducts, "/products?collection=clothes")}
+                                {openSection === "clothes" && (
+                                    <div className="bg-zinc-50 px-8 pb-8 pt-2 text-xs font-light uppercase tracking-[0.2em] text-zinc-400">
+                                        Coming soon
+                                    </div>
+                                )}
                             </div>
 
                             <div className="border-y border-zinc-100">
@@ -239,11 +243,15 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                                     <span className="text-xs font-black uppercase tracking-[0.2em]">Explorează</span>
                                     <ChevronDown
                                         className={`h-4 w-4 text-zinc-400 transition-transform duration-300 ${
-                                            openSection === "all" ? "rotate-180 text-black" : ""
+                                            openSection === "all" ? "rotate-180 text-neutral-800" : ""
                                         }`}
                                     />
                                 </button>
-                                {openSection === "all" && renderProducts(allProducts, "/products")}
+                                {openSection === "all" && (
+                                    <div className="bg-zinc-50 px-8 pb-8 pt-2 text-xs font-light uppercase tracking-[0.2em] text-zinc-400">
+                                        Coming soon
+                                    </div>
+                                )}
                             </div>
                         </nav>
                     </div>
