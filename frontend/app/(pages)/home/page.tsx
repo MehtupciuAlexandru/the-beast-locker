@@ -15,8 +15,8 @@ import { mockProducts } from "@/lib/mocks/products";
 export default function HomePage() {
     return (
         <>
-            <><BannerPopup/></>
-            <CookiesPopup />
+            {/*<><BannerPopup/></>*/}
+            {/*<CookiesPopup />*/}
             <Hero />
             <PlatformDetails />
             <Categories />
