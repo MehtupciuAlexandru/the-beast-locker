@@ -112,6 +112,65 @@ export class EventRegistrationService {
         }
     }
 
+    async exportCsv(ctx: RequestContext): Promise<string> {
+        const repository = this.connection.getRepository(ctx, EventRegistration);
+
+        const registrations = await repository.find({
+            order: {
+                createdAt: 'DESC',
+            },
+        });
+
+        const headers = [
+            'ID',
+            'Event Name',
+            'Source',
+            'Full Name',
+            'Sports Club',
+            'Phone Number',
+            'Email',
+            'GDPR Consent',
+            'GDPR Consent Text',
+            'Submitted At',
+        ];
+
+        const rows = registrations.map((registration) => [
+            registration.id,
+            registration.eventName,
+            registration.source,
+            registration.fullName,
+            registration.sportsClub || '',
+            registration.phoneNumber,
+            registration.email,
+            registration.gdprConsent ? 'Yes' : 'No',
+            registration.gdprConsentText,
+            registration.createdAt.toISOString(),
+        ]);
+
+        return [
+            headers.join(','),
+            ...rows.map((row) => row.map((value) => this.escapeCsvValue(value)).join(',')),
+        ].join('\r\n');
+    }
+
+
+    private escapeCsvValue(value: unknown): string {
+        if (value === null || value === undefined) return '';
+
+        const stringValue = String(value);
+
+        if (
+            stringValue.includes(',') ||
+            stringValue.includes('"') ||
+            stringValue.includes('\n') ||
+            stringValue.includes('\r')
+        ) {
+            return `"${stringValue.replace(/"/g, '""')}"`;
+        }
+
+        return stringValue;
+    }
+
     private normalizeName(value: string) {
         return value
             .trim()
