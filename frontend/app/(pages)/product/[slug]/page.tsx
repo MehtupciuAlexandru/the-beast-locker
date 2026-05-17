@@ -3,6 +3,7 @@ import Footer from "@/components/layout/footer";
 import ProductDetails from "@/sections/products/ProductDetails";
 import {getProductBySlug, getProducts} from "@/lib/api/products";
 import RecentlyViewed from "@/sections/products/RecentlyViewed";
+import ProductBreadcrumbs from "@/components/layout/Breadcrumbs";
 
 export default async function ProductPage(
     { params }: { params: Promise<{ slug: string }> }
@@ -19,6 +20,7 @@ export default async function ProductPage(
     return (
         <>
             <Navbar />
+            <ProductBreadcrumbs product={product} />
             <ProductDetails product={product} />
             <RecentlyViewed />
             <Footer />

@@ -1,29 +1,34 @@
 import Image from "next/image";
 import Link from "next/link";
+import Footer from "@/components/layout/footer";
+import Navbar from "@/components/layout/Navbar";
 
 const categories = [
     {
-        title: "ECHIPAMENT",
-        subtitle: "Echipamente concepute pentru siguranța și confortul sportivilor, indiferent de ramura sportivă",
+        title: "BOX",
+        // subtitle: "Echipamente concepute pentru siguranța și confortul sportivilor, indiferent de ramura sportivă",
         image: "/images/banners/competition.jpeg",
-        link: "/equipment",
+        link: "/products?collection=equipment",
     },
     {
-        title: "ÎMBRĂCĂMINTE",
-        subtitle: "Haine și Accesorii gândite să îți deblocheze adevăratul potențial",
-        image: "/images/banners/train.jpeg",
+        title: "KICKBOX",
+        // subtitle: "Haine și Accesorii gândite să îți deblocheze adevăratul potențial",
+        image: "/images/banners/boxers.jpeg",
         link: "/products?collection=clothes",
     },
     {
-        title: "ACCESORII",
-        subtitle: "Lucrurile mici care fac diferența",
-        image: "/images/banners/boxers.jpeg",
+        title: "MMA",
+        // subtitle: "Lucrurile mici care fac diferența",
+        image: "/images/banners/train.jpeg",
         link: "/products",
     }
 ];
 
 export default function Categories() {
     return (
+
+        <>
+            <Navbar />
         <section className="w-full p-4 bg-white flex justify-center">
             <div className="flex flex-col lg:flex-row gap-4 w-full max-w-full">
                 {categories.map((cat, index) => (
@@ -47,13 +52,15 @@ export default function Categories() {
                             <h2 className="text-white text-2xl sm:text-3xl font-extrabold tracking-widest uppercase">
                                 {cat.title}
                             </h2>
-                            <p className="text-white text-sm sm:text-base mt-2 max-w-[260px] leading-tight">
-                                {cat.subtitle}
-                            </p>
+                            {/*<p className="text-white text-sm sm:text-base mt-2 max-w-[260px] leading-tight">*/}
+                            {/*    {cat.subtitle}*/}
+                            {/*</p>*/}
                         </div>
                     </Link>
                 ))}
             </div>
         </section>
+            <Footer />
+        </>
     );
 }

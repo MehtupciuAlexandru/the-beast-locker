@@ -1,5 +1,6 @@
 import { ProductPreview } from "@/types/product";
 import ProductCard from "@/components/product/ProductCard";
+import Link from "next/link";
 
 type FeaturedProductsProps = {
     products: ProductPreview[];
@@ -11,7 +12,7 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
             <div className="w-full py-10 ml-5 mr-5">
 
                 <h2 className="text-sm font-semibold tracking-widest mb-5 text-black">
-                    CELE MAI VANDUTE
+                    NO PLAN B
                 </h2>
                 <div className="w-full h-[1px] bg-gray-300 mt-3 mb-6" />
 
@@ -24,14 +25,16 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
                     ))}
                 </div>
 
+                import Link from "next/link"
+
                 <div className="flex justify-center mt-10">
-                    <button
-                        type="button"
+                    <Link
+                        href="/products"
                         aria-label="Shop collection"
                         className="border border-black px-6 py-2 text-black text-xs font-semibold tracking-widest transition hover:bg-black hover:text-white"
                     >
                         VEZI TOT
-                    </button>
+                    </Link>
                 </div>
 
             </div>

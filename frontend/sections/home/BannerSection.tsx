@@ -32,12 +32,12 @@ export default function UrbanBanner() {
 
                 {/* Main title */}
                 <h2 className="text-white font-bold uppercase pt-40 leading-tight text-3xl md:text-5xl tracking-wide">
-                    URBANITE COLLECTION 25 // NEW
+                    NO PLAN B COLLECTION 26 // NEW
                 </h2>
 
                 {/* Subtitle */}
                 <p className="text-white text-xs md:text-sm mt-4 max-w-[300px] md:max-w-[420px] leading-relaxed">
-                    NOUA NOASTRĂ COLECȚIE URBANĂ ‘25. NUMAI PE PLATFORMA BEAST LOCKER
+                    NOUA NOASTRĂ COLECȚIE, CONCEPUTĂ PENTRU CEI CARE SUNT SUFICIENT DE PUTERNICI SĂ NU DEA ÎNAPOI
                 </p>
 
                 {/* Button */}

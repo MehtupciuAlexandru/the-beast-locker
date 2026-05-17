@@ -11,7 +11,7 @@ import { useCartUI } from "@/lib/context/CartUIContext";
 const desktopLinks = [
     { label: "Echipamente", href: "/products?collection=equipment" },
     { label: "Îmbrăcăminte", href: "/products?collection=clothes" },
-    { label: "Explorează", href: "/products" },
+    { label: "Accesorii", href: "/products" },
 ];
 
 export default function Navbar() {

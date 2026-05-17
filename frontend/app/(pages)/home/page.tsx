@@ -23,7 +23,6 @@ export default function HomePage() {
             <FeaturedProducts products={mockProducts} />
             <BannerSection />
             <Story />
-            <SocialFavorites items={mockProducts} />
             <Newsletter />
             <Footer />
         </>

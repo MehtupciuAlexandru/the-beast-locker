@@ -22,11 +22,17 @@ export default function Hero() {
                     <div className="mx-auto max-w-[280px] text-white md:mx-0 md:max-w-[420px] lg:max-w-[560px]">
 
                         <h1 className="mb-3 text-[40px] font-extrabold uppercase leading-[0.98] tracking-[-0.02em] md:text-[42px] lg:text-[62px]">
-                            URBANITE COLLECTION 25 // NEW
+                            NO PLAN B
+                        </h1>
+                        <h1 className="mb-3 text-[40px] font-extrabold uppercase leading-[0.98] tracking-[-0.02em] md:text-[48px] lg:text-[48px]">
+                            COLLECTION 26 //
+                        </h1>
+                        <h1 className="mb-3 text-[40px] font-extrabold uppercase leading-[0.98] tracking-[-0.02em] md:text-[42px] lg:text-[48px]">
+                            NEW
                         </h1>
 
                         <p className="mx-auto mb-4 max-w-[250px] text-[15px] leading-[1.35] text-white/90 md:mx-0 md:max-w-[340px] md:text-[11px] lg:max-w-[420px] lg:text-[12px]">
-                            NOUA NOASTRĂ COLECȚIE URBANĂ ’25. NUMAI PE PLATFORMA BEAST LOCKER
+                            NOUA NOASTRĂ COLECȚIE, CONCEPUTĂ PENTRU CEI CARE SUNT SUFICIENT DE PUTERNICI SĂ NU DEA ÎNAPOI
                         </p>
 
                         <button className="h-[34px] bg-[#FFD400] px-5 text-[15px] font-bold uppercase text-black md:h-[38px] md:px-6 md:text-[12px] lg:h-[42px] lg:px-7 lg:text-[13px]">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ProductPreview } from "@/types/product";
 import ProductCardCompact from "@/components/product/ProductCardCompact";
 import FiltersSidebar from "@/components/filters/FiltersSidebar";
@@ -19,39 +20,76 @@ type ProductsLayoutProps = {
     title?: string;
 };
 
-export default function ProductsLayout({ products, title = "Explorează" }: ProductsLayoutProps) {
-    const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-    const [selectedColors, setSelectedColors] = useState<string[]>([]);
+export default function ProductsLayout({
+                                           products,
+                                           title = "Explorează",
+                                       }: ProductsLayoutProps) {
+    const [selectedEquipmentType, setSelectedEquipmentType] = useState("");
     const [inStockOnly, setInStockOnly] = useState(false);
     const [sort, setSort] = useState<SortOption>("featured");
 
     const [columns, setColumns] = useState<1 | 2>(2);
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-    const toggleSize = (size: string) => {
-        setSelectedSizes((prev) =>
-            prev.includes(size)
-                ? prev.filter((item) => item !== size)
-                : [...prev, size]
-        );
-    };
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
-    const toggleColor = (color: string) => {
-        setSelectedColors((prev) =>
-            prev.includes(color)
-                ? prev.filter((item) => item !== color)
-                : [...prev, color]
-        );
+    const selectedCollection = searchParams.get("collection") || "";
+
+    const setCollection = (collectionSlug: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (collectionSlug) {
+            params.set("collection", collectionSlug);
+        } else {
+            params.delete("collection");
+        }
+
+        const queryString = params.toString();
+
+        router.push(queryString ? `/products?${queryString}` : "/products");
     };
 
     const resetFilters = () => {
-        setSelectedSizes([]);
-        setSelectedColors([]);
+        const params = new URLSearchParams(searchParams.toString());
+
+        params.delete("collection");
+
+        setSelectedEquipmentType("");
         setInStockOnly(false);
+
+        const queryString = params.toString();
+
+        router.push(queryString ? `/products?${queryString}` : "/products");
     };
 
     const sortedProducts = useMemo(() => {
-        const result = [...products];
+        let result = [...products];
+
+        if (selectedEquipmentType) {
+            result = result.filter((product: any) => {
+                const searchableText = [
+                    product.name,
+                    product.slug,
+                    product.searchKeywords,
+                    product.seoTitle,
+                    product.seoDescription,
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
+
+                return searchableText.includes(selectedEquipmentType.toLowerCase());
+            });
+        }
+
+        if (sort === "a_z") {
+            result.sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        if (sort === "z_a") {
+            result.sort((a, b) => b.name.localeCompare(a.name));
+        }
 
         if (sort === "price_low") {
             result.sort((a, b) => a.price - b.price);
@@ -62,7 +100,7 @@ export default function ProductsLayout({ products, title = "Explorează" }: Prod
         }
 
         return result;
-    }, [products, sort]);
+    }, [products, sort, selectedEquipmentType]);
 
     return (
         <section className="w-full bg-[#f3f3f3] px-6 lg:px-12 py-8">
@@ -139,10 +177,10 @@ export default function ProductsLayout({ products, title = "Explorează" }: Prod
                 {/* Desktop Filters */}
                 <div className="hidden lg:block">
                     <FiltersSidebar
-                        selectedSizes={selectedSizes}
-                        toggleSize={toggleSize}
-                        selectedColors={selectedColors}
-                        toggleColor={toggleColor}
+                        selectedCollection={selectedCollection}
+                        setCollection={setCollection}
+                        selectedEquipmentType={selectedEquipmentType}
+                        setSelectedEquipmentType={setSelectedEquipmentType}
                         inStockOnly={inStockOnly}
                         setInStockOnly={setInStockOnly}
                         resetFilters={resetFilters}
@@ -151,18 +189,26 @@ export default function ProductsLayout({ products, title = "Explorează" }: Prod
 
                 {/* Products */}
                 <div className="flex-1">
-                    <div
-                        className={`grid ${
-                            columns === 1 ? "grid-cols-1" : "grid-cols-2"
-                        } md:grid-cols-3 gap-x-8 gap-y-12`}
-                    >
-                        {sortedProducts.map((product) => (
-                            <ProductCardCompact
-                                key={product.id}
-                                product={product}
-                            />
-                        ))}
-                    </div>
+                    {sortedProducts.length === 0 ? (
+                        <div className="py-20 text-center">
+                            <p className="text-sm uppercase tracking-widest text-black">
+                                Nu am găsit produse.
+                            </p>
+                        </div>
+                    ) : (
+                        <div
+                            className={`grid ${
+                                columns === 1 ? "grid-cols-1" : "grid-cols-2"
+                            } md:grid-cols-3 gap-x-8 gap-y-12`}
+                        >
+                            {sortedProducts.map((product) => (
+                                <ProductCardCompact
+                                    key={product.id}
+                                    product={product}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
 
             </div>
@@ -189,13 +235,22 @@ export default function ProductsLayout({ products, title = "Explorează" }: Prod
                     </button>
 
                     <FiltersSidebar
-                        selectedSizes={selectedSizes}
-                        toggleSize={toggleSize}
-                        selectedColors={selectedColors}
-                        toggleColor={toggleColor}
+                        selectedCollection={selectedCollection}
+                        setCollection={(value) => {
+                            setCollection(value);
+                            setMobileFiltersOpen(false);
+                        }}
+                        selectedEquipmentType={selectedEquipmentType}
+                        setSelectedEquipmentType={(value) => {
+                            setSelectedEquipmentType(value);
+                            setMobileFiltersOpen(false);
+                        }}
                         inStockOnly={inStockOnly}
                         setInStockOnly={setInStockOnly}
-                        resetFilters={resetFilters}
+                        resetFilters={() => {
+                            resetFilters();
+                            setMobileFiltersOpen(false);
+                        }}
                     />
                 </div>
             </>

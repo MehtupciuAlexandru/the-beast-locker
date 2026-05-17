@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Footer() {
     return (
@@ -53,6 +54,34 @@ export default function Footer() {
                                         className="h-[14px] w-[14px]"
                                     />
                                 </button>
+
+                                <button
+                                    type="button"
+                                    aria-label="YouTube"
+                                    className="flex items-center justify-center hover:opacity-70 transition"
+                                >
+                                    <Image
+                                        src="/icons/youtube.svg"
+                                        alt=""
+                                        width={14}
+                                        height={14}
+                                        className="h-[14px] w-[14px]"
+                                    />
+                                </button>
+
+                                <button
+                                    type="button"
+                                    aria-label="Twitter"
+                                    className="flex items-center justify-center hover:opacity-70 transition"
+                                >
+                                    <Image
+                                        src="/icons/twitter.svg"
+                                        alt=""
+                                        width={14}
+                                        height={14}
+                                        className="h-[14px] w-[14px]"
+                                    />
+                                </button>
                             </div>
                         </div>
 
@@ -62,24 +91,24 @@ export default function Footer() {
                             </h3>
 
                             <div className="mt-5 flex flex-col gap-3 text-[12px] text-black">
-                                <button
-                                    type="button"
+                                <Link
+                                    href="/login"
                                     className="text-center md:text-left hover:opacity-70 transition"
                                 >
                                     LOGIN
-                                </button>
-                                <button
-                                    type="button"
+                                </Link>
+                                <Link
+                                    href="/register"
                                     className="text-center md:text-left hover:opacity-70 transition"
                                 >
                                     SIGNUP
-                                </button>
-                                <button
-                                    type="button"
+                                </Link>
+                                <Link
+                                    href="/account"
                                     className="text-center md:text-left hover:opacity-70 transition"
                                 >
                                     CONT
-                                </button>
+                                </Link>
                             </div>
                         </div>
 
@@ -89,36 +118,36 @@ export default function Footer() {
                             </h3>
 
                             <div className="mt-5 flex flex-col gap-3 text-[12px] text-black">
-                                <button
-                                    type="button"
-                                    className="text-center md:text-left hover:opacity-70 transition"
+                                <a
+                                    href="/about"
+                                    className="text-center md:text-left hover:opacity-70 transition block"
                                 >
                                     DESPRE NOI
-                                </button>
-                                <button
-                                    type="button"
-                                    className="text-center md:text-left hover:opacity-70 transition"
+                                </a>
+                                <a
+                                    href="/return"
+                                    className="text-center md:text-left hover:opacity-70 transition block"
                                 >
                                     POLITICA DE RETUR
-                                </button>
-                                <button
-                                    type="button"
-                                    className="text-center md:text-left hover:opacity-70 transition"
+                                </a>
+                                <a
+                                    href="#"
+                                    className="text-center md:text-left hover:opacity-70 transition block"
                                 >
                                     POLITICA DE CONFIDENȚIALITATE
-                                </button>
-                                <button
-                                    type="button"
-                                    className="text-center md:text-left hover:opacity-70 transition"
+                                </a>
+                                <a
+                                    href="#"
+                                    className="text-center md:text-left hover:opacity-70 transition block"
                                 >
                                     TERMENI ȘI CONDIȚII
-                                </button>
-                                <button
-                                    type="button"
-                                    className="text-center md:text-left hover:opacity-70 transition"
+                                </a>
+                                <a
+                                    href="#"
+                                    className="text-center md:text-left hover:opacity-70 transition block"
                                 >
                                     FAQ
-                                </button>
+                                </a>
                             </div>
                         </div>
 
@@ -161,7 +190,7 @@ export default function Footer() {
                                         alt=""
                                         width={96}
                                         height={32}
-                                        className="h-auto w-[96px]"
+                                        className="h-auto w-[160px]"
                                     />
                                 </button>
 
@@ -186,7 +215,7 @@ export default function Footer() {
                 <div>
                     <div className="h-px w-full bg-gray-300" />
                     <div className="py-10 text-center text-[10px] tracking-[0.08em] text-gray-500">
-                        COPYRIGHT © 2025 BEASTLOCKER
+                        COPYRIGHT © 2026 BEASTLOCKER
                     </div>
                 </div>
             </div>
