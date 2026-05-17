@@ -144,10 +144,9 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                         onClick={onClose}
                         className="group flex items-center justify-between px-8 py-3.5 transition-colors hover:bg-white"
                     >
-                        <span className="text-[11px] font-bold uppercase tracking-tight text-zinc-600 group-hover:text-black transition-colors">
+                        <span className="text-[11px] font-bold uppercase tracking-tight text-zinc-600 group-hover:text-neutral-800 transition-colors">
                             {product.name}
                         </span>
-
                     </Link>
                 ))}
 
@@ -155,7 +154,7 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                     <Link
                         href={collectionHref}
                         onClick={onClose}
-                        className="flex items-center justify-between px-8 py-4 bg-black group transition-colors hover:bg-zinc-800"
+                        className="flex items-center justify-between px-8 py-4 bg-neutral-800 group transition-colors hover:bg-neutral-700"
                     >
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Vezi toate</span>
                         <ArrowRight size={14} className="text-white transition-transform group-hover:translate-x-1" />
@@ -169,13 +168,13 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
         <>
             <div
                 onClick={onClose}
-                className={`fixed inset-0 bg-black/60 backdrop-blur-sm transition-all duration-500 z-[60] ${
+                className={`fixed inset-0 bg-neutral-900/60 backdrop-blur-sm transition-all duration-500 z-[60] ${
                     isOpen ? "opacity-100 visible" : "opacity-0 invisible"
                 }`}
             />
 
             <div
-                className={`fixed top-0 left-0 h-full w-[300px] sm:w-[380px] bg-white text-black z-[70] transform transition-transform duration-500 ease-out shadow-2xl border-r border-zinc-100 ${
+                className={`fixed top-0 left-0 h-full w-[300px] sm:w-[380px] bg-white text-neutral-800 z-[70] transform transition-transform duration-500 ease-out shadow-2xl border-r border-zinc-100 ${
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
             >
@@ -184,7 +183,7 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                         <span className="text-xl font-black tracking-tighter italic">BEAST <span className="text-zinc-300">LOCKER</span></span>
                         <button
                             onClick={onClose}
-                            className="group flex items-center gap-2 text-[10px] font-black tracking-widest text-zinc-400 hover:text-black transition-colors"
+                            className="group flex items-center gap-2 text-[10px] font-black tracking-widest text-zinc-400 hover:text-neutral-800 transition-colors bg-transparent border-none p-0 cursor-pointer"
                         >
                             ÎNCHIDE <X size={16} className="group-hover:rotate-90 transition-transform" />
                         </button>
@@ -203,7 +202,7 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                                     <span className="text-xs font-black uppercase tracking-[0.2em]">Echipamente</span>
                                     <ChevronDown
                                         className={`h-4 w-4 text-zinc-400 transition-transform duration-300 ${
-                                            openSection === "equipment" ? "rotate-180 text-black" : ""
+                                            openSection === "equipment" ? "rotate-180 text-neutral-800" : ""
                                         }`}
                                     />
                                 </button>
@@ -226,8 +225,18 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                                     />
                                 </button>
                                 {openSection === "clothes" && (
-                                    <div className="bg-zinc-50 px-8 pb-8 pt-2 text-xs font-light uppercase tracking-[0.2em] text-zinc-400">
-                                        Coming soon
+                                    <div className="flex flex-col bg-zinc-50 border-y border-zinc-100 animate-in fade-in slide-in-from-top-1 duration-200">
+                                        <div className="px-8 pb-6 pt-4 text-xs font-light uppercase tracking-[0.2em] text-zinc-400">
+                                            Coming soon
+                                        </div>
+                                        <Link
+                                            href="/countdown"
+                                            onClick={onClose}
+                                            className="flex items-center justify-between px-8 py-4 bg-neutral-800 group transition-colors hover:bg-neutral-700"
+                                        >
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Vezi toate</span>
+                                            <ArrowRight size={14} className="text-white transition-transform group-hover:translate-x-1" />
+                                        </Link>
                                     </div>
                                 )}
                             </div>
@@ -248,8 +257,18 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                                     />
                                 </button>
                                 {openSection === "all" && (
-                                    <div className="bg-zinc-50 px-8 pb-8 pt-2 text-xs font-light uppercase tracking-[0.2em] text-zinc-400">
-                                        Coming soon
+                                    <div className="flex flex-col bg-zinc-50 border-y border-zinc-100 animate-in fade-in slide-in-from-top-1 duration-200">
+                                        <div className="px-8 pb-6 pt-4 text-xs font-light uppercase tracking-[0.2em] text-zinc-400">
+                                            Coming soon
+                                        </div>
+                                        <Link
+                                            href="/countdown"
+                                            onClick={onClose}
+                                            className="flex items-center justify-between px-8 py-4 bg-neutral-800 group transition-colors hover:bg-neutral-700"
+                                        >
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Vezi toate</span>
+                                            <ArrowRight size={14} className="text-white transition-transform group-hover:translate-x-1" />
+                                        </Link>
                                     </div>
                                 )}
                             </div>
