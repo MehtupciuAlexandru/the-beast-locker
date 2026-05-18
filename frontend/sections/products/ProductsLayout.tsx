@@ -13,7 +13,9 @@ type SortOption =
     | "a_z"
     | "z_a"
     | "price_low"
-    | "price_high";
+    | "price_high"
+    | "date_old"
+    | "date_new";
 
 type ProductsLayoutProps = {
     products: ProductPreview[];
