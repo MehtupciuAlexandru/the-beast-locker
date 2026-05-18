@@ -242,27 +242,26 @@ export default function ProductDetails({ product }: Props) {
                         </p>
 
                         {variants.length > 0 && (
-                            <div className="mb-6 w-full flex flex-col items-center">
-                                <label className="text-sm font-Inter mb-4 block text-neutral-500 tracking-wide">
-                                    Variant - <span className="text-[#1a1a1a] font-Inter">{getVariantLabel(selectedVariant)}</span>
+                            <div className="mb-6 w-full border-b border-[#e5e5e5] pb-6">
+                                <label className="text-[11px] font-normal mb-3 block text-neutral-700 uppercase tracking-wide text-left">
+                                    Variantă -{" "}
+                                    <span className="text-neutral-400 font-InterLight">
+                Alegeți varianta
+            </span>
                                 </label>
 
-                                <div className="flex justify-center gap-2 mb-3">
+                                <div className="grid grid-cols-4 gap-2">
                                     {variants.map((variant: any) => (
                                         <button
                                             key={variant.id}
                                             onClick={() => setSelectedVariantId(variant.id)}
-                                            className={`w-20 h-24 border transition-colors cursor-pointer overflow-hidden flex items-center justify-center bg-white ${
+                                            className={`h-[40px] text-[11px] border tracking-wider transition-colors cursor-pointer flex items-center justify-center uppercase ${
                                                 selectedVariantId === variant.id
-                                                    ? "border-[#1a1a1a]"
-                                                    : "border-transparent opacity-60"
+                                                    ? "border-[#1a1a1a] text-[#1a1a1a] font-bold bg-white"
+                                                    : "border-[#e5e5e5] bg-white text-neutral-300 font-normal hover:border-neutral-400 hover:text-neutral-500"
                                             }`}
                                         >
-                                            <img
-                                                src={variant.image || variant.gallery?.[0] || product.image}
-                                                alt={getVariantLabel(variant)}
-                                                className="w-full h-full object-cover"
-                                            />
+                                            {getVariantLabel(variant)}
                                         </button>
                                     ))}
                                 </div>
