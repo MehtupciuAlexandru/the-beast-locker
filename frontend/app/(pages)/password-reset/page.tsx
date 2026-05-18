@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/footer";
 import { resetPassword } from "@/lib/api/auth";
 
-export default function PasswordResetPage() {
+function PasswordResetContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -157,5 +157,19 @@ export default function PasswordResetPage() {
 
             <Footer />
         </>
+    );
+}
+
+export default function PasswordResetPage() {
+    return (
+        <Suspense
+            fallback={
+                <div className="min-h-screen flex items-center justify-center bg-white text-[#1c1c1e] font-Inter18Semibold">
+                    Se încarcă...
+                </div>
+            }
+        >
+            <PasswordResetContent />
+        </Suspense>
     );
 }
