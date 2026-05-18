@@ -20,10 +20,13 @@ export default function NotFound() {
                 </div>
 
                 <div className="text-center space-y-6 max-w-2xl">
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-neutral-900 uppercase">
-                        Ne pare rău! Pagina nu a fost găsită
+                    <h1 className="text-xl sm:text-4xl md:text-5xl font-Inter tracking-tight text-[#1a1a1a]">
+                        Ne pare rău!
                     </h1>
-                    <p className="text-base sm:text-lg text-neutral-500 font-medium max-w-lg mx-auto">
+                    <h1 className="text-xl sm:text-4xl md:text-5xl font-Inter tracking-tight text-[#1a1a1a]">
+                        Pagina nu a fost găsită
+                    </h1>
+                    <p className="text-base sm:text-lg text-neutral-500 font-Inter max-w-lg mx-auto">
                         Această pagină nu a fost găsită sau link-ul a fost folosit incorect.
                     </p>
                 </div>
@@ -31,11 +34,11 @@ export default function NotFound() {
                 <div className="mt-14">
                     <Link
                         href="/home"
-                        className="inline-flex items-center gap-3 bg-[#1a1a1a] text-white uppercase text-xs sm:text-sm tracking-[0.25em] font-bold px-12 py-5 hover:bg-black transition-colors"
+                        className="inline-flex items-center justify-center gap-3 whitespace-nowrap text-center bg-[#1a1a1a] text-white uppercase text-xs sm:text-sm tracking-[0.25em] font-Inter18Semibold px-12 py-5 hover:bg-black transition-colors"
                     >
                         Înapoi la pagina principală
                         <svg
-                            className="w-4 h-4"
+                            className="w-4 h-4 shrink-0"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"

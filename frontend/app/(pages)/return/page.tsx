@@ -9,24 +9,23 @@ export default function ReturnsPage() {
 
             <main className="w-full bg-white text-black min-h-screen flex flex-col">
                 <div className="w-full border-b border-gray-200">
-                    <div className="w-full px-6 md:px-10 py-6 text-xs sm:text-sm text-gray-500 uppercase tracking-widest">
+                    <div className="w-full px-6 md:px-10 py-6 text-[15px] font-Inter text-[#6a6a6a] uppercase tracking-widest">
                         EXPLOREAZĂ // DESPRE NOI // CUMPĂRARE / RETUR
                     </div>
                 </div>
 
                 <div className="flex flex-col md:flex-row w-full flex-1">
-
                     <div className="w-full md:w-[320px] lg:w-[350px] shrink-0 bg-[#f0f4f8]">
                         <ExploreMenu />
                     </div>
 
                     <div className="flex-1 w-full pb-20 pt-8 md:pt-12 px-6 md:px-12 lg:px-20 xl:px-32">
-                        <h1 className="text-3xl md:text-4xl font-medium text-black mb-10">
+                        <h1 className="text-3xl md:text-4xl font-Intertext-black mb-10">
                             Cumpărare / Retur
                         </h1>
 
-                        <div className="w-full text-base md:text-lg leading-relaxed text-gray-800 space-y-6 max-w-5xl">
-                            <p className="font-bold text-black">
+                        <div className="w-full text-[15px] font-Inter leading-relaxed text-[#6a6a6a] space-y-6 max-w-5xl">
+                            <p className="font-bold text-[#1c1c1E]">
                                 Urmează modificări semnificative ale politicii de retur!
                             </p>
 
@@ -46,7 +45,7 @@ export default function ReturnsPage() {
                                 Produsele din categoria lenjerie intimă achiziționate din magazinele fizice NU se returnează și NU se probează. Lenjeria intimă se returnează în magazinele fizice DOAR dacă a fost achiziționată din magazinul online și doar în termenul legal de 14 zile (de la data primirii coletului), fără a prezenta vreun motiv. Această categorie de produse se poate returna în magazine strict în condițiile legii (nu sunt conforme, defecte de fabricație, etc.)
                             </p>
 
-                            <p className="font-bold text-black pt-4">
+                            <p className="font-bold text-[#1c1c1E] pt-4">
                                 Retur prin curierul FAN
                             </p>
 

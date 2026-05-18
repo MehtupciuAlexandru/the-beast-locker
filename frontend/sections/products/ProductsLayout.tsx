@@ -103,11 +103,11 @@ export default function ProductsLayout({
     }, [products, sort, selectedEquipmentType]);
 
     return (
-        <section className="w-full bg-[#f3f3f3] px-6 lg:px-12 py-8">
+        <section className="w-full bg-white px-6 lg:px-12 py-8 text-[#1C1C1E] font-InterLight">
 
             {/* Header */}
             <div className="mb-6 flex items-center justify-between">
-                <h1 className="text-xs tracking-widest text-black uppercase">
+                <h1 className="text-xs tracking-widest text-[#1C1C1E] uppercase">
                     {title}
                 </h1>
 
@@ -138,39 +138,40 @@ export default function ProductsLayout({
             </div>
 
             {/* Mobile Controls */}
-            <div className="flex lg:hidden border-t border-b border-black">
+            <div className="flex lg:hidden border-t border-b border-gray-400">
 
                 <button
                     onClick={() => setMobileFiltersOpen(true)}
-                    className="flex-1 py-3 text-[10px] tracking-widest text-black border-r border-black"
+                    className="flex-1 py-3 text-[13px] tracking-widest text-[#1C1C1E] border-r border-[#1C1C1E] flex items-center justify-center gap-2"
                 >
                     FILTRE
+                    <img src="/icons/filters.svg" alt="Filter Icon" className="w-4 h-4" />
                 </button>
 
-                <div className="flex-1 border-r border-black flex items-center justify-center">
-                    <SortDropdown value={sort} onChange={setSort} />
-                </div>
-
-                <div className="flex">
-                    <button
-                        onClick={() => setColumns(1)}
-                        className={`px-3 ${
-                            columns === 1 ? "bg-black text-white" : "text-black"
-                        }`}
-                    >
-                        ▢
-                    </button>
-
-                    <button
-                        onClick={() => setColumns(2)}
-                        className={`px-3 ${
-                            columns === 2 ? "bg-black text-white" : "text-black"
-                        }`}
-                    >
-                        ▦
-                    </button>
-                </div>
+            <div className="flex-1 border-r border-[#1C1C1E] flex items-center justify-center">
+                <SortDropdown value={sort} onChange={setSort} />
             </div>
+
+            <div className="flex">
+                <button
+                    onClick={() => setColumns(1)}
+                    className={`px-3 ${
+                        columns === 1 ? "bg-[#1C1C1E] text-white" : "text-[#1C1C1E]"
+                    }`}
+                >
+                    <img src="/icons/setColumns1.svg" alt="One Column" />
+                </button>
+
+                <button
+                    onClick={() => setColumns(2)}
+                    className={`px-3 ${
+                        columns === 2 ? "bg-[#1C1C1E] text-white" : "text-[#1C1C1E]"
+                    }`}
+                >
+                    <img src="/icons/setColumns2.svg" alt="Two Columns" />
+                </button>
+            </div>
+        </div>
 
             <div className="flex gap-16 mt-6">
 
@@ -191,7 +192,7 @@ export default function ProductsLayout({
                 <div className="flex-1">
                     {sortedProducts.length === 0 ? (
                         <div className="py-20 text-center">
-                            <p className="text-sm uppercase tracking-widest text-black">
+                            <p className="text-sm uppercase tracking-widest text-[#1C1C1E]">
                                 Nu am găsit produse.
                             </p>
                         </div>
@@ -229,7 +230,7 @@ export default function ProductsLayout({
                 >
                     <button
                         onClick={() => setMobileFiltersOpen(false)}
-                        className="mb-6 text-sm text-black"
+                        className="mb-6 text-sm text-[#1C1C1E]"
                     >
                         CLOSE
                     </button>

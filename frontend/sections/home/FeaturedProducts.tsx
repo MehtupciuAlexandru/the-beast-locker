@@ -25,7 +25,6 @@ export default function FeaturedProducts({ products }: FeaturedProductsProps) {
                     ))}
                 </div>
 
-                import Link from "next/link"
 
                 <div className="flex justify-center mt-10">
                     <Link

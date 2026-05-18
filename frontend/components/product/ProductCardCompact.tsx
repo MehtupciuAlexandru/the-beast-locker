@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ProductPreview } from "@/types/product";
 
@@ -10,28 +9,25 @@ export default function ProductCardCompact({ product }: Props) {
     return (
         <Link
             href={`/product/${product.slug}`}
-            className="block"
+            className="flex flex-col w-[335px] h-[335px] mx-auto text-center font-InterLight overflow-hidden"
         >
-            {/* Image */}
-            <div className="bg-white p-2">
-                <div className="relative aspect-square w-full">
-                    <img
-                        src={product.image}
-                        alt={product.name}
-                        className="absolute inset-0 w-full h-full object-contain"
-                    />
-                </div>
+            <div className="bg-white p-2 relative flex-1 min-h-0 w-full flex items-center justify-center">
+                <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-contain"
+                />
             </div>
 
-            {/* Name */}
-            <p className="mt-2 text-[10px] tracking-widest text-black">
-                {product.name}
-            </p>
+            <div className="mt-4 px-2 shrink-0 pb-2">
+                <p className="text-[12px] uppercase tracking-[0.22em] text-[#1a1a1e] leading-relaxed font-InterLight line-clamp-2">
+                    {product.name}
+                </p>
 
-            {/* Price */}
-            <p className="mt-1 text-[10px] text-black">
-                {product.price.toFixed(2)} lei
-            </p>
+                <p className="mt-3 text-[12px] text-[#6a6a6a] font-InterLight">
+                    {product.price.toFixed(2).replace(".", ",")} lei
+                </p>
+            </div>
         </Link>
     );
 }

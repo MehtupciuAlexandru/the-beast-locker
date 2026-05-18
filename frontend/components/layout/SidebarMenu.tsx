@@ -180,7 +180,7 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
             >
                 <div className="flex flex-col h-full">
                     <div className="flex items-center justify-between p-8">
-                        <span className="text-xl font-black tracking-tighter italic">BEAST <span className="text-zinc-300">LOCKER</span></span>
+                        <span className="text-2xl font-GemunuExtraBold tracking-tighter italic">BEAST <span className="text-zinc-300">LOCKER</span></span>
                         <button
                             onClick={onClose}
                             className="group flex items-center gap-2 text-[10px] font-black tracking-widest text-zinc-400 hover:text-neutral-800 transition-colors bg-transparent border-none p-0 cursor-pointer"
@@ -189,7 +189,7 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                         </button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto no-scrollbar">
+                    <div className="flex-1 overflow-y-auto no-scrollbar font-GemunuRegular">
                         <nav className="flex flex-col">
                             <div className="border-t border-zinc-100">
                                 <button
@@ -199,10 +199,10 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                                         openSection === "equipment" ? "bg-zinc-50" : "hover:bg-zinc-50/50"
                                     }`}
                                 >
-                                    <span className="text-xs font-black uppercase tracking-[0.2em]">Echipamente</span>
+                                    <span className="text-s font-black uppercase tracking-[0.2em]">Echipamente</span>
                                     <ChevronDown
-                                        className={`h-4 w-4 text-zinc-400 transition-transform duration-300 ${
-                                            openSection === "equipment" ? "rotate-180 text-neutral-800" : ""
+                                        className={`h-4 w-4 text-[#6a6a6a] transition-transform duration-300 ${
+                                            openSection === "equipment" ? "rotate-180 text-[#1a1a1e]" : ""
                                         }`}
                                     />
                                 </button>
@@ -217,7 +217,7 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                                         openSection === "clothes" ? "bg-zinc-50" : "hover:bg-zinc-50/50"
                                     }`}
                                 >
-                                    <span className="text-xs font-black uppercase tracking-[0.2em]">Îmbrăcăminte</span>
+                                    <span className="text-s font-black uppercase tracking-[0.2em]">Îmbrăcăminte</span>
                                     <ChevronDown
                                         className={`h-4 w-4 text-zinc-400 transition-transform duration-300 ${
                                             openSection === "clothes" ? "rotate-180 text-neutral-800" : ""
@@ -234,7 +234,7 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                                             onClick={onClose}
                                             className="flex items-center justify-between px-8 py-4 bg-neutral-800 group transition-colors hover:bg-neutral-700"
                                         >
-                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Vezi toate</span>
+                                            <span className="text-[10px] text-s uppercase tracking-[0.2em] text-white">Vezi toate</span>
                                             <ArrowRight size={14} className="text-white transition-transform group-hover:translate-x-1" />
                                         </Link>
                                     </div>
@@ -249,7 +249,7 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                                         openSection === "all" ? "bg-zinc-50" : "hover:bg-zinc-50/50"
                                     }`}
                                 >
-                                    <span className="text-xs font-black uppercase tracking-[0.2em]">Explorează</span>
+                                    <span className="text-s font-black uppercase tracking-[0.2em]">Explorează</span>
                                     <ChevronDown
                                         className={`h-4 w-4 text-zinc-400 transition-transform duration-300 ${
                                             openSection === "all" ? "rotate-180 text-neutral-800" : ""

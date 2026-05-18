@@ -69,14 +69,14 @@ export default function CartDrawer({ isOpen, onClose }: Props) {
 
             {/* Drawer */}
             <div
-                className={`fixed text-black right-0 top-0 h-full w-[75%] sm:w-[350px] sm:w-[400px] bg-white z-50 flex flex-col shadow-2xl transform transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] ${
+                className={`fixed text-[#6a6a6a] right-0 top-0 h-full w-[75%] sm:w-[350px] sm:w-[400px] bg-white z-50 flex flex-col shadow-2xl transform transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] ${
                     isOpen ? "translate-x-0" : "translate-x-full"
                 }`}
             >
                 {/* Header */}
                 <div className="flex justify-between items-center p-6 border-b border-gray-100">
-                    <h2 className="text-sm font-bold tracking-widest uppercase">
-                        Coșul Tău
+                    <h2 className="text-sm text-[#1c1c1e] font-Inter tracking-widest uppercase">
+                        COȘ DE CUMPĂRĂTURI
                         {!loading && order?.lines?.length > 0 && (
                             <span className="ml-2 text-gray-400 font-normal">
                                 ({order.lines.reduce((acc: number, line: any) => acc + line.quantity, 0)})
@@ -87,7 +87,7 @@ export default function CartDrawer({ isOpen, onClose }: Props) {
                         onClick={onClose}
                         className="p-2 -mr-2 text-gray-400 hover:text-black transition-colors duration-300 hover:rotate-90 cursor-pointer"
                     >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-[#1c1c1e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
@@ -108,7 +108,7 @@ export default function CartDrawer({ isOpen, onClose }: Props) {
                             <svg className="w-12 h-12 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                             </svg>
-                            <p className="text-sm text-gray-500 uppercase tracking-widest">Coșul este gol</p>
+                            <p className="text-xs text-gray-500 uppercase tracking-widest">Coșul tău este gol</p>
                             <button onClick={onClose} className="mt-4 text-xs font-medium border-b border-black pb-1 hover:text-gray-500 hover:border-gray-500 transition-colors duration-300 cursor-pointer">
                                 CONTINUĂ CUMPĂRĂTURILE
                             </button>

@@ -31,19 +31,19 @@ export default function UrbanBanner() {
                 </div>
 
                 {/* Main title */}
-                <h2 className="text-white font-bold uppercase pt-40 leading-tight text-3xl md:text-5xl tracking-wide">
+                <h2 className="text-white font-GemunuExtraBold uppercase pt-40 leading-tight text-3xl md:text-5xl tracking-wide">
                     NO PLAN B COLLECTION 26 // NEW
                 </h2>
 
                 {/* Subtitle */}
-                <p className="text-white text-xs md:text-sm mt-4 max-w-[300px] md:max-w-[420px] leading-relaxed">
+                <p className="text-white font-Inter18Semibold text-xs md:text-sm mt-4 max-w-[300px] md:max-w-[800px] leading-relaxed">
                     NOUA NOASTRĂ COLECȚIE, CONCEPUTĂ PENTRU CEI CARE SUNT SUFICIENT DE PUTERNICI SĂ NU DEA ÎNAPOI
                 </p>
 
                 {/* Button */}
                 <button
                     type="button"
-                    className="mt-6 bg-white text-black px-6 py-3 text-xs md:text-sm font-semibold tracking-widest hover:bg-black hover:text-white border border-white transition"
+                    className="mt-6 bg-white text-black px-6 py-3 text-xs md:text-sm font-Inter18Semibold tracking-widest hover:bg-black hover:text-white border border-white transition"
                 >
                     CUMPĂRĂ ACUM
                 </button>

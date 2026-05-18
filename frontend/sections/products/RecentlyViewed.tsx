@@ -25,19 +25,19 @@ export default function RecentlyViewed({
             )
             : recentlyViewedProducts;
 
-        setProducts(filteredProducts.slice(0, 5));
+        setProducts(filteredProducts.slice(0, 3));
     }, [excludeProductId]);
 
     if (!products || products.length === 0) return null;
 
     return (
-        <section className="w-full bg-[#f3f3f3] px-6 lg:px-12 py-8">
+        <section className="w-full bg-white px-6 lg:px-12 py-8">
 
-            <h2 className="text-xs tracking-widest text-black mb-4">
+            <h2 className="text-xl font-GemunuBold tracking-widest text-black mb-4">
                 {title}
             </h2>
 
-            <div className="w-full h-[1px] bg-black mb-6" />
+            <div className="w-full h-[1px] bg-[#bcbcbc] mb-6" />
 
             <div className="lg:hidden overflow-x-auto">
                 <div className="flex gap-6 w-max">

@@ -3,12 +3,12 @@ import Link from "next/link";
 
 export default function Footer() {
     return (
-        <footer className="w-full bg-[#f5f5f5] flex justify-center h-[880px] md:h-[500px]">
+        <footer className="w-full bg-[#f5f5f5] flex justify-center h-[880px] md:h-[500px] text-[#6A6A6A] font-Inter">
             <div className="w-full max-w-[1200px] px-6 md:px-8 flex flex-col justify-between">
                 <div className="pt-10 md:pt-16">
                     <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1.35fr_1.45fr] gap-10 md:gap-12">
                         <div className="flex flex-col items-center text-center md:items-start md:text-left">
-                            <h3 className="text-[13px] font-medium tracking-[0.12em] text-black">
+                            <h3 className="text-[13px] font-medium tracking-[0.12em]">
                                 SOCIAL MEDIA
                             </h3>
 
@@ -86,11 +86,11 @@ export default function Footer() {
                         </div>
 
                         <div className="flex flex-col items-center text-center md:items-start md:text-left">
-                            <h3 className="text-[13px] font-medium tracking-[0.12em] text-black">
+                            <h3 className="text-[13px] font-medium tracking-[0.12em]">
                                 CONTUL MEU
                             </h3>
 
-                            <div className="mt-5 flex flex-col gap-3 text-[12px] text-black">
+                            <div className="mt-5 flex flex-col gap-3 text-[12px]">
                                 <Link
                                     href="/login"
                                     className="text-center md:text-left hover:opacity-70 transition"
@@ -113,11 +113,11 @@ export default function Footer() {
                         </div>
 
                         <div className="flex flex-col items-center text-center md:items-start md:text-left">
-                            <h3 className="text-[13px] font-medium tracking-[0.12em] text-black">
+                            <h3 className="text-[13px] font-medium tracking-[0.12em]">
                                 AJUTOR
                             </h3>
 
-                            <div className="mt-5 flex flex-col gap-3 text-[12px] text-black">
+                            <div className="mt-5 flex flex-col gap-3 text-[12px]">
                                 <a
                                     href="/about"
                                     className="text-center md:text-left hover:opacity-70 transition block"
@@ -152,11 +152,11 @@ export default function Footer() {
                         </div>
 
                         <div className="flex flex-col items-center text-center md:items-start md:text-left md:border-l md:border-gray-300 md:pl-10">
-                            <h3 className="text-[13px] font-medium tracking-[0.12em] text-black">
+                            <h3 className="text-[13px] font-medium tracking-[0.12em]">
                                 CONTACT
                             </h3>
 
-                            <div className="mt-5 space-y-4 text-[12px] text-black">
+                            <div className="mt-5 space-y-4 text-[12px]">
                                 <p className="leading-6">
                                     AI NEVOIE DE AJUTOR? INFORMAȚII?
                                     <br />
@@ -164,17 +164,35 @@ export default function Footer() {
                                 </p>
 
                                 <div className="flex items-center gap-3 justify-center md:justify-start">
-                                    <span className="text-[14px]">🕒</span>
+                                    <Image
+                                        src="/icons/clock.svg"
+                                        alt=""
+                                        width={20}
+                                        height={20}
+                                        className="h-[18px] w-[18px]"
+                                    />
                                     <span>DE LUNI PÂNĂ VINERI DE LA 9:00 LA 19:00</span>
                                 </div>
 
                                 <div className="flex items-center gap-3 justify-center md:justify-start">
-                                    <span className="text-[14px]">📞</span>
+                                    <Image
+                                        src="/icons/phone.svg"
+                                        alt=""
+                                        width={20}
+                                        height={20}
+                                        className="h-[18px] w-[18px]"
+                                    />
                                     <span>+40 770 155 925</span>
                                 </div>
 
                                 <div className="flex items-center gap-3 justify-center md:justify-start">
-                                    <span className="text-[14px]">✉️</span>
+                                    <Image
+                                        src="/icons/mail.svg"
+                                        alt=""
+                                        width={20}
+                                        height={20}
+                                        className="h-[18px] w-[18px]"
+                                    />
                                     <span>beastproject@gmail.com</span>
                                 </div>
                             </div>
@@ -214,7 +232,7 @@ export default function Footer() {
 
                 <div>
                     <div className="h-px w-full bg-gray-300" />
-                    <div className="py-10 text-center text-[10px] tracking-[0.08em] text-gray-500">
+                    <div className="py-10 text-center text-[10px] tracking-[0.08em]">
                         COPYRIGHT © 2026 BEASTLOCKER
                     </div>
                 </div>

@@ -23,14 +23,14 @@ export default function Navbar() {
 
     return (
         <header className="w-full">
-            <div className="flex h-9 items-center justify-center gap-2 bg-black px-4 text-[11px] font-medium tracking-[0.08em] text-white sm:h-10 sm:text-xs">
+            <div className="flex h-9 items-center justify-center gap-2 bg-[#1C1C1E] px-4 text-[11px] font-Inter tracking-[0.08em] text-white sm:h-10 sm:text-xxs">
                 <span className="text-center">
                     Transport GRATUIT la comenzi peste 299 RON (vezi condiții)
                 </span>
                 <span aria-hidden="true">→</span>
             </div>
 
-            <div className="grid h-[76px] grid-cols-[auto_1fr_auto] items-center bg-[#f3f3f3] pl-4 sm:px-6">
+            <div className="grid h-[76px] grid-cols-[auto_1fr_auto] items-center bg-white pl-4 sm:px-6">
                 <div className="flex items-center justify-start lg:hidden">
                     <button
                         type="button"
@@ -79,7 +79,7 @@ export default function Navbar() {
                         <Link
                             key={link.label}
                             href={link.href}
-                            className="text-3xl font-GemunuRegular text-black transition hover:opacity-70"
+                            className="text-2xl font-Inter18Semibold text-[#1C1C1E] transition hover:opacity-70"
                         >
                             {link.label}
                         </Link>
@@ -91,7 +91,7 @@ export default function Navbar() {
                         type="button"
                         aria-label="Search"
                         onClick={() => setIsSearchOpen(true)}
-                        className="flex h-10 w-10 items-center justify-center"
+                        className="flex h-10 w-10 items-center justify-center cursor-pointer"
                     >
                         <Image
                             src="/icons/searchIcon.svg"
@@ -105,7 +105,7 @@ export default function Navbar() {
                     <Link
                         href="/account"
                         aria-label="Account"
-                        className="flex h-10 w-10 items-center justify-center"
+                        className="flex h-10 w-10 items-center justify-center cursor-pointer"
                     >
                         <Image
                             src="/icons/accountIcon.svg"
@@ -119,7 +119,7 @@ export default function Navbar() {
                     <button
                         aria-label="Cart"
                         onClick={openCart}
-                        className="flex h-10 w-10 items-center justify-center"
+                        className="flex h-10 w-10 items-center justify-center cursor-pointer"
                     >
                         <Image
                             src="/icons/cartIcon.svg"

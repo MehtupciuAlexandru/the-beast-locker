@@ -6,7 +6,7 @@ import { useState } from "react"
 const menuItems = [
     { label: "Cumpărare / Retur", href: "#", active: true },
     { label: "Contact", href: "#" },
-    { label: "Despre noi", href: "#" },
+    { label: "Despre noi", href: "/about" },
     { label: "Politica de confidențialitate", href: "#" },
     { label: "Termeni și condiții", href: "#" },
     { label: "Întrebări frecvente", href: "#" },
@@ -22,7 +22,7 @@ export default function ExploreMenu() {
     const [isOpen, setIsOpen] = useState(false)
 
     return (
-        <aside className="w-full bg-[#f0f4f8] h-full px-6 md:px-10 py-6 md:py-8">
+        <aside className="w-full bg-[#f0f4f8] h-full px-6 md:px-10 py-6 md:py-8 font-Inter">
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center justify-between w-full md:cursor-default md:mb-8"

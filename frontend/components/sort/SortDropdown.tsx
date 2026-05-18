@@ -8,7 +8,9 @@ type SortOption =
     | "a_z"
     | "z_a"
     | "price_low"
-    | "price_high";
+    | "price_high"
+    | "date_old"
+    | "date_new";
 
 type Props = {
     value: SortOption;
@@ -22,13 +24,15 @@ const options: { label: string; value: SortOption }[] = [
     { label: "Alfabetic, Z-A", value: "z_a" },
     { label: "Preț, mic la mare", value: "price_low" },
     { label: "Preț, mare la mic", value: "price_high" },
+    { label: "Dată, vechi la nou", value: "date_old" },
+    { label: "Dată, nou la vechi", value: "date_new" },
 ];
 
 export default function SortDropdown({ value, onChange }: Props) {
     const [open, setOpen] = useState(false);
 
     return (
-        <div className="relative">
+        <div className="relative shrink-0 font-Inter">
             <style>{`
                 @keyframes menuSlideUp {
                     from { transform: translateY(100%); }
@@ -65,12 +69,14 @@ export default function SortDropdown({ value, onChange }: Props) {
             {open && (
                 <>
                     <div
-                        className="fixed inset-0 bg-neutral-800/40 backdrop-blur-xs z-50 md:hidden animate-backdrop-fade-in"
+                        className="fixed inset-0 bg-neutral-800/40 backdrop-blur-xs z-50 lg:hidden animate-backdrop-fade-in"
                         onClick={() => setOpen(false)}
                     />
 
-                    <div className="fixed bottom-0 left-0 right-0 bg-white z-50 shadow-[0_-8px_30px_rgb(0,0,0,0.08)] border-t border-neutral-100 rounded-t-xl md:rounded-t-none animate-menu-slide-up md:animate-none md:absolute md:bottom-auto md:left-auto md:right-0 md:top-full md:mt-3 md:w-[280px] md:border md:border-neutral-200/60 md:shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
-                        <div className="relative flex items-center justify-center py-4 border-b border-neutral-100">
+                    {/* Added lg:min-w-[240px] lg:max-w-[240px] w-full lg:w-max to permanently lock the width */}
+                    <div className="fixed inset-x-0 bottom-0 bg-white z-50 shadow-[0_-8px_30px_rgb(0,0,0,0.08)] border-t border-neutral-100 rounded-t-xl animate-menu-slide-up lg:animate-none lg:absolute lg:inset-auto lg:right-0 lg:top-full lg:mt-3 w-full lg:w-[240px] lg:min-w-[240px] lg:max-w-[240px] lg:h-auto lg:py-6 lg:flex lg:flex-col lg:border lg:border-neutral-200/60 lg:shadow-[0_10px_30px_rgba(0,0,0,0.06)] lg:rounded-t-none">
+
+                        <div className="relative flex items-center justify-center py-4 border-b border-neutral-100 shrink-0 lg:hidden">
                             <span className="text-[11px] font-semibold tracking-[0.2em] text-neutral-800 uppercase"></span>
                             <button
                                 type="button"
@@ -81,7 +87,7 @@ export default function SortDropdown({ value, onChange }: Props) {
                             </button>
                         </div>
 
-                        <div className="flex flex-col items-center justify-center py-6 gap-4">
+                        <div className="flex flex-col items-center justify-center py-6 lg:py-0 gap-5 flex-1 overflow-y-auto">
                             {options.map((option) => {
                                 const active = option.value === value;
 
@@ -92,10 +98,10 @@ export default function SortDropdown({ value, onChange }: Props) {
                                             onChange(option.value);
                                             setOpen(false);
                                         }}
-                                        className={`text-center text-xs tracking-wide py-1 px-4 bg-transparent border-none cursor-pointer block transition-colors duration-200 ${
+                                        className={`text-center text-[14px] tracking-wide whitespace-nowrap bg-transparent border-none cursor-pointer block transition-colors duration-200 w-full ${
                                             active
-                                                ? "text-neutral-800 font-medium underline underline-offset-4 decoration-neutral-400"
-                                                : "text-neutral-400 hover:text-neutral-800 font-light"
+                                                ? "text-black underline underline-offset-[6px] decoration-1 decoration-black"
+                                                : "text-[#666666] hover:text-black"
                                         }`}
                                     >
                                         {option.label}

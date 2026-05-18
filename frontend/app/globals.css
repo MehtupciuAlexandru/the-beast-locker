@@ -11,12 +11,60 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
+  --font-Inter: "Inter", sans-serif;
+  --font-Inter18Semibold: "Inter18Semibold", sans-serif;
+  --font-InterLight: "InterLight", sans-serif;
   --font-GemunuRegular: 'GemunuRegular', sans-serif;
+  --font-GemunuBold: 'GemunuBold', sans-serif;
+  --font-GemunuExtraBold: 'GemunuExtraBold', sans-serif;
+  --font-GemunuLight: 'GemunuLight', sans-serif;
 }
 
 @font-face {
   font-family: 'GemunuRegular';
   src: url('/fonts/GemunuLibre-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GemunuBold';
+  src: url('/fonts/GemunuLibre-Bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GemunuExtraBold';
+  src: url('/fonts/GemunuLibre-ExtraBold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GemunuLight';
+  src: url('/fonts/GemunuLibre-Light.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter_18pt-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'InterLight';
+  src: url('/fonts/Inter_18pt-Light.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter18Semibold';
+  src: url('/fonts/Inter_18pt-Semibold.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }

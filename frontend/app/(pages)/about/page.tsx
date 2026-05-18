@@ -7,7 +7,7 @@ export default function AboutUs() {
         <>
             <Navbar />
 
-            <main className="w-full bg-white text-black min-h-screen pb-20">
+            <main className="w-full bg-white text-[#1c1c1e] min-h-screen pb-20 font-Inter">
                 <div className="w-full border-b border-gray-200">
                     <div className="max-w-[1200px] mx-auto px-4 py-4 md:py-6 text-[10px] sm:text-xs text-gray-500 uppercase tracking-widest">
                         EXPLOREAZĂ // DESPRE NOI // CINE SUNTEM
@@ -26,7 +26,7 @@ export default function AboutUs() {
                             />
                         </div>
                         <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                            <h1 className="text-white text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-wider text-center px-4 leading-tight">
+                            <h1 className="text-white text-4xl sm:text-5xl md:text-6xl font-GemunuExtraBold uppercase tracking-wider text-center px-4 leading-tight">
                                 ONLY FOR THE<br className="md:hidden" /> MOTIVATED
                             </h1>
                         </div>
@@ -43,9 +43,9 @@ export default function AboutUs() {
                         />
                     </div>
 
-                    <div className="w-full text-xs md:text-sm leading-loose text-gray-800 space-y-10">
+                    <div className="w-full text-[15px] font-Inter md:text-[15px] leading-loose text-gray-800 space-y-10">
                         <div>
-                            <h2 className="uppercase tracking-[0.15em] font-semibold mb-4 text-black">
+                            <h2 className="uppercase tracking-[0.15em]  mb-4 text-black">
                                 WELCOME TO BEAST LOCKER
                             </h2>
                             <p>
@@ -54,7 +54,7 @@ export default function AboutUs() {
                         </div>
 
                         <div>
-                            <h2 className="uppercase tracking-[0.15em] font-semibold mb-4 text-black">
+                            <h2 className="uppercase tracking-[0.15em]  mb-4 text-black">
                                 OUR MISSION
                             </h2>
                             <p className="mb-4">
@@ -84,7 +84,7 @@ export default function AboutUs() {
                         </div>
 
                         <div>
-                            <h2 className="uppercase tracking-[0.15em] font-semibold mb-4 text-black">
+                            <h2 className="uppercase tracking-[0.15em]  mb-4 ">
                                 MADE BY ATHLETES, FOR ATHLETES
                             </h2>
                             <p className="mb-4">
@@ -111,7 +111,7 @@ export default function AboutUs() {
                                 We don't do fake. We don't do fluff.<br />
                                 Just passion, strength, and the relentless pursuit of better.
                             </p>
-                            <p className="uppercase tracking-[0.15em] font-semibold text-black">
+                            <p className="uppercase tracking-[0.15em]">
                                 JOIN THE LOCKER
                             </p>
                         </div>

@@ -12,19 +12,19 @@ const categories = [
         title: "ÎMBRĂCĂMINTE",
         subtitle: "Haine și Accesorii gândite să îți deblocheze adevăratul potențial",
         image: "/images/banners/train.jpeg",
-        link: "/products?collection=clothes",
+        link: "/countdown",
     },
     {
         title: "ACCESORII",
         subtitle: "Lucrurile mici care fac diferența",
         image: "/images/banners/boxers.jpeg",
-        link: "/products",
+        link: "/countdown",
     }
 ];
 
 export default function Categories() {
     return (
-        <section className="w-full p-4 bg-white flex justify-center">
+        <section className="w-full p-4 bg-white flex justify-center font-GemunuExtraBold">
             <div className="flex flex-col lg:flex-row gap-4 w-full max-w-full">
                 {categories.map((cat, index) => (
                     <Link
@@ -44,10 +44,10 @@ export default function Categories() {
                         <div className="absolute inset-0 bg-black/40" />
 
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                            <h2 className="text-white text-2xl sm:text-3xl font-extrabold tracking-widest uppercase">
+                            <h2 className="text-white text-3xl sm:text-5xl font-extrabold tracking-widest uppercase">
                                 {cat.title}
                             </h2>
-                            <p className="text-white text-sm sm:text-base mt-2 max-w-[260px] leading-tight">
+                            <p className="text-white font-Inter text-sm sm:text-base mt-2 max-w-[260px] leading-tight">
                                 {cat.subtitle}
                             </p>
                         </div>

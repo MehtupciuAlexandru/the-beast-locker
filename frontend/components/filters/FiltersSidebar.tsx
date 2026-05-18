@@ -59,15 +59,15 @@ export default function FiltersSidebar({
     }, []);
 
     return (
-        <div className="w-[230px] text-black select-none font-sans  p-2">
+        <div className="w-[420px] text-[#1C1C1E] select-none font-Inter p-2">
             <div className="mb-5 border-b border-neutral-200 pb-3">
                 <button
                     type="button"
                     onClick={() => setCollectionsOpen((prev) => !prev)}
-                    className="flex w-full items-center justify-between text-[11px] font-medium tracking-widest text-neutral-800 cursor-pointer"
+                    className="flex w-full items-center justify-between text-[11px] font-medium tracking-widest text-[#1C1C1E] cursor-pointer"
                 >
                     <span>COLECȚIE</span>
-                    <span className="text-sm font-light text-neutral-400">{collectionsOpen ? "−" : "+"}</span>
+                    <span className="text-sm font-light text-[#1C1C1E]/50">{collectionsOpen ? "−" : "+"}</span>
                 </button>
 
                 {collectionsOpen && (
@@ -76,7 +76,7 @@ export default function FiltersSidebar({
                             type="button"
                             onClick={() => setCollection("")}
                             className={`text-left text-[10px] tracking-widest cursor-pointer transition-colors ${
-                                selectedCollection === "" ? "font-bold text-black" : "text-neutral-400 hover:text-black"
+                                selectedCollection === "" ? "font-bold text-[#1C1C1E]" : "text-[#1C1C1E]/50 hover:text-[#1C1C1E]"
                             }`}
                         >
                             TOATE
@@ -88,7 +88,7 @@ export default function FiltersSidebar({
                                 type="button"
                                 onClick={() => setCollection(collection.slug)}
                                 className={`text-left text-[10px] uppercase tracking-widest cursor-pointer transition-colors ${
-                                    selectedCollection === collection.slug ? "font-bold text-black" : "text-neutral-400 hover:text-black"
+                                    selectedCollection === collection.slug ? "font-bold text-[#1C1C1E]" : "text-[#1C1C1E]/50 hover:text-[#1C1C1E]"
                                 }`}
                             >
                                 {collection.name}
@@ -102,10 +102,10 @@ export default function FiltersSidebar({
                 <button
                     type="button"
                     onClick={() => setEquipmentOpen((prev) => !prev)}
-                    className="flex w-full items-center justify-between text-[11px] font-medium tracking-widest text-neutral-800 cursor-pointer"
+                    className="flex w-full items-center justify-between text-[11px] font-medium tracking-widest text-[#1C1C1E] cursor-pointer"
                 >
                     <span>TIPUL ECHIPAMENTULUI</span>
-                    <span className="text-sm font-light text-neutral-400">{equipmentOpen ? "−" : "+"}</span>
+                    <span className="text-sm font-light text-[#1C1C1E]/50">{equipmentOpen ? "−" : "+"}</span>
                 </button>
 
                 {equipmentOpen && (
@@ -114,7 +114,7 @@ export default function FiltersSidebar({
                             type="button"
                             onClick={() => setSelectedEquipmentType("")}
                             className={`text-left text-[10px] tracking-widest cursor-pointer transition-colors ${
-                                selectedEquipmentType === "" ? "font-bold text-black" : "text-neutral-400 hover:text-black"
+                                selectedEquipmentType === "" ? "font-bold text-[#1C1C1E]" : "text-[#1C1C1E]/50 hover:text-[#1C1C1E]"
                             }`}
                         >
                             TOATE
@@ -126,7 +126,7 @@ export default function FiltersSidebar({
                                 type="button"
                                 onClick={() => setSelectedEquipmentType(type)}
                                 className={`text-left text-[10px] tracking-widest cursor-pointer transition-colors ${
-                                    selectedEquipmentType === type ? "font-bold text-black" : "text-neutral-400 hover:text-black"
+                                    selectedEquipmentType === type ? "font-bold text-[#1C1C1E]" : "text-[#1C1C1E]/50 hover:text-[#1C1C1E]"
                                 }`}
                             >
                                 {type}
@@ -140,10 +140,10 @@ export default function FiltersSidebar({
                 <button
                     type="button"
                     onClick={() => setStockOpen((prev) => !prev)}
-                    className="flex w-full items-center justify-between text-[11px] font-medium tracking-widest text-neutral-800 cursor-pointer"
+                    className="flex w-full items-center justify-between text-[11px] font-medium tracking-widest text-[#1C1C1E] cursor-pointer"
                 >
                     <span>STOC</span>
-                    <span className="text-sm font-light text-neutral-400">{stockOpen ? "−" : "+"}</span>
+                    <span className="text-sm font-light text-[#1C1C1E]/50">{stockOpen ? "−" : "+"}</span>
                 </button>
 
                 {stockOpen && (
@@ -151,7 +151,7 @@ export default function FiltersSidebar({
                         <div
                             onClick={() => setInStockOnly(!inStockOnly)}
                             className={`w-[36px] h-[18px] relative cursor-pointer p-[1px] border transition-colors duration-150 ease-out ${
-                                inStockOnly ? "bg-black border-black" : "bg-[#b3b3b3] border-[#b3b3b3]"
+                                inStockOnly ? "bg-[#1C1C1E] border-[#1C1C1E]" : "bg-[#b3b3b3] border-[#b3b3b3]"
                             }`}
                         >
                             <div
@@ -165,11 +165,11 @@ export default function FiltersSidebar({
             </div>
 
             <div className="pt-1">
-                <p className="mb-3 text-[11px] font-medium tracking-widest text-neutral-700">RESETARE FILTRE</p>
+                <p className="mb-3 text-[11px] font-medium tracking-widest text-[#1C1C1E]">RESETARE FILTRE</p>
                 <button
                     type="button"
                     onClick={resetFilters}
-                    className="border border-neutral-200 w-24 py-2.5 text-[10px] font-medium tracking-[0.2em] text-neutral-400 hover:text-black hover:border-black transition-colors cursor-pointer bg-white"
+                    className="border border-neutral-200 w-24 py-2.5 text-[10px] font-medium tracking-[0.2em] text-[#1C1C1E]/50 hover:text-[#1C1C1E] hover:border-[#1C1C1E] transition-colors cursor-pointer bg-white"
                 >
                     RESET
                 </button>

@@ -19,23 +19,19 @@ export default function Newsletter() {
     };
 
     return (
-        <section className="w-full bg-[#f5f5f5] flex justify-center py-10 md:py-20">
+        <section className="w-full bg-[#f5f5f5] flex justify-center py-10 md:py-20 font-Inter">
             <div className="w-full max-w-[390px] md:max-w-[800px] px-6 text-center">
 
-                {/* Title */}
                 <h1 className="text-2xl md:text-4xl font-semibold leading-tight text-black">
                     Obține 10% reducere la noua colecție!
                 </h1>
 
-                {/* Subtitle */}
-                <p className="mt-4 text-sm text-gray-700 leading-relaxed">
+                <p className="mt-4 font-Inter18Semibold text-sm text-gray-700 leading-relaxed">
                     Înscrie-te la newsletterul nostru pentru a primi un cod de reducere și fii la curent cu noutățile de la BeastLocker.
                 </p>
 
-                {/* Form */}
                 <form onSubmit={handleSubmit} className="mt-8">
 
-                    {/* Input + Button */}
                     <div className="flex flex-col md:flex-row items-center gap-4 md:gap-2">
 
                         <input
@@ -59,7 +55,6 @@ export default function Newsletter() {
 
                     </div>
 
-                    {/* Checkbox */}
                     <label className="flex items-start gap-2 mt-6 text-left text-[11px] text-gray-700 cursor-pointer max-w-[600px] mx-auto">
                         <input
                             type="checkbox"
@@ -68,7 +63,7 @@ export default function Newsletter() {
                             className="mt-1 accent-black"
                         />
 
-                        <span>
+                        <span className="font-Inter">
                             Accept și înțeleg{" "}
                             <button
                                 type="button"

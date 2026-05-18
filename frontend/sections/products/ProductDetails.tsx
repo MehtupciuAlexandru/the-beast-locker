@@ -227,34 +227,42 @@ export default function ProductDetails({ product }: Props) {
                         </div>
                     </div>
 
-                    <div className="px-4 py-6 bg-white">
+                    <div className="px-4 py-8 bg-white flex flex-col items-center text-center">
 
-                        <h1 className="text-lg font-medium mb-4 uppercase tracking-wider text-[#1a1a1a]">
+                        <h1 className="text-4xl font-GemunuRegular mb-1 uppercase tracking-widest text-[#1a1a1a]">
                             {product.name}
                         </h1>
 
-                        <p className="text-base font-normal mb-6 text-[#1a1a1a]">
-                            {displayedPrice.toFixed(2)} lei
+                        <p className="text-sm font-Inter mb-6 uppercase tracking-wider text-[#1a1a1a]">
+                            {getVariantLabel(selectedVariant)}
+                        </p>
+
+                        <p className="text-2xl font-InterLight mb-8 text-[#6A6A6A] tracking-wide">
+                            {displayedPrice.toFixed(2).replace(".", ",")} lei
                         </p>
 
                         {variants.length > 0 && (
-                            <div className="mb-6">
-                                <label className="text-[11px] font-normal mb-3 block text-neutral-500 uppercase tracking-wide">
-                                    Variantă - <span className="text-neutral-400 font-light">Alegeți varianta</span>
+                            <div className="mb-6 w-full flex flex-col items-center">
+                                <label className="text-sm font-Inter mb-4 block text-neutral-500 tracking-wide">
+                                    Variant - <span className="text-[#1a1a1a] font-Inter">{getVariantLabel(selectedVariant)}</span>
                                 </label>
 
-                                <div className="grid grid-cols-3 gap-1.5 mb-3">
+                                <div className="flex justify-center gap-2 mb-3">
                                     {variants.map((variant: any) => (
                                         <button
                                             key={variant.id}
                                             onClick={() => setSelectedVariantId(variant.id)}
-                                            className={`h-[32px] text-[10px] border tracking-wider transition-colors cursor-pointer flex items-center justify-center ${
+                                            className={`w-20 h-24 border transition-colors cursor-pointer overflow-hidden flex items-center justify-center bg-white ${
                                                 selectedVariantId === variant.id
-                                                    ? "border-[#1a1a1a] text-[#1a1a1a] font-bold bg-white"
-                                                    : "border-[#e5e5e5] bg-white text-neutral-300 font-normal hover:border-neutral-400 hover:text-neutral-500"
+                                                    ? "border-[#1a1a1a]"
+                                                    : "border-transparent opacity-60"
                                             }`}
                                         >
-                                            {getVariantLabel(variant)}
+                                            <img
+                                                src={variant.image || variant.gallery?.[0] || product.image}
+                                                alt={getVariantLabel(variant)}
+                                                className="w-full h-full object-cover"
+                                            />
                                         </button>
                                     ))}
                                 </div>
@@ -268,23 +276,23 @@ export default function ProductDetails({ product }: Props) {
                             ADAUGĂ ÎN COȘ
                         </button>
 
-                        <div className="border-t border-[#e5e5e5]">
+                        <div className="border-t border-[#e5e5e5] w-full text-left">
                             <button
                                 onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
-                                className="w-full flex items-center justify-between py-4 text-xs font-medium uppercase border-b border-[#e5e5e5] text-[#1a1a1a] tracking-wider cursor-pointer"
+                                className="w-full flex items-center justify-between py-4 text-xs font-Inter uppercase border-b border-[#e5e5e5] text-[#1a1a1a] tracking-wider cursor-pointer"
                             >
                                 DESCRIERE
                                 {isDescriptionOpen ? (
-                                    <span className="text-lg font-light text-neutral-400 leading-none">−</span>
+                                    <span className="text-lg font-InterLight text-neutral-400 leading-none">−</span>
                                 ) : (
-                                    <span className="text-lg font-light text-neutral-400 leading-none">+</span>
+                                    <span className="text-lg font-InterLight text-neutral-400 leading-none">+</span>
                                 )}
                             </button>
 
                             {isDescriptionOpen && (
                                 <div className="py-4 text-xs text-neutral-500 leading-relaxed border-b border-[#e5e5e5] space-y-4">
                                     <div dangerouslySetInnerHTML={{ __html: product.description }} />
-                                    <p className="text-[11px] italic text-neutral-400 block pt-2">
+                                    <p className="text-[11px] font-InterLight text-neutral-400 block pt-2">
                                         Model is 5&apos;11 170lbs wearing a size M.
                                     </p>
                                 </div>
@@ -292,18 +300,18 @@ export default function ProductDetails({ product }: Props) {
 
                             <button
                                 onClick={() => setIsCompositionOpen(!isCompositionOpen)}
-                                className="w-full flex items-center justify-between py-4 text-xs font-medium uppercase border-b border-[#e5e5e5] text-[#1a1a1a] tracking-wider cursor-pointer"
+                                className="w-full flex items-center justify-between py-4 text-xs font-Inter uppercase border-b border-[#e5e5e5] text-[#1a1a1a] tracking-wider cursor-pointer"
                             >
                                 COMPOZIȚIE ȘI ÎNTREȚINERE
                                 {isCompositionOpen ? (
-                                    <span className="text-lg font-light text-neutral-400 leading-none">−</span>
+                                    <span className="text-lg font-InterLight text-neutral-400 leading-none">−</span>
                                 ) : (
-                                    <span className="text-lg font-light text-neutral-400 leading-none">+</span>
+                                    <span className="text-lg font-InterLight text-neutral-400 leading-none">+</span>
                                 )}
                             </button>
 
                             {isCompositionOpen && (
-                                <div className="py-4 text-xs text-neutral-500 leading-relaxed border-b border-[#e5e5e5]">
+                                <div className="py-4 text-xs font-InterLight text-neutral-500 leading-relaxed border-b border-[#e5e5e5]">
                                     <p className="mb-2"><strong>Composition:</strong></p>
                                     <p className="mb-4">100% Premium Cotton</p>
                                     <p className="mb-2"><strong>Care Instructions:</strong></p>

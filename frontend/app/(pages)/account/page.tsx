@@ -5,20 +5,21 @@ import { getActiveCustomer } from "@/lib/api/auth";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/footer";
 import { useRouter } from "next/navigation";
-import {logout} from "@/lib/api/auth";
-import {deleteCustomerAddress, setDefaultAddress, updateCustomerAddress} from "@/lib/api/customer";
+import { logout } from "@/lib/api/auth";
+import { deleteCustomerAddress, setDefaultAddress, updateCustomerAddress } from "@/lib/api/customer";
 import { updateCustomerDetails } from "@/lib/api/customer";
 import { updatePassword } from "@/lib/api/customer";
 import { createCustomerAddress } from "@/lib/api/customer";
-import {getAvailableCountries} from "@/lib/api/shop";
-
+import { getAvailableCountries } from "@/lib/api/shop";
 
 export default function AccountPage() {
     const router = useRouter();
+
     const handleLogout = async () => {
         await logout();
         router.push("/login");
     };
+
     const [email, setEmail] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [lastName, setLastName] = useState<string | null>(null);
@@ -109,8 +110,6 @@ export default function AccountPage() {
             setLastName(data.activeCustomer.lastName);
             setFirstName(data.activeCustomer.firstName);
             setEmail(data.activeCustomer.emailAddress);
-
-
         } catch {
             router.push("/login");
         } finally {
@@ -147,7 +146,6 @@ export default function AccountPage() {
     }, []);
 
     const handleAddAddress = async () => {
-
         if (
             !newAddress.fullName.trim() ||
             !newAddress.streetLine1.trim() ||
@@ -213,13 +211,11 @@ export default function AccountPage() {
 
             setIsAddAddressOpen(false);
             setEditingAddressId(null);
-
         } catch (err) {
             console.error(err);
             setMessage("Eroare la adăugarea adresei");
             setMessageType("error");
         }
-
     };
 
     const handleDeleteAddress = (e: React.MouseEvent, id: string) => {
@@ -252,7 +248,6 @@ export default function AccountPage() {
             setMessageType("success");
 
             setDeleteAddressId(null);
-
         } catch (err) {
             console.error(err);
             setMessage("A apărut o eroare la ștergere");
@@ -274,6 +269,7 @@ export default function AccountPage() {
             console.error(err);
         }
     };
+
     if (loading || isAuthenticated === null) {
         return (
             <section className="min-h-[80vh] flex items-center justify-center bg-white text-neutral-800">
@@ -367,7 +363,6 @@ export default function AccountPage() {
             setEditLastName("");
             setNewPassword("");
             setConfirmPassword("");
-
         } catch (err) {
             console.error(err);
 
@@ -376,15 +371,12 @@ export default function AccountPage() {
         }
     };
 
-
-
     return (
         <>
             <Navbar />
 
             <section className="min-h-[80vh] px-8 md:px-16 py-12 bg-white text-neutral-800 font-sans">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12 md:gap-20">
-
                     <div className="w-full md:w-3/5 flex flex-col">
                         <button
                             onClick={handleLogout}
@@ -504,7 +496,6 @@ export default function AccountPage() {
                                         </div>
                                     );
                                 })}
-
                             </div>
                         ) : (
                             <p className="text-xs text-neutral-400 font-light">
@@ -515,7 +506,7 @@ export default function AccountPage() {
                         <div className="flex flex-col gap-2 mt-6">
                             <button
                                 onClick={handleSetDefaultAddress}
-                                className="bg-neutral-800 text-white text-xs uppercase tracking-widest py-3 px-6 rounded-none hover:bg-neutral-700 transition-colors cursor-pointer w-full text-center font-medium shadow-none border-none outline-none block"
+                                className="bg-[#1c1c1E] text-white text-xs uppercase tracking-widest py-3 px-6 rounded-none hover:bg-black transition-colors cursor-pointer w-full text-center font-medium shadow-none border-none outline-none block"
                                 disabled={!selectedAddressId}
                             >
                                 SETEAZĂ ADRESA SELECTATĂ CA ACTIVĂ
@@ -526,20 +517,19 @@ export default function AccountPage() {
                                     resetAddressForm();
                                     setIsAddAddressOpen(true);
                                 }}
-                                className="bg-neutral-800 text-white text-xs uppercase tracking-widest py-3 px-6 rounded-none hover:bg-neutral-700 transition-colors cursor-pointer w-full text-center font-medium shadow-none border-none outline-none block"
+                                className="bg-[#1c1c1E] text-white text-xs uppercase tracking-widest py-3 px-6 rounded-none hover:bg-black transition-colors cursor-pointer w-full text-center font-medium shadow-none border-none outline-none block"
                             >
                                 ADAUGĂ ADRESĂ
                             </button>
 
                             <button
                                 onClick={() => setIsEditOpen(true)}
-                                className="bg-neutral-800 text-white text-xs uppercase tracking-widest py-3 px-6 rounded-none hover:bg-neutral-700 transition-colors cursor-pointer w-full text-center font-medium shadow-none border-none outline-none block"
+                                className="bg-[#1c1c1E] text-white text-xs uppercase tracking-widest py-3 px-6 rounded-none hover:bg-black transition-colors cursor-pointer w-full text-center font-medium shadow-none border-none outline-none block"
                             >
                                 EDITEAZĂ DETALIILE CONTULUI
                             </button>
                         </div>
                     </div>
-
                 </div>
             </section>
 
@@ -675,12 +665,11 @@ export default function AccountPage() {
 
                             <button
                                 onClick={handleSaveAccount}
-                                className="flex-1 bg-neutral-800 text-white text-[11px] font-medium uppercase tracking-widest py-3 px-6 rounded-none hover:bg-neutral-700 transition-all cursor-pointer border-none"
+                                className="flex-1 bg-[#1c1c1E] text-white text-[11px] font-medium uppercase tracking-widest py-3 px-6 rounded-none hover:bg-black transition-all cursor-pointer border-none"
                             >
                                 Salvează
                             </button>
                         </div>
-
                     </div>
                 </div>
             )}
@@ -689,7 +678,7 @@ export default function AccountPage() {
                 <div className="fixed top-6 right-6 z-[9999]">
                     <div
                         className={`px-5 py-3 rounded-none shadow-xl text-xs uppercase tracking-wider text-white font-medium ${
-                            messageType === "success" ? "bg-neutral-800" : "bg-red-600"
+                            messageType === "success" ? "bg-[#1c1c1E]" : "bg-red-600"
                         }`}
                     >
                         {message}
@@ -840,12 +829,11 @@ export default function AccountPage() {
 
                             <button
                                 onClick={handleAddAddress}
-                                className="flex-1 bg-neutral-800 text-white text-[11px] font-medium uppercase tracking-widest py-3 px-6 rounded-none hover:bg-neutral-700 transition-all cursor-pointer border-none"
+                                className="flex-1 bg-[#1c1c1E] text-white text-[11px] font-medium uppercase tracking-widest py-3 px-6 rounded-none hover:bg-black transition-all cursor-pointer border-none"
                             >
                                 Salvează
                             </button>
                         </div>
-
                     </div>
                 </div>
             )}
@@ -881,7 +869,6 @@ export default function AccountPage() {
                                 Șterge
                             </button>
                         </div>
-
                     </div>
                 </div>
             )}
