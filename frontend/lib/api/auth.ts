@@ -136,3 +136,93 @@ export async function verifyCustomerAccount(token: string) {
 
     return graphqlRequest(query, { token }, true);
 }
+
+// FORGOR PASSWORD
+export async function forgotPassword(emailAddress: string) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop-api`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+            query: `
+                mutation RequestPasswordReset($emailAddress: String!) {
+                    requestPasswordReset(emailAddress: $emailAddress) {
+                        ... on Success {
+                            success
+                        }
+                        ... on ErrorResult {
+                            errorCode
+                            message
+                        }
+                    }
+                }
+            `,
+            variables: {
+                emailAddress,
+            },
+        }),
+    });
+
+    const result = await response.json();
+
+    if (result.errors?.length) {
+        throw new Error(result.errors[0].message);
+    }
+
+    const data = result.data?.requestPasswordReset;
+
+    if (!data?.success) {
+        throw new Error(data?.message || "Nu am putut trimite email-ul de resetare.");
+    }
+
+    return data;
+}
+
+
+// CHANGE PASSWRD
+
+export async function resetPassword(token: string, password: string) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop-api`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+            query: `
+                mutation ResetPassword($token: String!, $password: String!) {
+                    resetPassword(token: $token, password: $password) {
+                        ... on CurrentUser {
+                            id
+                            identifier
+                        }
+                        ... on ErrorResult {
+                            errorCode
+                            message
+                        }
+                    }
+                }
+            `,
+            variables: {
+                token,
+                password,
+            },
+        }),
+    });
+
+    const result = await response.json();
+
+    if (result.errors?.length) {
+        throw new Error(result.errors[0].message);
+    }
+
+    const data = result.data?.resetPassword;
+
+    if (!data?.id) {
+        throw new Error(data?.message || "Nu am putut reseta parola.");
+    }
+
+    return data;
+}

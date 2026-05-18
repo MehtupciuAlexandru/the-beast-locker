@@ -41,7 +41,7 @@ export default function LoginPage() {
         <>
             <Navbar />
 
-            <div className="min-h-[80vh] flex flex-col items-center justify-center px-4 bg-white text-black">
+            <div className="min-h-[80vh] flex flex-col items-center justify-center px-4 bg-white text-[#1c1c1e] font-Inter18Semibold">
                 <div className="w-full max-w-md flex flex-col gap-4">
                     <h1 className="text-2xl text-center">Autentificare</h1>
 
@@ -65,7 +65,7 @@ export default function LoginPage() {
                         <button
                             type="button"
                             onClick={() => setShowPassword((prev) => !prev)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600 cursor-pointer"
                         >
                             {showPassword ? "Ascunde" : "Arată"}
                         </button>
@@ -80,20 +80,29 @@ export default function LoginPage() {
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="bg-black text-white py-3 mt-2"
+                        className="bg-[#1c1c1E] text-white font-Inter18Semibold cursor-pointer py-3 mt-2 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                         {loading ? "Se procesează..." : "AUTENTIFICARE"}
                     </button>
 
-                    <p className="text-center text-sm text-gray-600 mt-4">
-                        Nu ai cont?{" "}
+                    <div className="flex flex-col items-center gap-2 mt-4 text-sm text-gray-600">
+                        <p>
+                            Nu ai cont?{" "}
+                            <Link
+                                href="/register"
+                                className="underline hover:text-black cursor-pointer"
+                            >
+                                Înregistrează-te acum
+                            </Link>
+                        </p>
+
                         <Link
-                            href="/register"
-                            className="underline hover:text-black"
+                            href="/forgot-password"
+                            className="underline hover:text-black cursor-pointer"
                         >
-                            Înregistrează-te acum
+                            Ai uitat parola?
                         </Link>
-                    </p>
+                    </div>
                 </div>
             </div>
 

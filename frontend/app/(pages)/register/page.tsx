@@ -86,7 +86,7 @@ export default function RegisterPage() {
         <>
             <Navbar />
 
-            <div className="min-h-[80vh] flex flex-col items-center justify-center px-4 bg-white text-black">
+            <div className="min-h-[80vh] flex flex-col items-center justify-center px-4 bg-white text-[#1c1c1e] font-Inter18Semibold">
                 {!success ? (
                     <div className="w-full max-w-md flex flex-col gap-4">
                         <h1 className="text-2xl text-center">Înregistrare</h1>
@@ -179,24 +179,24 @@ export default function RegisterPage() {
                         <button
                             onClick={handleSubmit}
                             disabled={loading}
-                            className="bg-black text-white py-3 mt-2 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
+                            className="bg-[#1c1c1e] font-Inter18Semibold text-white py-3 mt-2 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
                         >
                             {loading ? "Se procesează..." : "CREEAZĂ CONTUL"}
                         </button>
                     </div>
                 ) : (
                     <div className="text-center flex flex-col gap-4">
-                        <h2 className="text-xl font-semibold">
+                        <h2 className="text-xl font-Inter18Semibold">
                             Cont creat cu succes!
                         </h2>
 
-                        <p className="text-gray-600">
+                        <p className="text-gray-600 font-Inter18Semibold">
                             Verificați email-ul pentru activarea contului.
                         </p>
 
                         <button
                             onClick={() => router.push("/login")}
-                            className="bg-black text-white py-3 px-6 mt-4 cursor-pointer"
+                            className="bg-[#1c1c1e] text-white py-3 px-6 mt-4 cursor-pointer font-Inter18Semibold"
                         >
                             Mergi la login
                         </button>
