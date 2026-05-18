@@ -272,7 +272,7 @@ export default function AccountPage() {
 
     if (loading || isAuthenticated === null) {
         return (
-            <section className="min-h-[80vh] flex items-center justify-center bg-white text-neutral-800">
+            <section className="min-h-[80vh] flex items-center justify-center bg-white text-neutral-800 font-Inter">
             </section>
         );
     }
@@ -375,9 +375,9 @@ export default function AccountPage() {
         <>
             <Navbar />
 
-            <section className="min-h-[80vh] px-8 md:px-16 py-12 bg-white text-neutral-800 font-sans">
-                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12 md:gap-20">
-                    <div className="w-full md:w-3/5 flex flex-col">
+            <section className="min-h-[80vh] px-12 md:px-24 lg:px-32 py-12 bg-white text-neutral-800 font-Inter">
+                <div className="w-full flex flex-col md:flex-row justify-between gap-12 md:gap-32">
+                    <div className="w-full md:w-2/3 flex flex-col">
                         <button
                             onClick={handleLogout}
                             className="text-xs text-neutral-400 underline hover:text-neutral-800 mb-3 w-fit bg-transparent border-none p-0 cursor-pointer text-left normal-case tracking-normal font-normal shadow-none"
@@ -385,41 +385,41 @@ export default function AccountPage() {
                             Logout
                         </button>
 
-                        <h1 className="text-xl font-normal text-neutral-800 mb-1">
+                        <h1 className="text-xl font-InterLight text-neutral-800 mb-1">
                             Contul meu
                         </h1>
 
                         {loading ? (
-                            <p className="text-xs text-neutral-400 mb-10">Se încarcă...</p>
+                            <p className="text-xs font-Inter text-neutral-400 mb-10">Se încarcă...</p>
                         ) : (
-                            <p className="text-xs text-neutral-400 mb-10">
+                            <p className="text-xs font-Inter text-neutral-400 mb-10">
                                 Bine te-am regăsit, {firstName} {lastName}!
                             </p>
                         )}
 
                         <div className="mb-10">
-                            <p className="text-xs text-neutral-400 tracking-wide">
+                            <p className="text-xs font-Inter text-neutral-400 tracking-wide">
                                 Comenzile mele
                             </p>
                             <div className="border-b border-neutral-200 mt-1.5 mb-3"></div>
-                            <p className="text-xs text-neutral-400 font-light">
+                            <p className="text-xs font-Inter text-neutral-400 font-light">
                                 Încă nu aveți nicio comandă
                             </p>
                         </div>
 
                         <div className="mb-10">
-                            <p className="text-xs text-neutral-400 tracking-wide">
+                            <p className="text-xs font-Inter text-neutral-400 tracking-wide">
                                 Retururile mele
                             </p>
                             <div className="border-b border-neutral-200 mt-1.5 mb-3"></div>
-                            <p className="text-xs text-neutral-400 font-light">
+                            <p className="text-xs font-Inter text-neutral-400 font-light">
                                 Încă nu aveți niciun retur
                             </p>
                         </div>
                     </div>
 
                     <div className="w-full md:w-1/3 flex flex-col">
-                        <p className="text-xs text-neutral-400 tracking-wide">
+                        <p className="text-xs font-Inter text-neutral-400 tracking-wide">
                             Adresa principală
                         </p>
                         <div className="border-b border-neutral-200 mt-1.5 mb-4"></div>
@@ -444,7 +444,7 @@ export default function AccountPage() {
                                                 </p>
                                                 <div className="flex items-center gap-2">
                                                     {isDefault && (
-                                                        <span className="text-[10px] uppercase tracking-wider bg-neutral-100 text-neutral-600 px-2 py-0.5">
+                                                        <span className="text-[10px] font-Inter uppercase tracking-wider bg-neutral-100 text-neutral-600 px-2 py-0.5">
                                                             Principală
                                                         </span>
                                                     )}
@@ -534,62 +534,63 @@ export default function AccountPage() {
             </section>
 
             {isEditOpen && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 font-Inter">
                     <div
                         className="absolute inset-0 bg-neutral-800/50 backdrop-blur-xs transition-opacity"
                         onClick={() => setIsEditOpen(false)}
                     />
 
-                    <div className="relative bg-white text-neutral-800 w-full max-w-lg p-8 rounded-none border border-neutral-100 shadow-2xl overflow-y-auto max-h-[90vh]">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-sm font-semibold uppercase tracking-widest text-neutral-800">
+                    <div className="relative bg-white text-neutral-800 w-full max-w-lg p-8 md:p-10 rounded-none shadow-2xl overflow-y-auto max-h-[90vh]">
+                        <button
+                            onClick={() => setIsEditOpen(false)}
+                            className="absolute top-6 right-6 text-neutral-400 hover:text-neutral-800 bg-transparent border-none p-0 cursor-pointer text-xl font-light"
+                        >
+                            ✕
+                        </button>
+
+                        <div className="text-center mb-8">
+                            <h2 className="text-xl font-normal text-neutral-800">
                                 Editează detaliile contului
                             </h2>
-                            <button
-                                onClick={() => setIsEditOpen(false)}
-                                className="text-neutral-400 hover:text-neutral-800 bg-transparent border-none p-0 cursor-pointer text-sm font-light"
-                            >
-                                ✕
-                            </button>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 mb-5">
                             <div>
-                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Prenume</label>
+                                <label className="block text-xs text-neutral-400 mb-1">Prenume</label>
                                 <input
                                     type="text"
                                     value={editFirstName}
                                     onChange={(e) => setEditFirstName(e.target.value)}
-                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                    className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm outline-none bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300"
                                     placeholder={firstName || ""}
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Nume</label>
+                                <label className="block text-xs text-neutral-400 mb-1">Nume</label>
                                 <input
                                     type="text"
                                     value={editLastName}
                                     onChange={(e) => setEditLastName(e.target.value)}
-                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                    className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm outline-none bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300"
                                     placeholder={lastName || ""}
                                 />
                             </div>
                         </div>
 
                         <div className="mb-5">
-                            <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Parola curentă</label>
+                            <label className="block text-xs text-neutral-400 mb-1">Parola curentă</label>
                             <div className="relative">
                                 <input
                                     type={showCurrentPassword ? "text" : "password"}
                                     value={currentPassword}
                                     onChange={(e) => setCurrentPassword(e.target.value)}
-                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs pr-16 outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200"
+                                    className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm pr-16 outline-none bg-white focus:border-neutral-800 transition-colors duration-200"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowCurrentPassword((prev) => !prev)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider text-neutral-400 hover:text-neutral-800 font-medium bg-transparent border-none cursor-pointer"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-400 hover:text-neutral-800 font-medium bg-transparent border-none cursor-pointer"
                                 >
                                     {showCurrentPassword ? "Ascunde" : "Arată"}
                                 </button>
@@ -597,18 +598,18 @@ export default function AccountPage() {
                         </div>
 
                         <div className="mb-5">
-                            <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Parolă nouă</label>
+                            <label className="block text-xs text-neutral-400 mb-1">Parolă nouă</label>
                             <div className="relative">
                                 <input
                                     type={showNewPassword ? "text" : "password"}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs pr-16 outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200"
+                                    className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm pr-16 outline-none bg-white focus:border-neutral-800 transition-colors duration-200"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowNewPassword((prev) => !prev)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider text-neutral-400 hover:text-neutral-800 font-medium bg-transparent border-none cursor-pointer"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-400 hover:text-neutral-800 font-medium bg-transparent border-none cursor-pointer"
                                 >
                                     {showNewPassword ? "Ascunde" : "Arată"}
                                 </button>
@@ -616,18 +617,18 @@ export default function AccountPage() {
                         </div>
 
                         <div className="mb-5">
-                            <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Confirmă parola</label>
+                            <label className="block text-xs text-neutral-400 mb-1">Confirmă parola</label>
                             <div className="relative">
                                 <input
                                     type={showConfirmPassword ? "text" : "password"}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs pr-16 outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200"
+                                    className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm pr-16 outline-none bg-white focus:border-neutral-800 transition-colors duration-200"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowConfirmPassword((prev) => !prev)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider text-neutral-400 hover:text-neutral-800 font-medium bg-transparent border-none cursor-pointer"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-neutral-400 hover:text-neutral-800 font-medium bg-transparent border-none cursor-pointer"
                                 >
                                     {showConfirmPassword ? "Ascunde" : "Arată"}
                                 </button>
@@ -655,19 +656,18 @@ export default function AccountPage() {
                             </div>
                         )}
 
-                        <div className="flex justify-between gap-4 mt-8 pt-4 border-t border-neutral-100">
-                            <button
-                                onClick={() => setIsEditOpen(false)}
-                                className="flex-1 px-4 py-3 border border-neutral-200 text-[11px] font-medium uppercase tracking-widest rounded-none text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800 transition-all cursor-pointer bg-white"
-                            >
-                                Anulează
-                            </button>
-
+                        <div className="flex flex-col gap-3 mt-8 pt-4">
                             <button
                                 onClick={handleSaveAccount}
-                                className="flex-1 bg-[#1c1c1E] text-white text-[11px] font-medium uppercase tracking-widest py-3 px-6 rounded-none hover:bg-black transition-all cursor-pointer border-none"
+                                className="w-full bg-[#1c1c1E] text-white text-xs font-semibold uppercase tracking-widest py-3.5 px-6 rounded-none hover:bg-black transition-all cursor-pointer border-none"
                             >
                                 Salvează
+                            </button>
+                            <button
+                                onClick={() => setIsEditOpen(false)}
+                                className="w-full py-3 bg-transparent text-xs font-medium uppercase tracking-widest text-neutral-500 hover:text-neutral-800 transition-all cursor-pointer border-none"
+                            >
+                                Anulează
                             </button>
                         </div>
                     </div>
@@ -675,7 +675,7 @@ export default function AccountPage() {
             )}
 
             {message && (
-                <div className="fixed top-6 right-6 z-[9999]">
+                <div className="fixed top-6 right-6 z-[9999] font-Inter">
                     <div
                         className={`px-5 py-3 rounded-none shadow-xl text-xs uppercase tracking-wider text-white font-medium ${
                             messageType === "success" ? "bg-[#1c1c1E]" : "bg-red-600"
@@ -687,120 +687,124 @@ export default function AccountPage() {
             )}
 
             {isAddAddressOpen && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[9999] font-Inter flex items-center justify-center p-4 font-Inter">
                     <div
                         className="absolute inset-0 bg-neutral-800/50 backdrop-blur-xs transition-opacity"
                         onClick={() => setIsAddAddressOpen(false)}
                     />
 
-                    <div className="relative bg-white text-neutral-800 w-full max-w-xl p-8 rounded-none shadow-2xl overflow-y-auto max-h-[90vh]">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-sm font-semibold uppercase tracking-widest text-neutral-800">
-                                Detalii adresă
+                    <div className="relative bg-white text-neutral-800 w-full max-w-lg p-8 md:p-10 rounded-none font-Inter shadow-2xl overflow-y-auto max-h-[90vh]">
+                        <button
+                            onClick={() => {
+                                setIsAddAddressOpen(false);
+                                resetAddressForm();
+                            }}
+                            className="absolute top-6 right-6 text-neutral-400 hover:text-neutral-800 bg-transparent border-none p-0 cursor-pointer text-xl font-light"
+                        >
+                            ✕
+                        </button>
+
+                        <div className="text-center mb-8">
+                            <h2 className="text-2xl font-InterLight text-neutral-800">
+                                Editează adresa
                             </h2>
-                            <button
-                                onClick={() => {
-                                    setIsAddAddressOpen(false);
-                                    resetAddressForm();
-                                }}
-                                className="text-neutral-400 hover:text-neutral-800 bg-transparent border-none p-0 cursor-pointer text-sm font-light"
-                            >
-                                ✕
-                            </button>
+                            <p className="text-xs text-neutral-500 mt-4 font-Inter tracking-wide">
+                                Completați datele dumneavoastră mai jos:
+                            </p>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-4 font-Inter">
                             <div>
-                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Nume complet *</label>
+                                <label className="block text-xs text-neutral-400 font-InterLight mb-1">Nume complet *</label>
                                 <input
                                     placeholder="ex: Popescu Andrei"
                                     value={newAddress.fullName}
                                     onChange={(e) => setNewAddress({ ...newAddress, fullName: e.target.value })}
-                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                    className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm outline-none bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Companie (opțional)</label>
+                                <label className="block text-xs font-InterLight text-neutral-400 mb-1">Companie (opțional)</label>
                                 <input
                                     placeholder="Numele companiei"
                                     value={newAddress.company}
                                     onChange={(e) => setNewAddress({ ...newAddress, company: e.target.value })}
-                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                    className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm outline-none bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Adresă *</label>
+                                <label className="block text-xs font-InterLight text-neutral-400 mb-1">Adresă *</label>
                                 <input
                                     placeholder="Strada, numărul, blocul, apartamentul"
                                     value={newAddress.streetLine1}
                                     onChange={(e) => setNewAddress({ ...newAddress, streetLine1: e.target.value })}
-                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                    className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm outline-none bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Adresă secundară (opțional)</label>
+                                <label className="block text-xs font-InterLight text-neutral-400 mb-1">Adresă secundară (opțional)</label>
                                 <input
                                     placeholder="Alte detalii despre adresă"
                                     value={newAddress.streetLine2}
                                     onChange={(e) => setNewAddress({ ...newAddress, streetLine2: e.target.value })}
-                                    className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                    className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm outline-none bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Oraș *</label>
+                                    <label className="block text-xs font-InterLight text-neutral-400 mb-1">Oraș *</label>
                                     <input
                                         placeholder="Oraș"
                                         value={newAddress.city}
                                         onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
-                                        className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                        className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm outline-none bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Județ (opțional)</label>
+                                    <label className="block text-xs font-InterLight text-neutral-400 mb-1">Județ (opțional)</label>
                                     <input
                                         placeholder="Județ"
                                         value={newAddress.province}
                                         onChange={(e) => setNewAddress({ ...newAddress, province: e.target.value })}
-                                        className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                        className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm outline-none bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300"
                                     />
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Cod poștal *</label>
+                                    <label className="block text-xs font-InterLight text-neutral-400 mb-1">Cod poștal *</label>
                                     <input
                                         placeholder="Cod poștal"
                                         value={newAddress.postalCode}
                                         onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })}
-                                        className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                        className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm outline-none bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Telefon (opțional)</label>
+                                    <label className="block text-xs font-InterLight text-neutral-400 mb-1">Telefon (opțional)</label>
                                     <input
                                         placeholder="Număr de telefon"
                                         value={newAddress.phoneNumber}
                                         onChange={(e) => setNewAddress({ ...newAddress, phoneNumber: e.target.value })}
-                                        className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300 font-light"
+                                        className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm outline-none bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-[10px] uppercase font-semibold tracking-wider text-neutral-500 mb-1.5">Țară *</label>
+                                <label className="block text-xs font-InterLight text-neutral-400 mb-1">Țară *</label>
                                 <div className="relative">
                                     <select
                                         value={newAddress.countryCode}
                                         onChange={(e) => setNewAddress({ ...newAddress, countryCode: e.target.value })}
-                                        className="w-full border border-neutral-200 rounded-none px-3.5 py-2.5 text-xs outline-none bg-neutral-50/50 focus:bg-white focus:border-neutral-800 transition-colors duration-200 appearance-none text-neutral-800"
+                                        className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm outline-none bg-white focus:border-neutral-800 transition-colors duration-200 appearance-none text-neutral-800"
                                     >
                                         <option value="">Selectează țara *</option>
                                         {countries.map((country) => (
@@ -816,22 +820,21 @@ export default function AccountPage() {
                             </div>
                         </div>
 
-                        <div className="flex justify-between gap-4 mt-8 pt-4 border-t border-neutral-100">
+                        <div className="flex flex-col gap-3 mt-8 pt-4">
+                            <button
+                                onClick={handleAddAddress}
+                                className="w-full bg-[#1c1c1E] text-white text-xs font-Inter18Semibold uppercase tracking-widest py-3.5 px-6 rounded-none hover:bg-black transition-all cursor-pointer border-none"
+                            >
+                                Salvează
+                            </button>
                             <button
                                 onClick={() => {
                                     setIsAddAddressOpen(false);
                                     resetAddressForm();
                                 }}
-                                className="flex-1 px-4 py-3 border border-neutral-200 text-[11px] font-medium uppercase tracking-widest rounded-none text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800 transition-all cursor-pointer bg-white"
+                                className="w-full py-3 bg-transparent text-xs font-Inter18Semibold uppercase tracking-widest text-neutral-500 hover:text-neutral-800 transition-all cursor-pointer border-none"
                             >
                                 Anulează
-                            </button>
-
-                            <button
-                                onClick={handleAddAddress}
-                                className="flex-1 bg-[#1c1c1E] text-white text-[11px] font-medium uppercase tracking-widest py-3 px-6 rounded-none hover:bg-black transition-all cursor-pointer border-none"
-                            >
-                                Salvează
                             </button>
                         </div>
                     </div>
@@ -839,34 +842,35 @@ export default function AccountPage() {
             )}
 
             {deleteAddressId && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 font-Inter">
                     <div
                         className="absolute inset-0 bg-neutral-800/50 backdrop-blur-xs transition-opacity"
                         onClick={cancelDeleteAddress}
                     />
 
-                    <div className="relative bg-white text-neutral-800 w-full max-w-sm p-6 rounded-none shadow-2xl border border-neutral-100">
-                        <h2 className="text-xs font-semibold uppercase tracking-widest mb-2 text-neutral-800">
-                            Șterge adresa
-                        </h2>
+                    <div className="relative bg-white font-Inter text-neutral-800 w-full max-w-md p-8 md:p-10 rounded-none shadow-2xl border border-neutral-100">
+                        <div className="text-center mb-6">
+                            <h2 className="text-xl font-normal text-neutral-800">
+                                Șterge adresa
+                            </h2>
+                        </div>
 
-                        <p className="text-xs text-neutral-400 font-light mb-6 leading-relaxed">
+                        <p className="text-sm text-neutral-500 text-center mb-8">
                             Sigur doriți să ștergeți această adresă? Această acțiune este ireversibilă.
                         </p>
 
-                        <div className="flex justify-end gap-3">
-                            <button
-                                onClick={cancelDeleteAddress}
-                                className="px-4 py-2 border border-neutral-200 text-[10px] font-medium uppercase tracking-wider rounded-none text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800 transition-all cursor-pointer bg-white"
-                            >
-                                Anulează
-                            </button>
-
+                        <div className="flex flex-col gap-3">
                             <button
                                 onClick={confirmDeleteAddress}
-                                className="bg-red-600 text-white text-[10px] font-medium uppercase tracking-wider px-4 py-2 rounded-none hover:bg-red-700 transition-all cursor-pointer border-none"
+                                className="w-full bg-red-600 text-white text-xs font-Inter18Semibold uppercase tracking-widest px-6 py-3.5 rounded-none hover:bg-red-700 transition-all cursor-pointer border-none"
                             >
                                 Șterge
+                            </button>
+                            <button
+                                onClick={cancelDeleteAddress}
+                                className="w-full py-3 bg-transparent text-xs font-Inter uppercase tracking-widest text-neutral-500 hover:text-neutral-800 transition-all cursor-pointer border-none"
+                            >
+                                Anulează
                             </button>
                         </div>
                     </div>
