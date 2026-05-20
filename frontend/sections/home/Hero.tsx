@@ -9,7 +9,7 @@ export default function Hero() {
 
             <div className="relative h-[740px] w-full overflow-hidden md:h-[740px] lg:h-[760px]">
                 <Image
-                    src="/images/hero/hero-image.jpeg"
+                    src="/images/hero/hero-image.png"
                     alt="Urbanite Collection"
                     fill
                     unoptimized
@@ -32,13 +32,13 @@ export default function Hero() {
                             NEW
                         </h1>
 
-                        <p className="mx-auto mb-4 max-w-[280px] text-[18px] leading-[1.35] text-white/90 md:mx-0 md:max-w-[380px] md:text-[14px] lg:max-w-[460px] lg:text-[16px]">
+                        <p className="mx-auto font-Inter18Semibold mb-4 max-w-[280px] text-[18px] leading-[1.35] text-white/90 md:mx-0 md:max-w-[380px] md:text-[14px] lg:max-w-[460px] lg:text-[16px]">
                             NOUA NOASTRĂ COLECȚIE, CONCEPUTĂ PENTRU CEI CARE SUNT SUFICIENT DE PUTERNICI SĂ NU DEA ÎNAPOI
                         </p>
 
                         <Link
                             href="/products?collection=equipment"
-                            className="inline-flex h-[38px] items-center justify-center bg-[#27F2EB] px-5 text-[18px] font-bold uppercase text-black md:h-[44px] md:px-6 md:text-[15px] lg:h-[48px] lg:px-7 lg:text-[16px]"
+                            className="inline-flex h-[38px] items-center justify-center bg-[#27F2EB] px-5 text-[18px] font-Inter18Semibold uppercase text-black md:h-[44px] md:px-6 md:text-[15px] lg:h-[48px] lg:px-7 lg:text-[12px]"
                         >
                             CUMPĂRĂ ACUM
                         </Link>

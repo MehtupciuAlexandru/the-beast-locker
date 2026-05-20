@@ -9,15 +9,14 @@ export default function AboutUs() {
 
             <main className="w-full bg-white text-[#1c1c1e] min-h-screen pb-20 font-Inter">
                 <div className="w-full border-b border-gray-200">
-                    <div className="max-w-[1200px] mx-auto px-4 py-4 md:py-6 text-[10px] sm:text-xs text-gray-500 uppercase tracking-widest">
+                    <div className="w-full px-4 py-4 md:py-6 text-[10px] sm:text-xs text-gray-500 uppercase tracking-widest">
                         EXPLOREAZĂ // DESPRE NOI // CINE SUNTEM
                     </div>
                 </div>
 
-                <div className="w-full max-w-[1200px] mx-auto px-4 pt-4 md:px-0 md:pt-0">
-                    <div className="w-full h-[550px] md:h-[500px] relative overflow-hidden">
-
-                        <div className="absolute inset-0 scale-[1.78] md:scale-100 origin-center translate-y-[-15%] md:translate-y-0">
+                <div className="w-full max-w-[1790px] mx-auto px-4 pt-4 md:px-0 md:pt-12">
+                    <div className="relative w-full overflow-hidden h-[550px] md:h-auto md:aspect-[1790/806]">
+                        <div className="absolute inset-0 origin-center scale-[1.78] translate-y-[-15%] md:scale-100 md:translate-y-0">
                             <Image
                                 src="/images/hero/aboutUs.jpeg"
                                 alt="Only for the motivated"
@@ -25,8 +24,8 @@ export default function AboutUs() {
                                 className="object-cover object-center"
                             />
                         </div>
-                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                            <h1 className="text-white text-4xl sm:text-5xl md:text-6xl font-GemunuExtraBold uppercase tracking-wider text-center px-4 leading-tight">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                            <h1 className="px-4 text-center font-GemunuExtraBold text-5xl uppercase leading-tight tracking-wider text-white md:text-[128px]">
                                 ONLY FOR THE<br className="md:hidden" /> MOTIVATED
                             </h1>
                         </div>

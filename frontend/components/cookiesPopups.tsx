@@ -105,12 +105,12 @@ export default function CookiesPopup({ devMode = false }: CookiesPopupProps) {
                     <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <p className="text-[13px] leading-relaxed flex-1">
                             Acest website utilizează cookies pentru a asigura cea mai bună experiență utilizatorilor.{" "}
-                            <button
-                                onClick={() => setShowPreferences(true)}
+                            <a
+                                href="/privacy-policy"
                                 className="underline cursor-pointer hover:text-gray-300 transition"
                             >
                                 Politica de confidențialitate
-                            </button>
+                            </a>
                         </p>
 
                         <div className="flex gap-3 flex-shrink-0">
@@ -255,7 +255,7 @@ export default function CookiesPopup({ devMode = false }: CookiesPopupProps) {
                             <p className="mt-6 text-[13px] text-[#555555] leading-relaxed">
                                 *By clicking on the above buttons, I give my consent on collecting my IP and email ( if
                                 registered ). For more check{" "}
-                                <a href="#" className="underline hover:text-black transition-colors">
+                                <a href="/privacy-policy" className="underline hover:text-black transition-colors">
                                     Mai multe informații
                                 </a>
                             </p>
