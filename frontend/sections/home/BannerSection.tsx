@@ -4,7 +4,7 @@ export default function UrbanBanner() {
     return (
         <section className="w-full relative overflow-hidden h-[600px] flex items-center justify-center text-center">
             <Image
-                src="/images/banners/dog.jpeg"
+                src="/images/banners/dogNEW.jpeg"
                 alt=""
                 fill
                 className="object-cover"
@@ -15,17 +15,17 @@ export default function UrbanBanner() {
             <div className="absolute inset-0 bg-black/40" />
 
             <div className="relative z-10 flex flex-col items-center px-6">
-                <div className="w-[280px] md:w-[500px] lg:w-[650px]">
+                <div className="w-[220px] md:w-[380px] lg:w-[480px]">
                     <Image
-                        src="/svg/reserved.svg"
-                        alt="Reserved Only For The Motivated"
+                        src="/images/banners/NOPLANB.png"
+                        alt="No Plan B"
                         width={650}
                         height={260}
                         className="w-full h-auto"
                     />
                 </div>
 
-                <h2 className="text-white font-GemunuExtraBold uppercase mt-6 leading-tight text-2xl md:text-4xl lg:text-5xl tracking-wide">
+                <h2 className="text-white font-GemunuExtraBold uppercase mt-4 leading-tight text-2xl md:text-4xl lg:text-5xl tracking-wide">
                     NO PLAN B COLLECTION 26 // NEW
                 </h2>
 

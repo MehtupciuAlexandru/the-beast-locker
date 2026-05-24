@@ -6,60 +6,56 @@ import Navbar from "@/components/layout/Navbar";
 const categories = [
     {
         title: "BOX",
-        // subtitle: "Echipamente concepute pentru siguranța și confortul sportivilor, indiferent de ramura sportivă",
-        image: "/images/banners/competition.jpeg",
+        image: "/images/categories/BOXING.jpeg",
         link: "/products?collection=equipment",
+        objectPosition: "50% 25%",
     },
     {
         title: "KICKBOX",
-        // subtitle: "Haine și Accesorii gândite să îți deblocheze adevăratul potențial",
-        image: "/images/banners/boxers.jpeg",
-        link: "/products?collection=clothes",
+        image: "/images/categories/KICKBOXING.jpeg",
+        link: "/countdown",
+        objectPosition: "50% 15%",
     },
     {
         title: "MMA",
-        // subtitle: "Lucrurile mici care fac diferența",
-        image: "/images/banners/train.jpeg",
-        link: "/products",
+        image: "/images/categories/MMA.jpeg",
+        link: "/countdown",
+        objectPosition: "50% 40%",
     }
 ];
 
 export default function Categories() {
     return (
-
         <>
             <Navbar />
-        <section className="w-full p-4 bg-white flex justify-center">
-            <div className="flex flex-col lg:flex-row gap-4 w-full max-w-full">
-                {categories.map((cat, index) => (
-                    <Link
-                        key={index}
-                        href={cat.link}
-                        className="relative w-full flex-1 h-[600px] lg:h-[1133px] overflow-hidden block"
-                    >
-                        <Image
-                            src={cat.image}
-                            alt={cat.title}
-                            fill
-                            unoptimized
-                            className="object-cover"
-                            style={{ objectPosition: "50% 30%" }}
-                        />
+            <section className="w-full p-4 bg-white flex justify-center">
+                <div className="flex flex-col lg:flex-row gap-4 w-full max-w-full">
+                    {categories.map((cat, index) => (
+                        <Link
+                            key={index}
+                            href={cat.link}
+                            className="relative w-full lg:flex-1 h-[250px] lg:h-[1133px] overflow-hidden block"
+                        >
+                            <Image
+                                src={cat.image}
+                                alt={cat.title}
+                                fill
+                                unoptimized
+                                className="object-cover"
+                                style={{ objectPosition: cat.objectPosition }}
+                            />
 
-                        <div className="absolute inset-0 bg-black/40" />
+                            <div className="absolute inset-0 bg-black/40" />
 
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-                            <h2 className="text-white text-2xl sm:text-3xl font-extrabold tracking-widest uppercase">
-                                {cat.title}
-                            </h2>
-                            {/*<p className="text-white text-sm sm:text-base mt-2 max-w-[260px] leading-tight">*/}
-                            {/*    {cat.subtitle}*/}
-                            {/*</p>*/}
-                        </div>
-                    </Link>
-                ))}
-            </div>
-        </section>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+                                <h2 className="text-white text-2xl sm:text-3xl font-GemunuExtraBold tracking-widest uppercase">
+                                    {cat.title}
+                                </h2>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            </section>
             <Footer />
         </>
     );

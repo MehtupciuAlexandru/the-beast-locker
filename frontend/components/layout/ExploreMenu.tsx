@@ -11,11 +11,10 @@ const menuItems = [
     { label: "Politica de confidențialitate", href: "/privacy-policy" },
     { label: "Termeni și condiții", href: "/terms-and-conditions" },
     { label: "Întrebări frecvente", href: "/faq" },
-    { label: "Urmărirea comenzii", href: "#" },
-    { label: "Pot modifica o comandă deja plasată?", href: "#" },
-    { label: "Facturare / TVA", href: "#" },
-    { label: "Anularea unei comenzi", href: "#" },
-    { label: "Ghid de mărimi", href: "#" },
+    // { label: "Pot modifica o comandă deja plasată?", href: "#" },
+    // { label: "Facturare / TVA", href: "#" },
+    // { label: "Anularea unei comenzi", href: "#" },
+    // { label: "Ghid de mărimi", href: "#" },
 ]
 
 export default function ExploreMenu() {

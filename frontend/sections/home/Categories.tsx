@@ -5,20 +5,23 @@ const categories = [
     {
         title: "ECHIPAMENT",
         subtitle: "Echipamente concepute pentru siguranța și confortul sportivilor, indiferent de ramura sportivă",
-        image: "/images/banners/competition.jpeg",
+        image: "/images/categories/ECHIPAMENTE.jpeg",
         link: "/equipment",
+        objectPosition: "50% 67%",
     },
     {
         title: "ÎMBRĂCĂMINTE",
         subtitle: "Haine și Accesorii gândite să îți deblocheze adevăratul potențial",
-        image: "/images/banners/train.jpeg",
+        image: "/images/categories/Imbracaminte.jpeg",
         link: "/countdown",
+        objectPosition: "50% 10%",
     },
     {
         title: "ACCESORII",
         subtitle: "Lucrurile mici care fac diferența",
-        image: "/images/banners/boxers.jpeg",
+        image: "/images/categories/ACCESORII.jpeg",
         link: "/countdown",
+        objectPosition: "50% 50%",
     }
 ];
 
@@ -38,7 +41,7 @@ export default function Categories() {
                             fill
                             unoptimized
                             className="object-cover"
-                            style={{ objectPosition: "50% 30%" }}
+                            style={{ objectPosition: cat.objectPosition }}
                         />
 
                         <div className="absolute inset-0 bg-black/40" />
