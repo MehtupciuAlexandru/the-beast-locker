@@ -46,7 +46,7 @@ export default function Categories() {
 
                         <div className="absolute inset-0 bg-black/40" />
 
-                        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
+                        <div className="absolute left-1/2 top-1/2 flex w-full -translate-x-1/2 -translate-y-1/2 flex-col items-center px-4 text-center">
                             <h2 className="text-3xl font-GemunuExtraBold uppercase tracking-widest text-white sm:text-5xl">
                                 {cat.title}
                             </h2>
