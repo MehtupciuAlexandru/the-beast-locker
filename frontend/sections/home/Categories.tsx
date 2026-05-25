@@ -53,6 +53,7 @@ export default function Categories() {
                             <p className="mt-2 max-w-[260px] font-Inter text-sm leading-tight text-white sm:text-base">
                                 {cat.subtitle}
                             </p>
+                            {/*redeploy*/}
                         </div>
                     </Link>
                 ))}
