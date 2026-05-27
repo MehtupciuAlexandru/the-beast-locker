@@ -34,7 +34,7 @@ export default function Categories() {
                         <Link
                             key={index}
                             href={cat.link}
-                            className="relative w-full lg:flex-1 h-[250px] lg:h-[1133px] overflow-hidden block"
+                            className="relative w-full lg:flex-1 h-[265px] lg:h-[566px] overflow-hidden block"
                         >
                             <Image
                                 src={cat.image}

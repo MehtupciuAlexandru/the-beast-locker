@@ -7,7 +7,8 @@ const categories = [
         subtitle: "Echipamente concepute pentru siguranța și confortul sportivilor, indiferent de ramura sportivă",
         image: "/images/categories/ECHIPAMENTE.jpeg",
         link: "/equipment",
-        objectPosition: "50% 67%",
+        objectPositionMobile: "50% 57%",
+        objectPositionDesktop: "50% 67%",
     },
     {
         title: "ÎMBRĂCĂMINTE",
@@ -33,16 +34,37 @@ export default function Categories() {
                     <Link
                         key={index}
                         href={cat.link}
-                        className="relative block h-[180px] w-full overflow-hidden lg:h-[430px] lg:flex-1"
+                        className="relative block h-[230px] w-full overflow-hidden lg:h-[430px] lg:flex-1"
                     >
-                        <Image
-                            src={cat.image}
-                            alt={cat.title}
-                            fill
-                            unoptimized
-                            className="object-cover"
-                            style={{ objectPosition: cat.objectPosition }}
-                        />
+                        {cat.objectPositionMobile && cat.objectPositionDesktop ? (
+                            <>
+                                <Image
+                                    src={cat.image}
+                                    alt={cat.title}
+                                    fill
+                                    unoptimized
+                                    className="block object-cover lg:hidden"
+                                    style={{ objectPosition: cat.objectPositionMobile }}
+                                />
+                                <Image
+                                    src={cat.image}
+                                    alt={cat.title}
+                                    fill
+                                    unoptimized
+                                    className="hidden object-cover lg:block"
+                                    style={{ objectPosition: cat.objectPositionDesktop }}
+                                />
+                            </>
+                        ) : (
+                            <Image
+                                src={cat.image}
+                                alt={cat.title}
+                                fill
+                                unoptimized
+                                className="object-cover"
+                                style={{ objectPosition: cat.objectPosition }}
+                            />
+                        )}
 
                         <div className="absolute inset-0 bg-black/40" />
 
@@ -53,7 +75,6 @@ export default function Categories() {
                             <p className="mt-2 max-w-[260px] font-Inter text-sm leading-tight text-white sm:text-base">
                                 {cat.subtitle}
                             </p>
-                            {/*redeploy*/}
                         </div>
                     </Link>
                 ))}

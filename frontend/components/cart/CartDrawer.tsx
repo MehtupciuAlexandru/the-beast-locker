@@ -6,6 +6,7 @@ import {
     adjustOrderLine,
     removeOrderLine,
 } from "@/lib/api/cart";
+import Link from "next/link";
 
 type Props = {
     isOpen: boolean;
@@ -177,9 +178,13 @@ export default function CartDrawer({ isOpen, onClose }: Props) {
                         <p className="text-[12px] text-center text-[#737373] mb-5 tracking-wide">
                             Transportul și taxele sunt calculate la Checkout
                         </p>
-                        <button className="w-full bg-[#1c1c1e] text-white py-[18px] text-[12px] font-medium uppercase tracking-[0.15em] hover:bg-black transition-colors duration-300 cursor-pointer">
+                        <Link
+                            href="/checkout"
+                            onClick={onClose}
+                            className="block w-full bg-[#1c1c1e] text-white py-[18px] text-[12px] font-medium uppercase tracking-[0.15em] hover:bg-black transition-colors duration-300 cursor-pointer text-center"
+                        >
                             CHECKOUT // {((order?.totalWithTax || 0) / 100).toFixed(2).replace(".", ",")}lei
-                        </button>
+                        </Link>
                     </div>
                 )}
             </div>

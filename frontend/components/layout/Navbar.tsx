@@ -9,7 +9,7 @@ import CartDrawer from "@/components/cart/CartDrawer";
 import { useCartUI } from "@/lib/context/CartUIContext";
 
 const desktopLinks = [
-    { label: "Echipamente", href: "/products?collection=equipment" },
+    { label: "Echipamente", href: "/equipment" },
     { label: "Îmbrăcăminte", href: "/countdown" },
     { label: "Accesorii", href: "/countdown" },
 ];

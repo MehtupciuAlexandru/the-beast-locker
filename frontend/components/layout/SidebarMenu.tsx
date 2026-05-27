@@ -206,7 +206,7 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                                         }`}
                                     />
                                 </button>
-                                {openSection === "equipment" && renderProducts(equipmentProducts, "/products?collection=equipment")}
+                                {openSection === "equipment" && renderProducts(equipmentProducts, "/equipment")}
                             </div>
 
                             <div className="border-t border-zinc-100">
@@ -271,6 +271,16 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                                         </Link>
                                     </div>
                                 )}
+                            </div>
+
+                            <div className="border-b border-zinc-100">
+                                <Link
+                                    href="/account"
+                                    onClick={onClose}
+                                    className="flex w-full items-center justify-between px-8 py-6 text-left transition-all hover:bg-zinc-50/50"
+                                >
+                                    <span className="text-s font-black uppercase tracking-[0.2em]">Contul meu</span>
+                                </Link>
                             </div>
                         </nav>
                     </div>

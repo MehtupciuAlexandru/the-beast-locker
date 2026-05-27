@@ -35,7 +35,7 @@ export default function UrbanBanner() {
 
                 <button
                     type="button"
-                    className="mt-6 bg-[#27F2EB] text-black px-6 py-3 text-xs md:text-sm font-Inter18Semibold tracking-widest hover:bg-black hover:text-white cursor-pointer transition"
+                    className="mt-6 bg-[#27F2EB] text-black px-6 py-3 text-[10px] md:text-sm font-Inter18Semibold tracking-widest hover:bg-black hover:text-white cursor-pointer transition"
                 >
                     CUMPĂRĂ ACUM
                 </button>
