@@ -6,6 +6,7 @@ import { register } from "@/lib/api/auth";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/footer";
 import { useRouter } from "next/navigation";
+import { getRecaptchaToken } from "@/lib/recaptcha/client";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -73,7 +74,8 @@ export default function RegisterPage() {
         setLoading(true);
 
         try {
-            await register(email, password, firstName, lastName);
+            const recaptchaToken = await getRecaptchaToken("register");
+            await register(email, password, firstName, lastName, recaptchaToken);
             setSuccess(true);
         } catch (err: any) {
             setError(err.message || "Something went wrong");

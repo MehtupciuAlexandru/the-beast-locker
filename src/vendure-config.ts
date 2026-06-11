@@ -11,6 +11,7 @@ import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader } from '@ven
 import {AssetServerPlugin, configureS3AssetStorage} from '@vendure/asset-server-plugin';
 import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
+import { RecaptchaProtectionPlugin } from './plugins/recaptcha-protection/recaptcha-protection.plugin';
 import 'dotenv/config';
 import path from 'path';
 const IS_DEV = process.env.APP_ENV === 'dev';
@@ -119,6 +120,7 @@ export const config: VendureConfig = {
         BeastLockerPlugin,
         AuthValidationPlugin,
         EventRegistrationPlugin,
+        RecaptchaProtectionPlugin,
         AssetServerPlugin.init(
             useS3
                 ? {

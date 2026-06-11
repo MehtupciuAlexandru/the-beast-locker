@@ -5,7 +5,9 @@ export async function register(
     email: string,
     password: string,
     firstName: string,
-    lastName: string
+    lastName: string,
+    recaptchaToken: string
+
 ) {
     const query = `
         mutation Register($input: RegisterCustomerInput!) {
@@ -28,6 +30,7 @@ export async function register(
             firstName,
             lastName,
         },
+        recaptchaToken,
     };
 
     const data = await graphqlRequest(query, variables);
@@ -46,7 +49,7 @@ export async function register(
 }
 
 // LOGIN
-export async function login(email: string, password: string) {
+export async function login(email: string, password: string, recaptchaToken: string) {
     const query = `
         mutation Login($email: String!, $password: String!) {
             login(username: $email, password: $password) {
@@ -62,7 +65,15 @@ export async function login(email: string, password: string) {
         }
     `;
 
-    const data = await graphqlRequest(query, { email, password }, true);
+    const data = await graphqlRequest(
+        query,
+        {
+            email,
+            password,
+            recaptchaToken,
+        },
+        true
+    );
 
     const result = data.login;
 

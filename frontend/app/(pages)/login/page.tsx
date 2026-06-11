@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { login } from "@/lib/api/auth";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/footer";
+import { getRecaptchaToken } from "@/lib/recaptcha/client";
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -22,7 +23,8 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            await login(email, password);
+            const recaptchaToken = await getRecaptchaToken("login");
+            await login(email, password, recaptchaToken);
             router.push("/home");
         } catch (err: any) {
             const message = err.message || "";
