@@ -13,11 +13,13 @@ type FiltersSidebarProps = {
     resetFilters: () => void;
 };
 
+
 const equipmentTypes = [
     { label: "MANUSI BOX", slug: "manusi-box" },
     { label: "TIBIERE", slug: "tibiere" },
     { label: "MANUSI MMA", slug: "manusi-mma" },
     { label: "BANDAJE", slug: "bandaje" },
+    // { label: "NO PLAN B", slug: "no-plan-b" },
 ];
 
 export default function FiltersSidebar({
@@ -34,6 +36,9 @@ export default function FiltersSidebar({
     const [equipmentOpen, setEquipmentOpen] = useState(false);
     const [stockOpen, setStockOpen] = useState(false);
 
+    const visibleCollectionSlugs = ["no-plan-b"];
+
+
     useEffect(() => {
         let cancelled = false;
 
@@ -41,8 +46,12 @@ export default function FiltersSidebar({
             try {
                 const result = await getCollections();
 
+                const visibleCollections = result.filter((collection) =>
+                    visibleCollectionSlugs.includes(collection.slug)
+                );
+
                 if (!cancelled) {
-                    setCollections(result);
+                    setCollections(visibleCollections);
                 }
             } catch {
                 if (!cancelled) {
@@ -72,15 +81,15 @@ export default function FiltersSidebar({
 
                 {collectionsOpen && (
                     <div className="mt-3 flex flex-col gap-2 pl-0.5">
-                        <button
-                            type="button"
-                            onClick={() => setCollection("")}
-                            className={`text-left text-[10px] tracking-widest cursor-pointer transition-colors ${
-                                selectedCollection === "" ? "font-bold text-[#1C1C1E]" : "text-[#1C1C1E]/50 hover:text-[#1C1C1E]"
-                            }`}
-                        >
-                            TOATE
-                        </button>
+                        {/*<button*/}
+                        {/*    type="button"*/}
+                        {/*    onClick={() => setCollection("")}*/}
+                        {/*    className={`text-left text-[10px] tracking-widest cursor-pointer transition-colors ${*/}
+                        {/*        selectedCollection === "" ? "font-bold text-[#1C1C1E]" : "text-[#1C1C1E]/50 hover:text-[#1C1C1E]"*/}
+                        {/*    }`}*/}
+                        {/*>*/}
+                        {/*    TOATE*/}
+                        {/*</button>*/}
 
                         {collections.map((collection) => (
                             <button
@@ -110,18 +119,18 @@ export default function FiltersSidebar({
 
                 {equipmentOpen && (
                     <div className="mt-3 flex flex-col gap-2 pl-0.5">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setSelectedEquipmentType("");
-                                setCollection("");
-                            }}
-                            className={`text-left text-[10px] tracking-widest cursor-pointer transition-colors ${
-                                selectedCollection === "" ? "font-bold text-[#1C1C1E]" : "text-[#1C1C1E]/50 hover:text-[#1C1C1E]"
-                            }`}
-                        >
-                            TOATE
-                        </button>
+                        {/*<button*/}
+                        {/*    type="button"*/}
+                        {/*    onClick={() => {*/}
+                        {/*        setSelectedEquipmentType("");*/}
+                        {/*        setCollection("");*/}
+                        {/*    }}*/}
+                        {/*    className={`text-left text-[10px] tracking-widest cursor-pointer transition-colors ${*/}
+                        {/*        selectedCollection === "" ? "font-bold text-[#1C1C1E]" : "text-[#1C1C1E]/50 hover:text-[#1C1C1E]"*/}
+                        {/*    }`}*/}
+                        {/*>*/}
+                        {/*    TOATE*/}
+                        {/*</button>*/}
 
                         {equipmentTypes.map((type) => (
                             <button
