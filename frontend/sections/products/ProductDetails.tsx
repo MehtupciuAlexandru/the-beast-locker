@@ -194,7 +194,7 @@ export default function ProductDetails({ product }: Props) {
                         <img
                             src={currentImage}
                             alt={product.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain p-4"
                         />
 
                         <button
@@ -340,17 +340,17 @@ export default function ProductDetails({ product }: Props) {
                                     <img
                                         src={img}
                                         alt={`${product.name} view ${i + 1}`}
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-contain p-1"
                                     />
                                 </button>
                             ))}
                         </div>
 
-                        <div className="relative bg-white overflow-hidden">
+                        <div className="relative bg-white overflow-hidden w-[760px] h-[950px] flex items-center justify-center">
                             <img
                                 src={currentImage}
                                 alt={product.name}
-                                className="w-[760px] h-[950px] object-cover transition-all"
+                                className="w-full h-full object-contain p-6 transition-all"
                             />
 
                             <button
