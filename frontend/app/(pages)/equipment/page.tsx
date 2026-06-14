@@ -7,19 +7,19 @@ const categories = [
     {
         title: "BOX",
         image: "/images/categories/BOXING.jpeg",
-        link: "/products?collection=equipment",
+        link: "/products?collection=box",
         objectPosition: "50% 25%",
     },
     {
         title: "KICKBOX",
         image: "/images/categories/KICKBOXING.jpeg",
-        link: "/countdown",
+        link: "/products?collection=kickbox",
         objectPosition: "50% 15%",
     },
     {
         title: "MMA",
         image: "/images/categories/MMA.jpeg",
-        link: "/countdown",
+        link: "/products?collection=mma",
         objectPosition: "50% 40%",
     }
 ];
