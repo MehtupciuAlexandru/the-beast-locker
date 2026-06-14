@@ -68,22 +68,22 @@ export default function ProductsLayout({
     const sortedProducts = useMemo(() => {
         let result = [...products];
 
-        if (selectedEquipmentType) {
-            result = result.filter((product: any) => {
-                const searchableText = [
-                    product.name,
-                    product.slug,
-                    product.searchKeywords,
-                    product.seoTitle,
-                    product.seoDescription,
-                ]
-                    .filter(Boolean)
-                    .join(" ")
-                    .toLowerCase();
-
-                return searchableText.includes(selectedEquipmentType.toLowerCase());
-            });
-        }
+        // if (selectedEquipmentType) {
+        //     result = result.filter((product: any) => {
+        //         const searchableText = [
+        //             product.name,
+        //             product.slug,
+        //             product.searchKeywords,
+        //             product.seoTitle,
+        //             product.seoDescription,
+        //         ]
+        //             .filter(Boolean)
+        //             .join(" ")
+        //             .toLowerCase();
+        //
+        //         return searchableText.includes(selectedEquipmentType.toLowerCase());
+        //     });
+        // }
 
         if (sort === "a_z") {
             result.sort((a, b) => a.name.localeCompare(b.name));

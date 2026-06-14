@@ -429,9 +429,9 @@ export default function ProductDetails({ product }: Props) {
                             {isDescriptionOpen && (
                                 <div className="py-4.5 text-xs text-neutral-500 leading-relaxed border-b border-[#e5e5e5] space-y-4">
                                     <div dangerouslySetInnerHTML={{ __html: product.description }} />
-                                    <p className="text-[11px] italic text-neutral-400 block pt-1">
-                                        Model is 5&apos;11 170lbs wearing a size M.
-                                    </p>
+                                    {/*<p className="text-[11px] italic text-neutral-400 block pt-1">*/}
+                                    {/*    Model is 5&apos;11 170lbs wearing a size M.*/}
+                                    {/*</p>*/}
                                 </div>
                             )}
 

@@ -14,10 +14,10 @@ type FiltersSidebarProps = {
 };
 
 const equipmentTypes = [
-    "MANUSI BOX",
-    "TIBIERE",
-    "MANUSI MMA",
-    "BANDAJE",
+    { label: "MANUSI BOX", slug: "manusi-box" },
+    { label: "TIBIERE", slug: "tibiere" },
+    { label: "MANUSI MMA", slug: "manusi-mma" },
+    { label: "BANDAJE", slug: "bandaje" },
 ];
 
 export default function FiltersSidebar({
@@ -30,9 +30,9 @@ export default function FiltersSidebar({
                                            resetFilters,
                                        }: FiltersSidebarProps) {
     const [collections, setCollections] = useState<StoreCollection[]>([]);
-    const [collectionsOpen, setCollectionsOpen] = useState(true);
-    const [equipmentOpen, setEquipmentOpen] = useState(true);
-    const [stockOpen, setStockOpen] = useState(true);
+    const [collectionsOpen, setCollectionsOpen] = useState(false);
+    const [equipmentOpen, setEquipmentOpen] = useState(false);
+    const [stockOpen, setStockOpen] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -112,9 +112,12 @@ export default function FiltersSidebar({
                     <div className="mt-3 flex flex-col gap-2 pl-0.5">
                         <button
                             type="button"
-                            onClick={() => setSelectedEquipmentType("")}
+                            onClick={() => {
+                                setSelectedEquipmentType("");
+                                setCollection("");
+                            }}
                             className={`text-left text-[10px] tracking-widest cursor-pointer transition-colors ${
-                                selectedEquipmentType === "" ? "font-bold text-[#1C1C1E]" : "text-[#1C1C1E]/50 hover:text-[#1C1C1E]"
+                                selectedCollection === "" ? "font-bold text-[#1C1C1E]" : "text-[#1C1C1E]/50 hover:text-[#1C1C1E]"
                             }`}
                         >
                             TOATE
@@ -122,14 +125,19 @@ export default function FiltersSidebar({
 
                         {equipmentTypes.map((type) => (
                             <button
-                                key={type}
+                                key={type.slug}
                                 type="button"
-                                onClick={() => setSelectedEquipmentType(type)}
+                                onClick={() => {
+                                    setSelectedEquipmentType("");
+                                    setCollection(type.slug);
+                                }}
                                 className={`text-left text-[10px] tracking-widest cursor-pointer transition-colors ${
-                                    selectedEquipmentType === type ? "font-bold text-[#1C1C1E]" : "text-[#1C1C1E]/50 hover:text-[#1C1C1E]"
+                                    selectedCollection === type.slug
+                                        ? "font-bold text-[#1C1C1E]"
+                                        : "text-[#1C1C1E]/50 hover:text-[#1C1C1E]"
                                 }`}
                             >
-                                {type}
+                                {type.label}
                             </button>
                         ))}
                     </div>
