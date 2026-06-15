@@ -145,7 +145,7 @@ export default function ProductDetails({ product }: Props) {
                             <X className="w-[18px] h-[18px]" />
                         </button>
 
-                        <h2 className="text-lg text-[#1a1a1a] font-semibold mb-6 uppercase tracking-wider">
+                        <h2 className="text-lg text-[#1a1a1a] font-Inter18SemiBold mb-6 uppercase tracking-wider">
                             Size Guide
                         </h2>
 
@@ -153,39 +153,39 @@ export default function ProductDetails({ product }: Props) {
                             <table className="w-full text-xs text-[#1a1a1a]">
                                 <thead>
                                 <tr className="border-b border-neutral-200">
-                                    <th className="text-left py-3 px-2 font-semibold uppercase tracking-wider">Size</th>
-                                    <th className="text-left py-3 px-2 font-semibold uppercase tracking-wider">Chest (cm)</th>
-                                    <th className="text-left py-3 px-2 font-semibold uppercase tracking-wider">Length (cm)</th>
-                                    <th className="text-left py-3 px-2 font-semibold uppercase tracking-wider">Shoulder (cm)</th>
+                                    <th className="text-left py-3 px-2 font-Inter18SemiBold uppercase tracking-wider">Size</th>
+                                    <th className="text-left py-3 px-2 font-Inter18SemiBold uppercase tracking-wider">Chest (cm)</th>
+                                    <th className="text-left py-3 px-2 font-Inter18SemiBold uppercase tracking-wider">Length (cm)</th>
+                                    <th className="text-left py-3 px-2 font-Inter18SemiBold uppercase tracking-wider">Shoulder (cm)</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr className="border-b border-neutral-100 text-neutral-600">
-                                    <td className="py-3 px-2 font-medium text-[#1a1a1a]">XS</td>
+                                    <td className="py-3 px-2 font-Inter18SemiBold text-[#1a1a1a]">XS</td>
                                     <td className="py-3 px-2">91-96</td>
                                     <td className="py-3 px-2">69</td>
                                     <td className="py-3 px-2">42</td>
                                 </tr>
                                 <tr className="border-b border-neutral-100 text-neutral-600">
-                                    <td className="py-3 px-2 font-medium text-[#1a1a1a]">S</td>
+                                    <td className="py-3 px-2 font-Inter18SemiBold text-[#1a1a1a]">S</td>
                                     <td className="py-3 px-2">96-101</td>
                                     <td className="py-3 px-2">71</td>
                                     <td className="py-3 px-2">44</td>
                                 </tr>
                                 <tr className="border-b border-neutral-100 text-neutral-600">
-                                    <td className="py-3 px-2 font-medium text-[#1a1a1a]">M</td>
+                                    <td className="py-3 px-2 font-Inter18SemiBold text-[#1a1a1a]">M</td>
                                     <td className="py-3 px-2">101-106</td>
                                     <td className="py-3 px-2">73</td>
                                     <td className="py-3 px-2">46</td>
                                 </tr>
                                 <tr className="border-b border-neutral-100 text-neutral-600">
-                                    <td className="py-3 px-2 font-medium text-[#1a1a1a]">L</td>
+                                    <td className="py-3 px-2 font-Inter18SemiBold text-[#1a1a1a]">L</td>
                                     <td className="py-3 px-2">106-111</td>
                                     <td className="py-3 px-2">75</td>
                                     <td className="py-3 px-2">48</td>
                                 </tr>
                                 <tr className="border-b border-neutral-100 text-neutral-600">
-                                    <td className="py-3 px-2 font-medium text-[#1a1a1a]">XL</td>
+                                    <td className="py-3 px-2 font-Inter18SemiBold text-[#1a1a1a]">XL</td>
                                     <td className="py-3 px-2">111-116</td>
                                     <td className="py-3 px-2">77</td>
                                     <td className="py-3 px-2">50</td>
@@ -194,7 +194,7 @@ export default function ProductDetails({ product }: Props) {
                             </table>
                         </div>
 
-                        <p className="mt-6 text-[11px] text-neutral-400">
+                        <p className="mt-6 text-[11px] text-neutral-400 font-Inter">
                             All measurements are approximate and may vary by up to 2cm.
                         </p>
                     </div>
@@ -252,8 +252,7 @@ export default function ProductDetails({ product }: Props) {
                     </div>
 
                     <div className="px-4 py-8 bg-white flex flex-col items-center text-center">
-
-                        <h1 className="text-4xl font-GemunuRegular mb-1 uppercase tracking-widest text-[#1a1a1a]">
+                        <h1 className="text-4xl font-Inter mb-1 uppercase tracking-widest text-[#1a1a1a]">
                             {product.name}
                         </h1>
 
@@ -267,11 +266,11 @@ export default function ProductDetails({ product }: Props) {
 
                         {variants.length > 0 && (
                             <div className="mb-6 w-full border-b border-[#e5e5e5] pb-6">
-                                <label className="text-[11px] font-normal mb-3 block text-neutral-700 uppercase tracking-wide text-left">
+                                <label className="text-[11px] font-Inter mb-3 block text-neutral-700 uppercase tracking-wide text-left">
                                     Variantă -{" "}
                                     <span className="text-neutral-400 font-InterLight">
-                Alegeți varianta
-            </span>
+                                        Alegeți varianta
+                                    </span>
                                 </label>
 
                                 <div className="grid grid-cols-4 gap-2">
@@ -281,8 +280,8 @@ export default function ProductDetails({ product }: Props) {
                                             onClick={() => setSelectedVariantId(variant.id)}
                                             className={`h-[40px] text-[11px] border tracking-wider transition-colors cursor-pointer flex items-center justify-center uppercase ${
                                                 selectedVariantId === variant.id
-                                                    ? "border-[#1a1a1a] text-[#1a1a1a] font-bold bg-white"
-                                                    : "border-[#e5e5e5] bg-white text-neutral-300 font-normal hover:border-neutral-400 hover:text-neutral-500"
+                                                    ? "border-[#1a1a1a] text-[#1a1a1a] font-Inter18SemiBold bg-white"
+                                                    : "border-[#e5e5e5] bg-white text-neutral-300 font-Inter hover:border-neutral-400 hover:text-neutral-500"
                                             }`}
                                         >
                                             {getVariantLabel(variant)}
@@ -294,7 +293,7 @@ export default function ProductDetails({ product }: Props) {
 
                         <button
                             onClick={handleAddToCart}
-                            className="w-full bg-[#1a1a1a] text-white py-3.5 text-xs font-medium uppercase tracking-[0.15em] mb-6 hover:bg-black transition-colors cursor-pointer"
+                            className="w-full bg-[#1a1a1a] text-white py-3.5 text-xs font-Inter18SemiBold uppercase tracking-[0.15em] mb-6 hover:bg-black transition-colors cursor-pointer"
                         >
                             ADAUGĂ ÎN COȘ
                         </button>
@@ -313,11 +312,8 @@ export default function ProductDetails({ product }: Props) {
                             </button>
 
                             {isDescriptionOpen && (
-                                <div className="py-4 text-xs text-neutral-500 leading-relaxed border-b border-[#e5e5e5] space-y-4">
+                                <div className="py-4 text-xs text-neutral-500 leading-relaxed border-b border-[#e5e5e5] space-y-4 font-Inter">
                                     <div dangerouslySetInnerHTML={{ __html: product.description }} />
-                                    {/*<p className="text-[11px] font-InterLight text-neutral-400 block pt-2">*/}
-                                    {/* Model is 5&apos;11 170lbs wearing a size M.*/}
-                                    {/*</p>*/}
                                 </div>
                             )}
 
@@ -325,7 +321,7 @@ export default function ProductDetails({ product }: Props) {
                                 onClick={() => setIsCompositionOpen(!isCompositionOpen)}
                                 className="w-full flex items-center justify-between py-4 text-xs font-Inter uppercase border-b border-[#e5e5e5] text-[#1a1a1a] tracking-wider cursor-pointer"
                             >
-                                COMPOZIȚIE ȘI ÎNTREȚINERE
+                                PRODUCT CARE INSTRUCTIONS
                                 {isCompositionOpen ? (
                                     <span className="text-lg font-InterLight text-neutral-400 leading-none">−</span>
                                 ) : (
@@ -414,19 +410,18 @@ export default function ProductDetails({ product }: Props) {
                     </div>
 
                     <div className="flex flex-col w-[460px] bg-white pt-2">
-
-                        <h1 className="text-3xl font-normal mb-3 uppercase tracking-wider text-[#1a1a1a] leading-tight">
+                        <h1 className="text-3xl font-Inter mb-3 uppercase tracking-wider text-[#1a1a1a] leading-tight">
                             {product.name}
                         </h1>
 
-                        <p className="text-2xl font-normal mb-8 text-[#1a1a1a]">
+                        <p className="text-2xl font-Inter mb-8 text-[#1a1a1a]">
                             {displayedPrice.toFixed(2)} lei
                         </p>
 
                         {variants.length > 0 && (
                             <div className="mb-6 border-b border-[#e5e5e5] pb-6">
-                                <label className="text-[11px] font-normal mb-3 block text-neutral-700 uppercase tracking-wide">
-                                    Variantă - <span className="text-neutral-400 font-light">Alegeți varianta</span>
+                                <label className="text-[11px] font-Inter mb-3 block text-neutral-700 uppercase tracking-wide">
+                                    Variantă - <span className="text-neutral-400 font-InterLight">Alegeți varianta</span>
                                 </label>
 
                                 <div className="grid grid-cols-5 gap-1.5 mb-3.5">
@@ -436,8 +431,8 @@ export default function ProductDetails({ product }: Props) {
                                             onClick={() => setSelectedVariantId(variant.id)}
                                             className={`h-[40px] text-[11px] border tracking-wider transition-colors cursor-pointer flex items-center justify-center ${
                                                 selectedVariantId === variant.id
-                                                    ? "border-[#1a1a1a] text-[#1a1a1a] font-bold bg-white"
-                                                    : "border-[#e5e5e5] bg-white text-neutral-300 font-normal hover:border-neutral-400 hover:text-neutral-500"
+                                                    ? "border-[#1a1a1a] text-[#1a1a1a] font-Inter18SemiBold bg-white"
+                                                    : "border-[#e5e5e5] bg-white text-neutral-300 font-Inter hover:border-neutral-400 hover:text-neutral-500"
                                             }`}
                                         >
                                             {getVariantLabel(variant)}
@@ -449,7 +444,7 @@ export default function ProductDetails({ product }: Props) {
 
                         <button
                             onClick={handleAddToCart}
-                            className="w-full bg-[#1a1a1a] text-white py-4.5 text-sm font-medium uppercase tracking-[0.18em] mb-8 hover:bg-black transition-colors cursor-pointer flex items-center justify-center"
+                            className="w-full bg-[#1a1a1a] text-white py-4.5 text-sm font-Inter18SemiBold uppercase tracking-[0.18em] mb-8 hover:bg-black transition-colors cursor-pointer flex items-center justify-center"
                         >
                             ADAUGĂ ÎN COȘ
                         </button>
@@ -457,49 +452,53 @@ export default function ProductDetails({ product }: Props) {
                         <div className="border-t border-[#e5e5e5]">
                             <button
                                 onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
-                                className="w-full flex items-center justify-between py-4.5 text-xs font-medium uppercase border-b border-[#e5e5e5] text-[#1a1a1a] tracking-wider cursor-pointer"
+                                className="w-full flex items-center justify-between py-4.5 text-xs font-Inter uppercase border-b border-[#e5e5e5] text-[#1a1a1a] tracking-wider cursor-pointer"
                             >
                                 DESCRIERE
                                 {isDescriptionOpen ? (
-                                    <span className="text-base font-light text-neutral-400 leading-none">−</span>
+                                    <span className="text-base font-InterLight text-neutral-400 leading-none">−</span>
                                 ) : (
-                                    <span className="text-base font-light text-neutral-400 leading-none">+</span>
+                                    <span className="text-base font-InterLight text-neutral-400 leading-none">+</span>
                                 )}
                             </button>
 
                             {isDescriptionOpen && (
-                                <div className="py-4.5 text-xs text-neutral-500 leading-relaxed border-b border-[#e5e5e5] space-y-4">
+                                <div className="py-4.5 text-xs text-neutral-500 leading-relaxed border-b border-[#e5e5e5] space-y-4 font-Inter">
                                     <div dangerouslySetInnerHTML={{ __html: product.description }} />
-                                    {/*<p className="text-[11px] italic text-neutral-400 block pt-1">*/}
-                                    {/* Model is 5&apos;11 170lbs wearing a size M.*/}
-                                    {/*</p>*/}
                                 </div>
                             )}
 
                             <div className="border-t border-[#e5e5e5]">
                                 <button
                                     onClick={() => setIsCompositionOpen(!isCompositionOpen)}
-                                    className="w-full flex items-center justify-between py-4.5 text-xs font-medium uppercase border-b border-[#e5e5e5] text-[#1a1a1a] tracking-wider cursor-pointer"
+                                    className="w-full flex items-center justify-between py-4.5 text-xs font-Inter18SemiBold uppercase border-b border-[#e5e5e5] text-[#1a1a1a] tracking-wider cursor-pointer"
                                 >
-                                    COMPOZIȚIE ȘI ÎNTREȚINERE
+                                    PRODUCT CARE INSTRUCTIONS
                                     {isCompositionOpen ? (
-                                        <span className="text-base font-light text-neutral-400 leading-none">−</span>
+                                        <span className="text-base font-InterLight text-neutral-400 leading-none">−</span>
                                     ) : (
-                                        <span className="text-base font-light text-neutral-400 leading-none">+</span>
+                                        <span className="text-base font-InterLight text-neutral-400 leading-none">+</span>
                                     )}
                                 </button>
 
                                 {isCompositionOpen && (
-                                    <div className="py-4.5 text-xs text-neutral-500 leading-relaxed border-b border-[#e5e5e5]">
-                                        <p className="mb-2"><strong>Composition:</strong></p>
-                                        <p className="mb-4">100% Premium Cotton</p>
-                                        <p className="mb-2"><strong>Care Instructions:</strong></p>
-                                        <ul className="list-disc list-inside space-y-1 text-neutral-400">
-                                            <li>Machine wash cold</li>
-                                            <li>Do not bleach</li>
-                                            <li>Tumble dry low</li>
-                                            <li>Iron on low heat</li>
+                                    <div className="py-4.5 text-xs font-InterLight text-neutral-500 leading-relaxed border-b border-[#e5e5e5]">
+                                        <p className="mb-4">
+                                            Pentru a pastra performanta si durabilitatea echipamentului Beast Locker:
+                                        </p>
+
+                                        <ul className="list-disc list-inside space-y-2 text-neutral-400 mb-4">
+                                            <li>Curatati dupa fiecare utilizare</li>
+                                            <li>Lasati produsul sa se usuce natural</li>
+                                            <li>Nu spalati la masina</li>
+                                            <li>Evitati contactul direct cu surse de caldura</li>
+                                            <li>Nu lasati produsul umed in geanta de antrenament</li>
+                                            <li>Depozitati intr-un loc uscat si aerisit</li>
                                         </ul>
+
+                                        <p>
+                                            Echipamentul bine intretinut rezista mai mult, la fel ca luptatorul care il poarta.
+                                        </p>
                                     </div>
                                 )}
                             </div>
