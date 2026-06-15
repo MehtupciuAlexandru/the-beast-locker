@@ -6,19 +6,19 @@ import Navbar from "@/components/layout/Navbar";
 const categories = [
     {
         title: "BOX",
-        image: "/images/categories/BOXING.jpeg",
+        image: "/images/categories/BOXING.jpg",
         link: "/products?collection=box",
         objectPosition: "50% 25%",
     },
     {
         title: "KICKBOX",
-        image: "/images/categories/KICKBOXING.jpeg",
+        image: "/images/categories/KICKBOXING.jpg",
         link: "/products?collection=kickbox",
         objectPosition: "50% 15%",
     },
     {
         title: "MMA",
-        image: "/images/categories/MMA.jpeg",
+        image: "/images/categories/MMA.jpg",
         link: "/products?collection=mma",
         objectPosition: "50% 40%",
     }
