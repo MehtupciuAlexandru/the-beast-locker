@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ChevronDown, X, ArrowRight, Loader2 } from "lucide-react";
 import { ProductPreview } from "@/types/product";
+import { getCollections, StoreCollection } from "@/lib/api/collections";
 
 type SidebarMenuProps = {
     isOpen: boolean;
@@ -13,6 +14,8 @@ type SidebarMenuProps = {
 type OpenSection = "equipment" | "clothes" | "all" | null;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+const equipmentCollectionSlugs = ["box", "kickbox", "mma"];
 
 async function fetchProducts(collectionSlug?: string): Promise<ProductPreview[]> {
     if (!API_URL) return [];
@@ -79,7 +82,7 @@ async function fetchProducts(collectionSlug?: string): Promise<ProductPreview[]>
 
 export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
     const [openSection, setOpenSection] = useState<OpenSection>(null);
-    const [equipmentProducts, setEquipmentProducts] = useState<ProductPreview[]>([]);
+    const [equipmentCollections, setEquipmentCollections] = useState<StoreCollection[]>([]);
     const [clothesProducts, setClothesProducts] = useState<ProductPreview[]>([]);
     const [allProducts, setAllProducts] = useState<ProductPreview[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -92,14 +95,22 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
         async function loadProducts() {
             setIsLoading(true);
 
-            const [equipment, clothes, all] = await Promise.all([
-                fetchProducts("equipment"),
+            const [collections, clothes, all] = await Promise.all([
+                getCollections(),
                 fetchProducts("clothes"),
                 fetchProducts(),
             ]);
 
+            const equipment = collections
+                .filter((collection) => equipmentCollectionSlugs.includes(collection.slug))
+                .sort(
+                    (a, b) =>
+                        equipmentCollectionSlugs.indexOf(a.slug) -
+                        equipmentCollectionSlugs.indexOf(b.slug)
+                );
+
             if (!cancelled) {
-                setEquipmentProducts(equipment);
+                setEquipmentCollections(equipment);
                 setClothesProducts(clothes);
                 setAllProducts(all);
                 setIsLoading(false);
@@ -164,6 +175,44 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
         );
     };
 
+    const renderEquipmentCollections = () => {
+        if (isLoading) {
+            return (
+                <div className="flex items-center gap-2 px-8 py-4">
+                    <Loader2 className="h-3 w-3 animate-spin text-zinc-400" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                    Încărcare...
+                </span>
+                </div>
+            );
+        }
+
+        if (equipmentCollections.length === 0) {
+            return (
+                <p className="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-zinc-300">
+                    Nicio colecție găsită
+                </p>
+            );
+        }
+
+        return (
+            <div className="flex flex-col bg-zinc-50 border-y border-zinc-100 animate-in fade-in slide-in-from-top-1 duration-200">
+                {equipmentCollections.map((collection) => (
+                    <Link
+                        key={collection.id}
+                        href={`/products?collection=${collection.slug}`}
+                        onClick={onClose}
+                        className="group flex items-center justify-between px-8 py-3.5 transition-colors hover:bg-white"
+                    >
+                    <span className="text-[11px] font-bold uppercase tracking-tight text-zinc-600 group-hover:text-neutral-800 transition-colors">
+                        {collection.name}
+                    </span>
+                    </Link>
+                ))}
+            </div>
+        );
+    };
+
     return (
         <>
             <div
@@ -206,7 +255,7 @@ export default function SidebarMenu({ isOpen, onClose }: SidebarMenuProps) {
                                         }`}
                                     />
                                 </button>
-                                {openSection === "equipment" && renderProducts(equipmentProducts, "/equipment")}
+                                {openSection === "equipment" && renderEquipmentCollections()}
                             </div>
 
                             <div className="border-t border-zinc-100">
