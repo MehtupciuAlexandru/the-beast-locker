@@ -379,7 +379,6 @@ export default function ProductDetails({ product }: Props) {
                     </div>
 
                     <div className="flex flex-col w-[460px] bg-white pt-2">
-                        <p className="text-[11px] text-neutral-400 mb-3 tracking-wide">050225</p>
 
                         <h1 className="text-3xl font-normal mb-3 uppercase tracking-wider text-[#1a1a1a] leading-tight">
                             {product.name}
