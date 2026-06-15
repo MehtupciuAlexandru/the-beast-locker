@@ -33,7 +33,7 @@ export default async function FeaturedProducts() {
                     <Link
                         href="/products?collection=no-plan-b"
                         aria-label="Shop No Plan B collection"
-                        className="border border-black px-6 py-2 text-xs font-semibold tracking-widest text-black transition hover:bg-black hover:text-white"
+                        className="border border-black px-6 py-2 text-xs font-Inter18Semibold tracking-widest text-black transition hover:bg-black hover:text-white"
                     >
                         VEZI TOT
                     </Link>
