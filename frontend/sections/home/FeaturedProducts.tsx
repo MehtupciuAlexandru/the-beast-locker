@@ -1,38 +1,44 @@
-import Image from "next/image";
+import ProductCard from "@/components/product/ProductCard";
 import Link from "next/link";
-import { ProductPreview } from "@/types/product";
+import { getProducts } from "@/lib/api/products";
 
-type ProductCardProps = {
-    product: ProductPreview;
-    className?: string;
-};
+export default async function FeaturedProducts() {
+    const products = await getProducts("no-plan-b");
 
-export default function ProductCard({ product, className = "" }: ProductCardProps) {
     return (
-        <Link
-            href={`/product/${product.slug}`}
-            aria-label={`View ${product.name}`}
-            className={`flex flex-col items-center justify-center ${className}`}
-        >
-            <div className="relative aspect-[3/4] w-full overflow-hidden bg-white">
-                <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-contain p-4"
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                />
-            </div>
+        <section className="flex w-full justify-center bg-white">
+            <div className="w-full px-5 py-10">
+                <h2 className="mb-5 text-lg font-GemunuBold tracking-widest text-black">
+                    NO PLAN B
+                </h2>
 
-            <div className="mt-4 flex flex-col items-center text-center w-full px-2">
-                <p className="text-[11px] uppercase leading-5 tracking-[0.18em] text-[#1a1a1a] font-normal w-full">
-                    {product.name}
-                </p>
+                <div className="mb-6 mt-3 h-[1px] w-full bg-gray-300" />
 
-                <p className="mt-2 text-[13px] font-light text-neutral-400 tracking-wide w-full">
-                    {product.price.toFixed(2).replace(".", ",")} lei
-                </p>
+                {products.length === 0 ? (
+                    <p className="py-10 text-center text-xs uppercase tracking-widest text-neutral-400">
+                        Nu există produse momentan.
+                    </p>
+                ) : (
+                    <div className="grid font-InterLight grid-cols-2 gap-y-10 gap-x-12 sm:gap-x-24 md:gap-x-32 lg:grid-cols-4 lg:gap-x-40 xl:gap-x-[200px]">
+                        {products.map((product) => (
+                            <ProductCard
+                                key={product.id}
+                                product={product}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                <div className="mt-10 flex justify-center">
+                    <Link
+                        href="/products?collection=no-plan-b"
+                        aria-label="Shop No Plan B collection"
+                        className="border border-black px-6 py-2 text-xs font-semibold tracking-widest text-black transition hover:bg-black hover:text-white"
+                    >
+                        VEZI TOT
+                    </Link>
+                </div>
             </div>
-        </Link>
+        </section>
     );
 }
