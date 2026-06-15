@@ -20,7 +20,7 @@ export default function HomePage() {
             <Hero />
             <PlatformDetails />
             <Categories />
-            <FeaturedProducts products={mockProducts} />
+            <FeaturedProducts />
             <BannerSection />
             <Story />
             <Newsletter />
