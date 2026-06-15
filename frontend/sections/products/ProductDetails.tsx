@@ -311,15 +311,22 @@ export default function ProductDetails({ product }: Props) {
 
                             {isCompositionOpen && (
                                 <div className="py-4 text-xs font-InterLight text-neutral-500 leading-relaxed border-b border-[#e5e5e5]">
-                                    <p className="mb-2"><strong>Composition:</strong></p>
-                                    <p className="mb-4">100% Premium Cotton</p>
-                                    <p className="mb-2"><strong>Care Instructions:</strong></p>
-                                    <ul className="list-disc list-inside space-y-1 text-neutral-400">
-                                        <li>Machine wash cold</li>
-                                        <li>Do not bleach</li>
-                                        <li>Tumble dry low</li>
-                                        <li>Iron on low heat</li>
+                                    <p className="mb-4">
+                                        Pentru a pastra performanta si durabilitatea echipamentului Beast Locker:
+                                    </p>
+
+                                    <ul className="list-disc list-inside space-y-2 text-neutral-400 mb-4">
+                                        <li>Curatati dupa fiecare utilizare</li>
+                                        <li>Lasati produsul sa se usuce natural</li>
+                                        <li>Nu spalati la masina</li>
+                                        <li>Evitati contactul direct cu surse de caldura</li>
+                                        <li>Nu lasati produsul umed in geanta de antrenament</li>
+                                        <li>Depozitati intr-un loc uscat si aerisit</li>
                                     </ul>
+
+                                    <p>
+                                        Echipamentul bine intretinut rezista mai mult, la fel ca luptatorul care il poarta.
+                                    </p>
                                 </div>
                             )}
                         </div>
