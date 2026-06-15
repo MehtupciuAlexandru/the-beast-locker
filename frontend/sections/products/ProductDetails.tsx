@@ -51,36 +51,43 @@ export default function ProductDetails({ product }: Props) {
 
     const currentImage = displayImages[currentIndex] || displayImages[0];
 
-    const touchStartX = useRef<number>(0);
-    const touchEndX = useRef<number>(0);
+    const mobileSliderRef = useRef<HTMLDivElement>(null);
+    const desktopSliderRef = useRef<HTMLDivElement>(null);
 
-    const handleTouchStart = (e: React.TouchEvent) => {
-        touchStartX.current = e.touches[0].clientX;
-    };
-
-    const handleTouchMove = (e: React.TouchEvent) => {
-        touchEndX.current = e.touches[0].clientX;
-    };
-
-    const handleTouchEnd = () => {
-        if (touchStartX.current - touchEndX.current > 50) {
-            nextImage();
-        }
-
-        if (touchStartX.current - touchEndX.current < -50) {
-            prevImage();
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const scrollLeft = e.currentTarget.scrollLeft;
+        const width = e.currentTarget.clientWidth;
+        if (width > 0) {
+            const index = Math.round(scrollLeft / width);
+            if (currentIndex !== index) {
+                setCurrentIndex(index);
+            }
         }
     };
 
-    const nextImage = () => {
-        setCurrentIndex((prev) => (prev + 1) % displayImages.length);
+    const scrollTo = (index: number) => {
+        const newIndex = index < 0 ? displayImages.length - 1 : index >= displayImages.length ? 0 : index;
+
+        if (mobileSliderRef.current) {
+            mobileSliderRef.current.scrollTo({
+                left: mobileSliderRef.current.clientWidth * newIndex,
+                behavior: "smooth",
+            });
+        }
+
+        if (desktopSliderRef.current) {
+            desktopSliderRef.current.scrollTo({
+                left: desktopSliderRef.current.clientWidth * newIndex,
+                behavior: "smooth",
+            });
+        }
+
+        setCurrentIndex(newIndex);
     };
 
-    const prevImage = () => {
-        setCurrentIndex((prev) =>
-            prev === 0 ? displayImages.length - 1 : prev - 1
-        );
-    };
+    const nextImage = () => scrollTo(currentIndex + 1);
+
+    const prevImage = () => scrollTo(currentIndex - 1);
 
     const { openCart } = useCartUI();
 
@@ -94,6 +101,12 @@ export default function ProductDetails({ product }: Props) {
 
     useEffect(() => {
         setCurrentIndex(0);
+        if (mobileSliderRef.current) {
+            mobileSliderRef.current.scrollTo({ left: 0, behavior: "smooth" });
+        }
+        if (desktopSliderRef.current) {
+            desktopSliderRef.current.scrollTo({ left: 0, behavior: "smooth" });
+        }
     }, [selectedVariantId]);
 
     useEffect(() => {
@@ -110,6 +123,11 @@ export default function ProductDetails({ product }: Props) {
 
     return (
         <>
+            <style dangerouslySetInnerHTML={{ __html: `
+                .scrollbar-hide::-webkit-scrollbar {
+                    display: none;
+                }
+            `}} />
             {isSizeGuideOpen && (
                 <div
                     className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 cursor-pointer backdrop-blur-[1px]"
@@ -185,17 +203,23 @@ export default function ProductDetails({ product }: Props) {
 
             <section className="w-full bg-white">
                 <div className="lg:hidden">
-                    <div
-                        className="relative w-full aspect-[3/4] bg-white cursor-pointer"
-                        onTouchStart={handleTouchStart}
-                        onTouchMove={handleTouchMove}
-                        onTouchEnd={handleTouchEnd}
-                    >
-                        <img
-                            src={currentImage}
-                            alt={product.name}
-                            className="w-full h-full object-contain p-4"
-                        />
+                    <div className="relative w-full aspect-[3/4] bg-white cursor-pointer">
+                        <div
+                            ref={mobileSliderRef}
+                            className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scroll-smooth scrollbar-hide"
+                            onScroll={handleScroll}
+                            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                        >
+                            {displayImages.map((img: string, i: number) => (
+                                <div key={i} className="min-w-full h-full flex-shrink-0 snap-center flex items-center justify-center">
+                                    <img
+                                        src={img}
+                                        alt={`${product.name} view ${i + 1}`}
+                                        className="w-full h-full object-contain p-4"
+                                    />
+                                </div>
+                            ))}
+                        </div>
 
                         <button
                             onClick={prevImage}
@@ -217,7 +241,7 @@ export default function ProductDetails({ product }: Props) {
                             {displayImages.map((_: any, i: number) => (
                                 <button
                                     key={i}
-                                    onClick={() => setCurrentIndex(i)}
+                                    onClick={() => scrollTo(i)}
                                     className={`w-1.5 h-1.5 rounded-full transition-colors cursor-pointer ${
                                         currentIndex === i ? "bg-[#1a1a1a]" : "bg-neutral-300"
                                     }`}
@@ -292,7 +316,7 @@ export default function ProductDetails({ product }: Props) {
                                 <div className="py-4 text-xs text-neutral-500 leading-relaxed border-b border-[#e5e5e5] space-y-4">
                                     <div dangerouslySetInnerHTML={{ __html: product.description }} />
                                     {/*<p className="text-[11px] font-InterLight text-neutral-400 block pt-2">*/}
-                                    {/*    Model is 5&apos;11 170lbs wearing a size M.*/}
+                                    {/* Model is 5&apos;11 170lbs wearing a size M.*/}
                                     {/*</p>*/}
                                 </div>
                             )}
@@ -339,7 +363,7 @@ export default function ProductDetails({ product }: Props) {
                             {displayImages.map((img: string, i: number) => (
                                 <button
                                     key={i}
-                                    onClick={() => setCurrentIndex(i)}
+                                    onClick={() => scrollTo(i)}
                                     className={`w-[84px] h-[112px] border overflow-hidden transition-colors bg-white cursor-pointer ${
                                         currentIndex === i ? "border-[#1a1a1a]" : "border-[#e5e5e5] hover:border-neutral-400"
                                     }`}
@@ -354,11 +378,22 @@ export default function ProductDetails({ product }: Props) {
                         </div>
 
                         <div className="relative bg-white overflow-hidden w-[760px] h-[950px] flex items-center justify-center">
-                            <img
-                                src={currentImage}
-                                alt={product.name}
-                                className="w-full h-full object-contain p-6 transition-all"
-                            />
+                            <div
+                                ref={desktopSliderRef}
+                                className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scroll-smooth scrollbar-hide"
+                                onScroll={handleScroll}
+                                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                            >
+                                {displayImages.map((img: string, i: number) => (
+                                    <div key={i} className="min-w-full h-full flex-shrink-0 snap-center flex items-center justify-center">
+                                        <img
+                                            src={img}
+                                            alt={`${product.name} view ${i + 1}`}
+                                            className="w-full h-full object-contain p-6 transition-all"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
 
                             <button
                                 onClick={prevImage}
@@ -436,7 +471,7 @@ export default function ProductDetails({ product }: Props) {
                                 <div className="py-4.5 text-xs text-neutral-500 leading-relaxed border-b border-[#e5e5e5] space-y-4">
                                     <div dangerouslySetInnerHTML={{ __html: product.description }} />
                                     {/*<p className="text-[11px] italic text-neutral-400 block pt-1">*/}
-                                    {/*    Model is 5&apos;11 170lbs wearing a size M.*/}
+                                    {/* Model is 5&apos;11 170lbs wearing a size M.*/}
                                     {/*</p>*/}
                                 </div>
                             )}
