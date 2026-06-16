@@ -463,8 +463,41 @@ export default function ProductDetails({ product }: Props) {
                             </button>
 
                             {isDescriptionOpen && (
-                                <div className="py-4.5 text-xs text-neutral-500 leading-relaxed border-b border-[#e5e5e5] space-y-4 font-Inter">
-                                    <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                                <div className="py-4.5 text-xs text-neutral-500 leading-relaxed border-b border-[#e5e5e5]">
+                                    <div
+                                        className="
+                font-Inter
+                whitespace-pre-line
+
+                [&_p]:mb-4
+                [&_p:last-child]:mb-0
+
+                [&_strong]:font-Inter18SemiBold
+                [&_strong]:text-[#1a1a1a]
+
+                [&_b]:font-Inter18SemiBold
+                [&_b]:text-[#1a1a1a]
+
+                [&_em]:font-InterLight
+                [&_em]:italic
+                [&_em]:text-[#1a1a1a]
+
+                [&_i]:font-InterLight
+                [&_i]:italic
+                [&_i]:text-[#1a1a1a]
+
+                [&_ul]:list-disc
+                [&_ul]:pl-4
+                [&_ul]:mb-5
+                [&_ul]:mt-2
+
+                [&_li]:mb-1
+                [&_li]:leading-relaxed
+
+                [&_br]:block
+            "
+                                        dangerouslySetInnerHTML={{ __html: product.description }}
+                                    />
                                 </div>
                             )}
 
