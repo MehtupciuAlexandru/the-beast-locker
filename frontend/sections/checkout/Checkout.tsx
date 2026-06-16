@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getActiveCustomer } from "@/lib/api/auth";
 import { createCustomerAddress, updateCustomerAddress } from "@/lib/api/customer";
 import { getAvailableCountries } from "@/lib/api/shop";
-import { getActiveOrder, removeOrderLine } from "@/lib/api/cart";
+import { adjustOrderLine, getActiveOrder, removeOrderLine } from "@/lib/api/cart";
 import { setCheckoutCustomer, setCheckoutShippingAddress } from "@/lib/api/checkout";
 
 type PaymentMethod = "card" | "paypal" | "apple-pay";
@@ -83,6 +83,7 @@ export default function Checkout() {
 
     const [countries, setCountries] = useState<any[]>([]);
     const [order, setOrder] = useState<ActiveOrder | null>(null);
+    const [updatingLine, setUpdatingLine] = useState<string | null>(null);
 
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
     const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
@@ -134,8 +135,10 @@ export default function Checkout() {
         setIsAddAddressOpen(false);
     };
 
-    const fetchOrder = async () => {
-        setOrderLoading(true);
+    const fetchOrder = async (showLoading = true) => {
+        if (showLoading) {
+            setOrderLoading(true);
+        }
 
         try {
             const activeOrder = await getActiveOrder();
@@ -144,7 +147,9 @@ export default function Checkout() {
             console.error(err);
             setOrder(null);
         } finally {
-            setOrderLoading(false);
+            if (showLoading) {
+                setOrderLoading(false);
+            }
         }
     };
 
@@ -287,20 +292,53 @@ export default function Checkout() {
         setIsAddAddressOpen(true);
     };
 
+    const increaseLine = async (orderLineId: string, quantity: number) => {
+        try {
+            setUpdatingLine(orderLineId);
+            await adjustOrderLine(orderLineId, quantity + 1);
+            await fetchOrder(false);
+        } catch (err: any) {
+            setMessage(err.message || "Nu am putut actualiza cantitatea.");
+            setMessageType("error");
+        } finally {
+            setUpdatingLine(null);
+        }
+    };
+
+    const decreaseLine = async (orderLineId: string, quantity: number) => {
+        if (quantity <= 1) return;
+
+        try {
+            setUpdatingLine(orderLineId);
+            await adjustOrderLine(orderLineId, quantity - 1);
+            await fetchOrder(false);
+        } catch (err: any) {
+            setMessage(err.message || "Nu am putut actualiza cantitatea.");
+            setMessageType("error");
+        } finally {
+            setUpdatingLine(null);
+        }
+    };
+
     const handleRemoveLine = async (orderLineId: string) => {
         try {
+            setUpdatingLine(orderLineId);
+
             const updatedOrder = await removeOrderLine(orderLineId);
 
             if (updatedOrder?.message) {
                 throw new Error(updatedOrder.message);
             }
 
-            setOrder(updatedOrder || null);
+            await fetchOrder(false);
+
             setMessage("Produsul a fost eliminat din comandă.");
             setMessageType("success");
         } catch (err: any) {
             setMessage(err.message || "Nu am putut elimina produsul.");
             setMessageType("error");
+        } finally {
+            setUpdatingLine(null);
         }
     };
 
@@ -469,10 +507,13 @@ export default function Checkout() {
         );
     }
 
+    const cartProductCount =
+        order?.lines?.reduce((total, line) => total + line.quantity, 0) || 0;
+
     const productTotal =
         order?.lines?.reduce((total, line) => total + getLineTotal(line), 0) || 0;
 
-    const vatValue = Math.round(productTotal * 0.19);
+    const vatValue = Math.round(productTotal * 0.21);
 
     const totalValue = productTotal;
 
@@ -485,7 +526,7 @@ export default function Checkout() {
                     </p>
 
                     <h1 className="text-[14px] md:text-[15px] font-Inter18Semibold leading-none">
-                        Complete your purchase
+                        Finalizează comanda
                     </h1>
                 </div>
 
@@ -493,7 +534,7 @@ export default function Checkout() {
                     <div className="flex flex-col gap-5 md:gap-6">
                         <div className="bg-white border border-[#d8d8d8] px-4 md:px-6 py-4 md:py-5">
                             <p className="text-[11px] text-neutral-500 mb-4">
-                                {order?.totalQuantity || 0} produse
+                                {cartProductCount} {cartProductCount === 1 ? "produs" : "produse"}
                             </p>
 
                             {order?.lines && order.lines.length > 0 ? (
@@ -501,7 +542,9 @@ export default function Checkout() {
                                     {order.lines.map((line) => (
                                         <div
                                             key={line.id}
-                                            className="flex items-start gap-4 md:gap-7 py-4 first:pt-0 last:pb-0"
+                                            className={`flex items-start gap-4 md:gap-7 py-4 first:pt-0 last:pb-0 transition-opacity ${
+    updatingLine === line.id ? "opacity-50 pointer-events-none" : "opacity-100"
+}`}
                                         >
                                             <div className="w-[70px] h-[96px] md:w-[105px] md:h-[135px] shrink-0 bg-white">
                                                 <img
@@ -526,13 +569,42 @@ export default function Checkout() {
                                                             Mărime: {getSizeLabel(line)}
                                                         </p>
 
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleRemoveLine(line.id)}
-                                                            className="mt-3 text-[10px] underline text-neutral-400 hover:text-red-600 cursor-pointer"
-                                                        >
-                                                            Șterge
-                                                        </button>
+                                                        <p className="mt-2 text-[10px] text-neutral-400">
+                                                            {line.quantity} × {formatPrice(line.productVariant.priceWithTax || 0)}
+                                                        </p>
+
+                                                        <div className="mt-4 flex items-center gap-4">
+                                                            <div className="flex items-center border border-gray-300">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => decreaseLine(line.id, line.quantity)}
+                                                                    disabled={line.quantity <= 1}
+                                                                    className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                                                >
+                                                                    <span className="text-lg leading-none -mt-0.5">–</span>
+                                                                </button>
+
+                                                                <span className="w-8 text-center text-[12px] text-[#1c1c1e] font-Inter">
+                                                                    {line.quantity}
+                                                                </span>
+
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => increaseLine(line.id, line.quantity)}
+                                                                    className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black hover:bg-gray-50 transition-colors cursor-pointer"
+                                                                >
+                                                                    <span className="text-lg leading-none -mt-0.5">+</span>
+                                                                </button>
+                                                            </div>
+
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRemoveLine(line.id)}
+                                                                className="text-[10px] underline text-neutral-400 hover:text-red-600 cursor-pointer"
+                                                            >
+                                                                Șterge
+                                                            </button>
+                                                        </div>
                                                     </div>
 
                                                     <p className="text-[11px] md:text-[12px] font-Inter18Semibold whitespace-nowrap text-[#1c1c1e]">
@@ -550,32 +622,32 @@ export default function Checkout() {
                             )}
                         </div>
 
-                        <div className="bg-white border border-[#d8d8d8] px-4 md:px-6 py-5">
-                            <h2 className="text-[12px] font-Inter18Semibold uppercase mb-5">
-                                Payment Method
-                            </h2>
+{/*                        <div className="bg-white border-[#d8d8d8] px-4 md:px-6 py-5">*/}
+{/*                            <h2 className="text-[12px] font-Inter18Semibold uppercase mb-5">*/}
+{/*                                Payment Method*/}
+{/*                            </h2>*/}
 
-                            <div className="grid grid-cols-3 gap-3 md:gap-4">
-                                {[
-                                    { id: "card", label: "Card" },
-                                    { id: "paypal", label: "PayPal" },
-                                    { id: "apple-pay", label: "Apple Pay" },
-                                ].map((method) => (
-                                    <button
-                                        key={method.id}
-                                        type="button"
-                                        onClick={() => setPaymentMethod(method.id as PaymentMethod)}
-                                        className={`h-[42px] border text-[11px] cursor-pointer transition-colors ${
-                                            paymentMethod === method.id
-                                                ? "border-[#1c1c1e] text-[#1c1c1e] font-Inter18Semibold"
-                                                : "border-[#d8d8d8] text-[#1c1c1e] hover:border-neutral-500"
-                                        }`}
-                                    >
-                                        {method.label}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+{/*                            <div className="grid grid-cols-3 gap-3 md:gap-4">*/}
+{/*                                {[*/}
+{/*                                    { id: "card", label: "Card" },*/}
+{/*                                    { id: "paypal", label: "PayPal" },*/}
+{/*                                    { id: "apple-pay", label: "Apple Pay" },*/}
+{/*                                ].map((method) => (*/}
+{/*                                    <button*/}
+{/*                                        key={method.id}*/}
+{/*                                        type="button"*/}
+{/*                                        onClick={() => setPaymentMethod(method.id as PaymentMethod)}*/}
+{/*                                        className={`h-[42px] border text-[11px] cursor-pointer transition-colors ${*/}
+{/*    paymentMethod === method.id*/}
+{/*        ? "border-[#1c1c1e] text-[#1c1c1e] font-Inter18Semibold"*/}
+{/*        : "border-[#d8d8d8] text-[#1c1c1e] hover:border-neutral-500"*/}
+{/*}`}*/}
+{/*                                    >*/}
+{/*                                        {method.label}*/}
+{/*                                    </button>*/}
+{/*                                ))}*/}
+{/*                            </div>*/}
+{/*                        </div>*/}
 
                         {isAuthenticated ? (
                             <div className="bg-white border border-[#d8d8d8] px-4 md:px-6 py-5">
@@ -593,10 +665,10 @@ export default function Checkout() {
                                                     key={address.id}
                                                     onClick={() => setSelectedAddressId(address.id)}
                                                     className={`relative border p-4 md:p-5 cursor-pointer transition-colors ${
-                                                        isSelected
-                                                            ? "border-[#1c1c1e]"
-                                                            : "border-[#d8d8d8] hover:border-neutral-500"
-                                                    }`}
+    isSelected
+        ? "border-[#1c1c1e]"
+        : "border-[#d8d8d8] hover:border-neutral-500"
+}`}
                                                 >
                                                     <div className="absolute right-4 top-4">
                                                         <input
@@ -694,8 +766,8 @@ export default function Checkout() {
                 <div className="fixed top-6 right-6 z-[9999]">
                     <div
                         className={`px-5 py-3 rounded-none shadow-xl text-xs uppercase tracking-wider text-white font-Inter18Semibold ${
-                            messageType === "success" ? "bg-[#1c1c1e]" : "bg-red-600"
-                        }`}
+    messageType === "success" ? "bg-[#1c1c1e]" : "bg-red-600"
+}`}
                     >
                         {message}
                     </div>
@@ -790,7 +862,7 @@ function GuestCheckoutForm({
     return (
         <div className="bg-white border border-[#d8d8d8] px-4 md:px-6 py-5">
             <h2 className="text-[12px] font-Inter18Semibold uppercase mb-5">
-                Delivery Details
+                Detalii livrare
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -910,7 +982,7 @@ function PriceSummary({
                 </div>
 
                 <div className="flex items-center justify-between text-[11px] text-neutral-500">
-                    <span>TVA (19%)</span>
+                    <span>TVA (21%)</span>
                     <span>inclus {vat}</span>
                 </div>
             </div>
@@ -935,3 +1007,4 @@ function PriceSummary({
         </div>
     );
 }
+
