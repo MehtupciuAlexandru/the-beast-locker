@@ -55,7 +55,12 @@ export async function getCustomerOrders() {
         query GetCustomerOrders {
             activeCustomer {
                 orders(options: {
-                    take: 20
+                    take: 50
+                    filter: {
+                        active: {
+                            eq: false
+                        }
+                    }
                     sort: {
                         orderPlacedAt: DESC
                     }
@@ -117,8 +122,17 @@ export async function getCustomerOrders() {
         true
     );
 
-    return data.activeCustomer?.orders || {
+    const orders = data.activeCustomer?.orders || {
         totalItems: 0,
         items: [],
+    };
+
+    const placedOrders = (orders.items || []).filter(
+        (order: CustomerOrder) => order.active === false && order.state !== "AddingItems"
+    );
+
+    return {
+        totalItems: placedOrders.length,
+        items: placedOrders,
     };
 }

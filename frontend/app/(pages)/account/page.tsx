@@ -54,6 +54,7 @@ export default function AccountPage() {
 
     const [orders, setOrders] = useState<CustomerOrder[]>([]);
     const [ordersLoading, setOrdersLoading] = useState(true);
+    const [isOrderHistoryOpen, setIsOrderHistoryOpen] = useState(false);
 
     const [newAddress, setNewAddress] = useState({
         fullName: "",
@@ -405,6 +406,14 @@ export default function AccountPage() {
         }).format(new Date(value));
     };
 
+    const activeOrders = orders.filter(
+        (order) => order.state === "PaymentSettled" && order.active === false
+    );
+
+    const historicOrders = orders.filter(
+        (order) => order.state !== "PaymentSettled" && order.active === false
+    );
+
     const getOrderStatusLabel = (state: string) => {
         switch (state) {
             case "PaymentSettled":
@@ -419,6 +428,71 @@ export default function AccountPage() {
                 return state;
         }
     };
+
+    const renderOrderCard = (order: CustomerOrder) => (
+        <div
+            key={order.id}
+            className="border border-neutral-200 p-4"
+        >
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <p className="text-[11px] font-Inter18Semibold text-neutral-800 uppercase tracking-wide">
+                        Comanda #{order.code}
+                    </p>
+
+                    <p className="mt-1 text-[10px] text-neutral-400">
+                        {formatDate(order.orderPlacedAt)}
+                    </p>
+                </div>
+
+                <p className="text-[10px] uppercase tracking-wide text-neutral-500">
+                    {getOrderStatusLabel(order.state)}
+                </p>
+            </div>
+
+            <div className="mt-4 flex flex-col gap-2">
+                {order.lines.map((line) => (
+                    <div
+                        key={line.id}
+                        className="flex items-center justify-between gap-4 text-xs text-neutral-500"
+                    >
+                    <span>
+                        {line.quantity} × {line.productVariant.product?.name || line.productVariant.name}
+                    </span>
+
+                        <span className="text-neutral-800">
+                        {formatPrice(line.linePriceWithTax)}
+                    </span>
+                    </div>
+                ))}
+            </div>
+
+            <div className="border-t border-neutral-100 mt-4 pt-3 flex items-center justify-between">
+            <span className="text-[11px] text-neutral-400">
+                Total
+            </span>
+
+                <span className="text-[12px] font-Inter18Semibold text-neutral-800">
+                {formatPrice(order.totalWithTax)}
+            </span>
+            </div>
+
+            {order.shippingLines && order.shippingLines.length > 0 && (
+                <p className="mt-2 text-[10px] text-neutral-400">
+                    Livrare: {order.shippingLines[0].shippingMethod.name}
+                </p>
+            )}
+
+            {order.fulfillments && order.fulfillments.length > 0 && (
+                <p className="mt-1 text-[10px] text-neutral-400">
+                    Status livrare: {order.fulfillments[0].state}
+                    {order.fulfillments[0].trackingCode
+                        ? ` / Tracking: ${order.fulfillments[0].trackingCode}`
+                        : ""}
+                </p>
+            )}
+        </div>
+    );
 
     return (
         <>
@@ -448,7 +522,7 @@ export default function AccountPage() {
 
                         <div className="mb-10">
                             <p className="text-xs font-Inter text-neutral-400 tracking-wide">
-                                Comenzile mele
+                                Comenzi active
                             </p>
 
                             <div className="border-b border-neutral-200 mt-1.5 mb-3"></div>
@@ -457,77 +531,50 @@ export default function AccountPage() {
                                 <p className="text-xs font-Inter text-neutral-400 font-light">
                                     Se încarcă comenzile...
                                 </p>
-                            ) : orders.length === 0 ? (
+                            ) : activeOrders.length === 0 ? (
                                 <p className="text-xs font-Inter text-neutral-400 font-light">
-                                    Încă nu aveți nicio comandă
+                                    Nu aveți comenzi active
                                 </p>
                             ) : (
                                 <div className="flex flex-col gap-4">
-                                    {orders.map((order) => (
-                                        <div
-                                            key={order.id}
-                                            className="border border-neutral-200 p-4"
-                                        >
-                                            <div className="flex items-start justify-between gap-4">
-                                                <div>
-                                                    <p className="text-[11px] font-Inter18Semibold text-neutral-800 uppercase tracking-wide">
-                                                        Comanda #{order.code}
-                                                    </p>
-
-                                                    <p className="mt-1 text-[10px] text-neutral-400">
-                                                        {formatDate(order.orderPlacedAt)}
-                                                    </p>
-                                                </div>
-
-                                                <p className="text-[10px] uppercase tracking-wide text-neutral-500">
-                                                    {getOrderStatusLabel(order.state)}
-                                                </p>
-                                            </div>
-
-                                            <div className="mt-4 flex flex-col gap-2">
-                                                {order.lines.map((line) => (
-                                                    <div
-                                                        key={line.id}
-                                                        className="flex items-center justify-between gap-4 text-xs text-neutral-500"
-                                                    >
-                                <span>
-                                    {line.quantity} × {line.productVariant.product?.name || line.productVariant.name}
-                                </span>
-
-                                                        <span className="text-neutral-800">
-                                    {formatPrice(line.linePriceWithTax)}
-                                </span>
-                                                    </div>
-                                                ))}
-                                            </div>
-
-                                            <div className="border-t border-neutral-100 mt-4 pt-3 flex items-center justify-between">
-                        <span className="text-[11px] text-neutral-400">
-                            Total
-                        </span>
-
-                                                <span className="text-[12px] font-Inter18Semibold text-neutral-800">
-                            {formatPrice(order.totalWithTax)}
-                        </span>
-                                            </div>
-
-                                            {order.shippingLines && order.shippingLines.length > 0 && (
-                                                <p className="mt-2 text-[10px] text-neutral-400">
-                                                    Livrare: {order.shippingLines[0].shippingMethod.name}
-                                                </p>
-                                            )}
-
-                                            {order.fulfillments && order.fulfillments.length > 0 && (
-                                                <p className="mt-1 text-[10px] text-neutral-400">
-                                                    Fulfillment: {order.fulfillments[0].state}
-                                                    {order.fulfillments[0].trackingCode
-                                                        ? ` / Tracking: ${order.fulfillments[0].trackingCode}`
-                                                        : ""}
-                                                </p>
-                                            )}
-                                        </div>
-                                    ))}
+                                    {activeOrders.map((order) => renderOrderCard(order))}
                                 </div>
+                            )}
+                        </div>
+
+                        <div className="mb-10">
+                            <button
+                                type="button"
+                                onClick={() => setIsOrderHistoryOpen((prev) => !prev)}
+                                className="w-full flex items-center justify-between text-left bg-transparent border-none p-0 cursor-pointer"
+                            >
+                                <p className="text-xs font-Inter text-neutral-400 tracking-wide">
+                                    Istoric comenzi
+                                </p>
+
+                                <span className="text-xs text-neutral-400">
+            {isOrderHistoryOpen ? "−" : "+"}
+        </span>
+                            </button>
+
+                            <div className="border-b border-neutral-200 mt-1.5 mb-3"></div>
+
+                            {isOrderHistoryOpen && (
+                                <>
+                                    {ordersLoading ? (
+                                        <p className="text-xs font-Inter text-neutral-400 font-light">
+                                            Se încarcă istoricul...
+                                        </p>
+                                    ) : historicOrders.length === 0 ? (
+                                        <p className="text-xs font-Inter text-neutral-400 font-light">
+                                            Nu există comenzi în istoric
+                                        </p>
+                                    ) : (
+                                        <div className="flex flex-col gap-4">
+                                            {historicOrders.map((order) => renderOrderCard(order))}
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
 
