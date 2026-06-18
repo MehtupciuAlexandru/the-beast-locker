@@ -11,6 +11,7 @@ import { updateCustomerDetails } from "@/lib/api/customer";
 import { updatePassword } from "@/lib/api/customer";
 import { createCustomerAddress } from "@/lib/api/customer";
 import { getAvailableCountries } from "@/lib/api/shop";
+import { CustomerOrder, getCustomerOrders } from "@/lib/api/orders";
 
 export default function AccountPage() {
     const router = useRouter();
@@ -50,6 +51,9 @@ export default function AccountPage() {
     const [deleteAddressId, setDeleteAddressId] = useState<string | null>(null);
 
     const [countries, setCountries] = useState<any[]>([]);
+
+    const [orders, setOrders] = useState<CustomerOrder[]>([]);
+    const [ordersLoading, setOrdersLoading] = useState(true);
 
     const [newAddress, setNewAddress] = useState({
         fullName: "",
@@ -110,6 +114,20 @@ export default function AccountPage() {
             setLastName(data.activeCustomer.lastName);
             setFirstName(data.activeCustomer.firstName);
             setEmail(data.activeCustomer.emailAddress);
+
+            try {
+                setOrdersLoading(true);
+
+                const orderData = await getCustomerOrders();
+
+                setOrders(orderData.items || []);
+            } catch (err) {
+                console.error("Failed to load customer orders:", err);
+                setOrders([]);
+            } finally {
+                setOrdersLoading(false);
+            }
+
         } catch {
             router.push("/login");
         } finally {
@@ -371,6 +389,37 @@ export default function AccountPage() {
         }
     };
 
+    const formatPrice = (value?: number) => {
+        if (value === undefined || value === null) return "0,00 lei";
+
+        return `${(value / 100).toFixed(2).replace(".", ",")} lei`;
+    };
+
+    const formatDate = (value?: string | null) => {
+        if (!value) return "Dată indisponibilă";
+
+        return new Intl.DateTimeFormat("ro-RO", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+        }).format(new Date(value));
+    };
+
+    const getOrderStatusLabel = (state: string) => {
+        switch (state) {
+            case "PaymentSettled":
+                return "Plată confirmată";
+            case "Shipped":
+                return "Expediată";
+            case "Delivered":
+                return "Livrată";
+            case "Cancelled":
+                return "Anulată";
+            default:
+                return state;
+        }
+    };
+
     return (
         <>
             <Navbar />
@@ -401,10 +450,85 @@ export default function AccountPage() {
                             <p className="text-xs font-Inter text-neutral-400 tracking-wide">
                                 Comenzile mele
                             </p>
+
                             <div className="border-b border-neutral-200 mt-1.5 mb-3"></div>
-                            <p className="text-xs font-Inter text-neutral-400 font-light">
-                                Încă nu aveți nicio comandă
-                            </p>
+
+                            {ordersLoading ? (
+                                <p className="text-xs font-Inter text-neutral-400 font-light">
+                                    Se încarcă comenzile...
+                                </p>
+                            ) : orders.length === 0 ? (
+                                <p className="text-xs font-Inter text-neutral-400 font-light">
+                                    Încă nu aveți nicio comandă
+                                </p>
+                            ) : (
+                                <div className="flex flex-col gap-4">
+                                    {orders.map((order) => (
+                                        <div
+                                            key={order.id}
+                                            className="border border-neutral-200 p-4"
+                                        >
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div>
+                                                    <p className="text-[11px] font-Inter18Semibold text-neutral-800 uppercase tracking-wide">
+                                                        Comanda #{order.code}
+                                                    </p>
+
+                                                    <p className="mt-1 text-[10px] text-neutral-400">
+                                                        {formatDate(order.orderPlacedAt)}
+                                                    </p>
+                                                </div>
+
+                                                <p className="text-[10px] uppercase tracking-wide text-neutral-500">
+                                                    {getOrderStatusLabel(order.state)}
+                                                </p>
+                                            </div>
+
+                                            <div className="mt-4 flex flex-col gap-2">
+                                                {order.lines.map((line) => (
+                                                    <div
+                                                        key={line.id}
+                                                        className="flex items-center justify-between gap-4 text-xs text-neutral-500"
+                                                    >
+                                <span>
+                                    {line.quantity} × {line.productVariant.product?.name || line.productVariant.name}
+                                </span>
+
+                                                        <span className="text-neutral-800">
+                                    {formatPrice(line.linePriceWithTax)}
+                                </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <div className="border-t border-neutral-100 mt-4 pt-3 flex items-center justify-between">
+                        <span className="text-[11px] text-neutral-400">
+                            Total
+                        </span>
+
+                                                <span className="text-[12px] font-Inter18Semibold text-neutral-800">
+                            {formatPrice(order.totalWithTax)}
+                        </span>
+                                            </div>
+
+                                            {order.shippingLines && order.shippingLines.length > 0 && (
+                                                <p className="mt-2 text-[10px] text-neutral-400">
+                                                    Livrare: {order.shippingLines[0].shippingMethod.name}
+                                                </p>
+                                            )}
+
+                                            {order.fulfillments && order.fulfillments.length > 0 && (
+                                                <p className="mt-1 text-[10px] text-neutral-400">
+                                                    Fulfillment: {order.fulfillments[0].state}
+                                                    {order.fulfillments[0].trackingCode
+                                                        ? ` / Tracking: ${order.fulfillments[0].trackingCode}`
+                                                        : ""}
+                                                </p>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         <div className="mb-10">

@@ -1,0 +1,67 @@
+{{> header title="Chitanță plată" }}
+
+<mj-section background-color="#ffffff">
+    <mj-column>
+        <mj-text font-size="16px" color="#111111" font-weight="bold">
+            Plata ta a fost confirmată
+        </mj-text>
+
+        <mj-text font-size="14px" color="#555555">
+            Bună, {{ order.customer.firstName }} {{ order.customer.lastName }},
+        </mj-text>
+
+        <mj-text font-size="14px" color="#555555">
+            Am primit plata pentru comanda #{{ order.code }}.
+        </mj-text>
+
+        <mj-table cellpadding="6px" cellspacing="0">
+            <tr>
+                <td><strong>Comandă</strong></td>
+                <td>#{{ order.code }}</td>
+            </tr>
+            <tr>
+                <td><strong>Metodă plată</strong></td>
+                <td>{{ payment.method }}</td>
+            </tr>
+            <tr>
+                <td><strong>Status plată</strong></td>
+                <td>{{ payment.state }}</td>
+            </tr>
+            <tr>
+                <td><strong>Total plătit</strong></td>
+                <td>{{ formatMoney payment.amount }} {{ order.currencyCode }}</td>
+            </tr>
+            {{#if payment.transactionId}}
+                <tr>
+                    <td><strong>ID tranzacție</strong></td>
+                    <td>{{ payment.transactionId }}</td>
+                </tr>
+            {{/if}}
+        </mj-table>
+
+        <mj-text font-size="14px" color="#111111" font-weight="bold">
+            Produse comandate
+        </mj-text>
+
+        <mj-table cellpadding="6px" cellspacing="0">
+            {{#each order.lines}}
+                <tr>
+                    <td>{{ quantity }} × {{ productVariant.name }}</td>
+                    <td align="right">{{ formatMoney linePriceWithTax }} {{ ../order.currencyCode }}</td>
+                </tr>
+            {{/each}}
+        </mj-table>
+
+        {{#if shippingLines}}
+            <mj-text font-size="14px" color="#555555">
+                Metodă de livrare: {{ shippingLines.0.shippingMethod.name }}
+            </mj-text>
+        {{/if}}
+
+        <mj-text font-size="13px" color="#777777">
+            Îți mulțumim pentru comandă!
+        </mj-text>
+    </mj-column>
+</mj-section>
+
+{{> footer }}

@@ -11,7 +11,9 @@ import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader } from '@ven
 import {AssetServerPlugin, configureS3AssetStorage} from '@vendure/asset-server-plugin';
 import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
+import { StripePlugin } from "@vendure/payments-plugin/package/stripe";
 import { RecaptchaProtectionPlugin } from './plugins/recaptcha-protection/recaptcha-protection.plugin';
+import { paymentReceiptHandler } from './plugins/email-transport/payment-receipt.handler';
 import 'dotenv/config';
 import path from 'path';
 const IS_DEV = process.env.APP_ENV === 'dev';
@@ -26,6 +28,7 @@ console.log("APP_ENV:", process.env.APP_ENV);
 console.log("S3_BUCKET:", process.env.S3_BUCKET);
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const ADMIN_UI_URL = process.env.ADMIN_UI_URL;
+const emailHandlers = [...defaultEmailHandlers, paymentReceiptHandler];
 
 export const config: VendureConfig = {
     apiOptions: {
@@ -120,6 +123,9 @@ export const config: VendureConfig = {
         BeastLockerPlugin,
         AuthValidationPlugin,
         EventRegistrationPlugin,
+        StripePlugin.init({
+            storeCustomersInStripe: true,
+        }),
         RecaptchaProtectionPlugin,
         AssetServerPlugin.init(
             useS3
@@ -154,7 +160,7 @@ export const config: VendureConfig = {
                     devMode: true,
                     outputPath: path.join(__dirname, '../static/email/test-emails'),
                     route: 'mailbox',
-                    handlers: defaultEmailHandlers,
+                    handlers: emailHandlers,
                     templateLoader: new FileBasedTemplateLoader(
                         path.join(__dirname, '../static/email/templates')
                     ),
@@ -170,7 +176,7 @@ export const config: VendureConfig = {
 
                     emailSender: new ResendEmailSender(),
 
-                    handlers: defaultEmailHandlers,
+                    handlers: emailHandlers,
                     templateLoader: new FileBasedTemplateLoader(
                         path.join(__dirname, '../static/email/templates')
                     ),

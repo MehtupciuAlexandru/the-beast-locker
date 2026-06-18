@@ -30,7 +30,7 @@ export class ResendEmailSender implements EmailSender {
             console.log(`[Email] Successfully sent to ${email.recipient}. ID: ${data.id}`);
         } catch (error) {
             console.error('[Email Sender Crash]:', error);
-            throw error; // Re-throw so Vendure knows the job failed
+            throw error; // Re-throw that ERRRRRRRRRRRRROR so Vendure knows the job failed
         }
     }
 }

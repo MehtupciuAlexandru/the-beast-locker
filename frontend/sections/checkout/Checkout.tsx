@@ -5,7 +5,15 @@ import { getActiveCustomer } from "@/lib/api/auth";
 import { createCustomerAddress, updateCustomerAddress } from "@/lib/api/customer";
 import { getAvailableCountries } from "@/lib/api/shop";
 import { adjustOrderLine, getActiveOrder, removeOrderLine } from "@/lib/api/cart";
-import { setCheckoutCustomer, setCheckoutShippingAddress } from "@/lib/api/checkout";
+import { createStripePaymentIntent } from "@/lib/api/stripe";
+import { getRecaptchaToken } from "@/lib/recaptcha/client";
+import StripePaymentForm from "@/components/checkout/StripePaymentForm";
+import {
+    getEligibleShippingMethods,
+    setCheckoutCustomer,
+    setCheckoutShippingAddress,
+    setCheckoutShippingMethod,
+} from "@/lib/api/checkout";
 
 type PaymentMethod = "card" | "paypal" | "apple-pay";
 
@@ -91,6 +99,13 @@ export default function Checkout() {
 
     const [message, setMessage] = useState<string | null>(null);
     const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
+
+    const [clientSecret, setClientSecret] = useState<string | null>(null);
+    const [isPreparingPayment, setIsPreparingPayment] = useState(false);
+
+    const [shippingMethods, setShippingMethods] = useState<any[]>([]);
+    const [selectedShippingMethodId, setSelectedShippingMethodId] = useState<string | null>(null);
+    const [shippingMethodsLoaded, setShippingMethodsLoaded] = useState(false);
 
     const [guestForm, setGuestForm] = useState({
         firstName: "",
@@ -417,7 +432,7 @@ export default function Checkout() {
         return "";
     };
 
-    const setLoggedInOrderAddress = async () => {
+    const setLoggedInOrderAddress = async (recaptchaToken: string) => {
         if (!selectedAddress) {
             throw new Error("Selectează o adresă de livrare.");
         }
@@ -446,40 +461,80 @@ export default function Checkout() {
             countryCode: selectedAddress.country?.code || "RO",
         };
 
-        return setCheckoutShippingAddress(input);
+        return setCheckoutShippingAddress(input, recaptchaToken);
     };
 
-    const setGuestOrderDetails = async () => {
+    const setGuestOrderDetails = async (recaptchaToken: string) => {
         const validationError = validateGuestForm();
 
         if (validationError) {
             throw new Error(validationError);
         }
 
-        await setCheckoutCustomer({
-            firstName: guestForm.firstName.trim(),
-            lastName: guestForm.lastName.trim(),
-            emailAddress: guestForm.emailAddress.trim(),
-            phoneNumber: guestForm.phoneNumber.trim(),
-        });
+        await setCheckoutCustomer(
+            {
+                firstName: guestForm.firstName.trim(),
+                lastName: guestForm.lastName.trim(),
+                emailAddress: guestForm.emailAddress.trim(),
+                phoneNumber: guestForm.phoneNumber.trim(),
+            },
+            recaptchaToken
+        );
 
-        return setCheckoutShippingAddress({
-            fullName: `${guestForm.firstName.trim()} ${guestForm.lastName.trim()}`,
-            company: guestForm.company.trim() || undefined,
-            streetLine1: guestForm.streetLine1.trim(),
-            streetLine2: guestForm.streetLine2.trim() || undefined,
-            city: guestForm.city.trim(),
-            province: guestForm.province.trim() || undefined,
-            postalCode: guestForm.postalCode.trim(),
-            phoneNumber: guestForm.phoneNumber.trim(),
-            countryCode: guestForm.countryCode,
-        });
+        return setCheckoutShippingAddress(
+            {
+                fullName: `${guestForm.firstName.trim()} ${guestForm.lastName.trim()}`,
+                company: guestForm.company.trim() || undefined,
+                streetLine1: guestForm.streetLine1.trim(),
+                streetLine2: guestForm.streetLine2.trim() || undefined,
+                city: guestForm.city.trim(),
+                province: guestForm.province.trim() || undefined,
+                postalCode: guestForm.postalCode.trim(),
+                phoneNumber: guestForm.phoneNumber.trim(),
+                countryCode: guestForm.countryCode,
+            },
+            recaptchaToken
+        );
+    };
+
+    const setFirstAvailableShippingMethod = async () => {
+        const methods = await getEligibleShippingMethods();
+
+        if (!methods.length) {
+            throw new Error("Nu există metode de livrare disponibile pentru această comandă.");
+        }
+
+        const standardMethod =
+            methods.find((method: any) => method.code === "standard-shipping") ||
+            methods[0];
+
+        return setCheckoutShippingMethod(standardMethod.id);
+    };
+
+    const loadShippingMethodsForOrder = async () => {
+        const methods = await getEligibleShippingMethods();
+
+        if (!methods.length) {
+            throw new Error("Nu există metode de livrare disponibile pentru această comandă.");
+        }
+
+        setShippingMethods(methods);
+
+        const standardMethod =
+            methods.find((method: any) => method.code === "standard-shipping") ||
+            methods[0];
+
+        setSelectedShippingMethodId(standardMethod.id);
+        setShippingMethodsLoaded(true);
+
+        return methods;
     };
 
     const handlePayNow = async () => {
         try {
             setMessage(null);
             setMessageType(null);
+            setIsPreparingPayment(true);
 
             if (!order || order.lines.length === 0) {
                 setMessage("Coșul este gol.");
@@ -487,17 +542,38 @@ export default function Checkout() {
                 return;
             }
 
+            const recaptchaToken = await getRecaptchaToken("checkout");
+
             const updatedOrder = isAuthenticated
-                ? await setLoggedInOrderAddress()
-                : await setGuestOrderDetails();
+                ? await setLoggedInOrderAddress(recaptchaToken)
+                : await setGuestOrderDetails(recaptchaToken);
 
             setOrder(updatedOrder);
 
-            setMessage("Datele de checkout au fost salvate. Urmează integrarea plății.");
+            if (!shippingMethodsLoaded || !selectedShippingMethodId) {
+                await loadShippingMethodsForOrder();
+
+                setMessage("Alege metoda de livrare, apoi continuă către plată.");
+                setMessageType("success");
+                return;
+            }
+
+            const orderWithShipping = await setCheckoutShippingMethod(selectedShippingMethodId);
+
+            setOrder(orderWithShipping);
+
+            const secret = await createStripePaymentIntent();
+
+            setClientSecret(secret);
+            setMessage("Datele au fost salvate. Completează plata cu cardul.");
+            setMessageType("success");
+            setMessage("Datele au fost salvate. Completează plata cu cardul.");
             setMessageType("success");
         } catch (err: any) {
             setMessage(err.message || "A apărut o eroare.");
             setMessageType("error");
+        } finally {
+            setIsPreparingPayment(false);
         }
     };
 
@@ -741,12 +817,79 @@ export default function Checkout() {
                             />
                         )}
 
+                        {shippingMethodsLoaded && shippingMethods.length > 0 && (
+                            <div className="bg-white border border-[#d8d8d8] px-4 md:px-6 py-5">
+                                <h2 className="text-[12px] font-Inter18Semibold uppercase mb-5">
+                                    Metodă de livrare
+                                </h2>
+
+                                <div className="flex flex-col gap-3">
+                                    {shippingMethods.map((method: any) => {
+                                        const isSelected = selectedShippingMethodId === method.id;
+
+                                        return (
+                                            <button
+                                                key={method.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedShippingMethodId(method.id);
+                                                    setClientSecret(null);
+                                                }}
+                                                className={`w-full border p-4 text-left cursor-pointer transition-colors ${
+                                                    isSelected
+                                                        ? "border-[#1c1c1e]"
+                                                        : "border-[#d8d8d8] hover:border-neutral-500"
+                                                }`}
+                                            >
+                                                <div className="flex items-center justify-between gap-4">
+                                                    <div>
+                                                        <p className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
+                                                            {method.name}
+                                                        </p>
+
+                                                        <p className="mt-1 text-[10px] text-neutral-400 uppercase tracking-wide">
+                                                            {method.code}
+                                                        </p>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-3">
+                                <span className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
+                                    {formatPrice(method.priceWithTax)}
+                                </span>
+
+                                                        <span
+                                                            className={`w-3.5 h-3.5 rounded-full border ${
+                                                                isSelected
+                                                                    ? "border-[#1c1c1e] bg-[#1c1c1e]"
+                                                                    : "border-neutral-300 bg-white"
+                                                            }`}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
+                        {clientSecret && (
+                            <div className="bg-white border border-[#d8d8d8] px-4 md:px-6 py-5">
+                                <h2 className="text-[12px] font-Inter18Semibold uppercase mb-5">
+                                    Plata cu cardul
+                                </h2>
+
+                                <StripePaymentForm clientSecret={clientSecret} />
+                            </div>
+                        )}
+
                         <div className="bg-white border border-[#d8d8d8] px-4 py-5 lg:hidden">
                             <PriceSummary
                                 productTotal={formatPrice(productTotal)}
                                 vat={formatPrice(vatValue)}
                                 total={formatPrice(totalValue)}
                                 onPay={handlePayNow}
+                                isPreparingPayment={isPreparingPayment}
                             />
                         </div>
                     </div>
@@ -757,6 +900,7 @@ export default function Checkout() {
                             vat={formatPrice(vatValue)}
                             total={formatPrice(totalValue)}
                             onPay={handlePayNow}
+                            isPreparingPayment={isPreparingPayment}
                         />
                     </div>
                 </div>
@@ -963,12 +1107,16 @@ function PriceSummary({
                           vat,
                           total,
                           onPay,
+                          isPreparingPayment,
                       }: {
     productTotal: string;
     vat: string;
     total: string;
     onPay: () => void;
+    isPreparingPayment: boolean;
 }) {
+
+
     return (
         <div>
             <h2 className="text-[12px] font-Inter18Semibold uppercase mb-5">
@@ -1000,9 +1148,12 @@ function PriceSummary({
             <button
                 type="button"
                 onClick={onPay}
-                className="w-full h-[46px] bg-black text-white text-[11px] font-Inter18Semibold uppercase tracking-[0.08em] hover:bg-[#1c1c1e] transition-colors cursor-pointer"
+                disabled={isPreparingPayment}
+                className="w-full h-[46px] bg-black text-white text-[11px] font-Inter18Semibold uppercase tracking-[0.08em] hover:bg-[#1c1c1e] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                Plătește acum
+                {isPreparingPayment
+                    ? "Se pregătește plata..."
+                    : "Continuă către plată"}
             </button>
         </div>
     );

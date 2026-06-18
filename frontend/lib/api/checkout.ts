@@ -43,12 +43,15 @@ const CHECKOUT_ORDER_FIELDS = `
     }
 `;
 
-export async function setCheckoutCustomer(input: {
-    firstName: string;
-    lastName: string;
-    emailAddress: string;
-    phoneNumber?: string;
-}) {
+export async function setCheckoutCustomer(
+    input: {
+        firstName: string;
+        lastName: string;
+        emailAddress: string;
+        phoneNumber?: string;
+    },
+    recaptchaToken?: string
+) {
     const data = await graphqlRequest(
         `
         mutation SetCustomerForOrder($input: CreateCustomerInput!) {
@@ -63,7 +66,7 @@ export async function setCheckoutCustomer(input: {
             }
         }
         `,
-        { input },
+        { input, recaptchaToken },
         true
     );
 
@@ -76,7 +79,7 @@ export async function setCheckoutCustomer(input: {
     return result;
 }
 
-export async function setCheckoutShippingAddress(input: any) {
+export async function setCheckoutShippingAddress(input: any, recaptchaToken?: string) {
     const data = await graphqlRequest(
         `
         mutation SetOrderShippingAddress($input: CreateAddressInput!) {
@@ -91,7 +94,7 @@ export async function setCheckoutShippingAddress(input: any) {
             }
         }
         `,
-        { input },
+        { input, recaptchaToken },
         true
     );
 
@@ -103,3 +106,54 @@ export async function setCheckoutShippingAddress(input: any) {
 
     return result;
 }
+
+
+export async function getEligibleShippingMethods() {
+    const data = await graphqlRequest(
+        `
+        query EligibleShippingMethods {
+            eligibleShippingMethods {
+                id
+                code
+                name
+                priceWithTax
+            }
+        }
+        `,
+        {},
+        true
+    );
+
+    return data.eligibleShippingMethods || [];
+}
+
+export async function setCheckoutShippingMethod(shippingMethodId: string) {
+    const data = await graphqlRequest(
+        `
+        mutation SetOrderShippingMethod($shippingMethodId: [ID!]!) {
+            setOrderShippingMethod(shippingMethodId: $shippingMethodId) {
+                ... on Order {
+                    ${CHECKOUT_ORDER_FIELDS}
+                }
+                ... on ErrorResult {
+                    errorCode
+                    message
+                }
+            }
+        }
+        `,
+        {
+            shippingMethodId: [shippingMethodId],
+        },
+        true
+    );
+
+    const result = data.setOrderShippingMethod;
+
+    if (result?.message) {
+        throw new Error(result.message);
+    }
+
+    return result;
+}
+
