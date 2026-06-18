@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getActiveCustomer } from "@/lib/api/auth";
 import { createCustomerAddress, updateCustomerAddress } from "@/lib/api/customer";
 import { getAvailableCountries } from "@/lib/api/shop";
@@ -82,6 +83,8 @@ export default function Checkout() {
     const [loading, setLoading] = useState(true);
     const [orderLoading, setOrderLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    const paymentSectionRef = useRef<HTMLDivElement | null>(null);
 
     const [firstName, setFirstName] = useState<string | null>(null);
     const [lastName, setLastName] = useState<string | null>(null);
@@ -235,6 +238,14 @@ export default function Checkout() {
     const selectedAddress = useMemo(() => {
         return addresses.find((address) => address.id === selectedAddressId) || null;
     }, [addresses, selectedAddressId]);
+
+    const selectedShippingMethod = useMemo(() => {
+        return shippingMethods.find((method: any) => method.id === selectedShippingMethodId) || null;
+    }, [shippingMethods, selectedShippingMethodId]);
+
+    const shippingValue =
+        selectedShippingMethod?.priceWithTax ||
+        (order?.shippingWithTax && order.shippingWithTax > 0 ? order.shippingWithTax : 0);
 
     const formatPrice = (value?: number) => {
         if (value === undefined || value === null) return "0,00 lei";
@@ -464,12 +475,14 @@ export default function Checkout() {
         return setCheckoutShippingAddress(input, recaptchaToken);
     };
 
-    const setGuestOrderDetails = async (recaptchaToken: string) => {
+    const setGuestOrderDetails = async () => {
         const validationError = validateGuestForm();
 
         if (validationError) {
             throw new Error(validationError);
         }
+
+        const customerRecaptchaToken = await getRecaptchaToken("checkout");
 
         await setCheckoutCustomer(
             {
@@ -478,8 +491,10 @@ export default function Checkout() {
                 emailAddress: guestForm.emailAddress.trim(),
                 phoneNumber: guestForm.phoneNumber.trim(),
             },
-            recaptchaToken
+            customerRecaptchaToken
         );
+
+        const addressRecaptchaToken = await getRecaptchaToken("checkout");
 
         return setCheckoutShippingAddress(
             {
@@ -493,23 +508,23 @@ export default function Checkout() {
                 phoneNumber: guestForm.phoneNumber.trim(),
                 countryCode: guestForm.countryCode,
             },
-            recaptchaToken
+            addressRecaptchaToken
         );
     };
 
-    const setFirstAvailableShippingMethod = async () => {
-        const methods = await getEligibleShippingMethods();
-
-        if (!methods.length) {
-            throw new Error("Nu există metode de livrare disponibile pentru această comandă.");
-        }
-
-        const standardMethod =
-            methods.find((method: any) => method.code === "standard-shipping") ||
-            methods[0];
-
-        return setCheckoutShippingMethod(standardMethod.id);
-    };
+    // const setFirstAvailableShippingMethod = async () => {
+    //     const methods = await getEligibleShippingMethods();
+    //
+    //     if (!methods.length) {
+    //         throw new Error("Nu există metode de livrare disponibile pentru această comandă.");
+    //     }
+    //
+    //     const standardMethod =
+    //         methods.find((method: any) => method.code === "standard-shipping") ||
+    //         methods[0];
+    //
+    //     return setCheckoutShippingMethod(standardMethod.id);
+    // };
 
     const loadShippingMethodsForOrder = async () => {
         const methods = await getEligibleShippingMethods();
@@ -542,40 +557,77 @@ export default function Checkout() {
                 return;
             }
 
-            const recaptchaToken = await getRecaptchaToken("checkout");
-
-            const updatedOrder = isAuthenticated
-                ? await setLoggedInOrderAddress(recaptchaToken)
-                : await setGuestOrderDetails(recaptchaToken);
-
-            setOrder(updatedOrder);
-
-            if (!shippingMethodsLoaded || !selectedShippingMethodId) {
-                await loadShippingMethodsForOrder();
-
-                setMessage("Alege metoda de livrare, apoi continuă către plată.");
-                setMessageType("success");
+            if (!selectedShippingMethodId) {
+                setMessage("Alege o metodă de livrare.");
+                setMessageType("error");
                 return;
             }
 
-            const orderWithShipping = await setCheckoutShippingMethod(selectedShippingMethodId);
+            const updatedOrder = isAuthenticated
+                ? await setLoggedInOrderAddress(await getRecaptchaToken("checkout"))
+                : await setGuestOrderDetails();
+
+            setOrder(updatedOrder);
+
+            const methods = await getEligibleShippingMethods();
+
+            if (!methods.length) {
+                throw new Error("Nu există metode de livrare disponibile pentru această comandă.");
+            }
+
+            setShippingMethods(methods);
+            setShippingMethodsLoaded(true);
+
+            const methodStillAvailable = methods.some(
+                (method: any) => method.id === selectedShippingMethodId
+            );
+
+            const shippingMethodId = methodStillAvailable
+                ? selectedShippingMethodId
+                : methods[0].id;
+
+            setSelectedShippingMethodId(shippingMethodId);
+
+            const orderWithShipping = await setCheckoutShippingMethod(shippingMethodId);
 
             setOrder(orderWithShipping);
 
             const secret = await createStripePaymentIntent();
 
             setClientSecret(secret);
-            setMessage("Datele au fost salvate. Completează plata cu cardul.");
+            setMessage("Completează plata cu cardul.");
             setMessageType("success");
-            setMessage("Datele au fost salvate. Completează plata cu cardul.");
-            setMessageType("success");
+
+            setTimeout(() => {
+                paymentSectionRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
+            }, 100);
         } catch (err: any) {
-            setMessage(err.message || "A apărut o eroare.");
+            const errorMessage = err.message || "A apărut o eroare.";
+
+            if (errorMessage.toLowerCase().includes("email address is not available")) {
+                setMessage("Acest email este deja asociat unui cont. Autentifică-te pentru a continua sau folosește alt email.");
+            } else {
+                setMessage(errorMessage);
+            }
+
             setMessageType("error");
         } finally {
             setIsPreparingPayment(false);
         }
     };
+
+
+    useEffect(() => {
+        if (orderLoading || !order?.lines?.length || shippingMethodsLoaded) return;
+
+        loadShippingMethodsForOrder().catch((err) => {
+            console.error("Failed to load shipping methods", err);
+        });
+    }, [orderLoading, order?.id, shippingMethodsLoaded]);
+
 
     if (loading || orderLoading) {
         return (
@@ -591,7 +643,9 @@ export default function Checkout() {
 
     const vatValue = Math.round(productTotal * 0.21);
 
-    const totalValue = productTotal;
+    const totalValue = productTotal + shippingValue;
+
+
 
     return (
         <section className="w-full bg-[#f5f5f5] min-h-screen font-Inter text-[#1c1c1e]">
@@ -739,7 +793,10 @@ export default function Checkout() {
                                             return (
                                                 <div
                                                     key={address.id}
-                                                    onClick={() => setSelectedAddressId(address.id)}
+                                                    onClick={() => {
+                                                        setSelectedAddressId(address.id);
+                                                        setClientSecret(null);
+                                                    }}
                                                     className={`relative border p-4 md:p-5 cursor-pointer transition-colors ${
     isSelected
         ? "border-[#1c1c1e]"
@@ -814,6 +871,7 @@ export default function Checkout() {
                                 guestForm={guestForm}
                                 setGuestForm={setGuestForm}
                                 countries={countries}
+                                onResetPayment={() => setClientSecret(null)}
                             />
                         )}
 
@@ -874,7 +932,10 @@ export default function Checkout() {
                         )}
 
                         {clientSecret && (
-                            <div className="bg-white border border-[#d8d8d8] px-4 md:px-6 py-5">
+                            <div
+                                ref={paymentSectionRef}
+                                className="bg-white border border-[#d8d8d8] px-4 md:px-6 py-5"
+                            >
                                 <h2 className="text-[12px] font-Inter18Semibold uppercase mb-5">
                                     Plata cu cardul
                                 </h2>
@@ -886,10 +947,12 @@ export default function Checkout() {
                         <div className="bg-white border border-[#d8d8d8] px-4 py-5 lg:hidden">
                             <PriceSummary
                                 productTotal={formatPrice(productTotal)}
+                                shipping={formatPrice(shippingValue)}
                                 vat={formatPrice(vatValue)}
                                 total={formatPrice(totalValue)}
                                 onPay={handlePayNow}
                                 isPreparingPayment={isPreparingPayment}
+                                disabled={!selectedShippingMethodId || !!clientSecret}
                             />
                         </div>
                     </div>
@@ -897,10 +960,12 @@ export default function Checkout() {
                     <div className="hidden lg:block bg-white border border-[#d8d8d8] p-6 sticky top-6">
                         <PriceSummary
                             productTotal={formatPrice(productTotal)}
+                            shipping={formatPrice(shippingValue)}
                             vat={formatPrice(vatValue)}
                             total={formatPrice(totalValue)}
                             onPay={handlePayNow}
                             isPreparingPayment={isPreparingPayment}
+                            disabled={!selectedShippingMethodId || !!clientSecret}
                         />
                     </div>
                 </div>
@@ -998,37 +1063,55 @@ function GuestCheckoutForm({
                                guestForm,
                                setGuestForm,
                                countries,
+                               onResetPayment,
                            }: {
     guestForm: any;
     setGuestForm: (value: any) => void;
     countries: any[];
+    onResetPayment: () => void;
 }) {
+
+    const updateGuestForm = (value: any) => {
+        onResetPayment();
+        setGuestForm(value);
+    };
+
     return (
         <div className="bg-white border border-[#d8d8d8] px-4 md:px-6 py-5">
             <h2 className="text-[12px] font-Inter18Semibold uppercase mb-5">
                 Detalii livrare
             </h2>
 
+            <p className="text-[11px] text-neutral-400 mb-5">
+                Ai deja cont?{" "}
+                <Link
+                    href="/login"
+                    className="underline text-neutral-700 hover:text-black"
+                >
+                    Autentifică-te
+                </Link>
+            </p>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <AddressInput label="Prenume *" value={guestForm.firstName} onChange={(value) => setGuestForm({ ...guestForm, firstName: value })} placeholder="Prenume" />
-                <AddressInput label="Nume *" value={guestForm.lastName} onChange={(value) => setGuestForm({ ...guestForm, lastName: value })} placeholder="Nume" />
-                <AddressInput label="Email *" value={guestForm.emailAddress} onChange={(value) => setGuestForm({ ...guestForm, emailAddress: value })} placeholder="Email" type="email" />
-                <AddressInput label="Telefon *" value={guestForm.phoneNumber} onChange={(value) => setGuestForm({ ...guestForm, phoneNumber: value })} placeholder="Telefon" />
+                <AddressInput label="Prenume *" value={guestForm.firstName} onChange={(value) => updateGuestForm({ ...guestForm, firstName: value })} placeholder="Prenume" />
+                <AddressInput label="Nume *" value={guestForm.lastName} onChange={(value) => updateGuestForm({ ...guestForm, lastName: value })} placeholder="Nume" />
+                <AddressInput label="Email *" value={guestForm.emailAddress} onChange={(value) => updateGuestForm({ ...guestForm, emailAddress: value })} placeholder="Email" type="email" />
+                <AddressInput label="Telefon *" value={guestForm.phoneNumber} onChange={(value) => updateGuestForm({ ...guestForm, phoneNumber: value })} placeholder="Telefon" />
             </div>
 
             <div className="mt-4 space-y-4">
-                <AddressInput label="Companie (opțional)" value={guestForm.company} onChange={(value) => setGuestForm({ ...guestForm, company: value })} placeholder="Numele companiei" />
-                <AddressInput label="Adresă *" value={guestForm.streetLine1} onChange={(value) => setGuestForm({ ...guestForm, streetLine1: value })} placeholder="Strada, numărul, blocul, apartamentul" />
-                <AddressInput label="Adresă secundară (opțional)" value={guestForm.streetLine2} onChange={(value) => setGuestForm({ ...guestForm, streetLine2: value })} placeholder="Alte detalii despre adresă" />
+                <AddressInput label="Companie (opțional)" value={guestForm.company} onChange={(value) => updateGuestForm({ ...guestForm, company: value })} placeholder="Numele companiei" />
+                <AddressInput label="Adresă *" value={guestForm.streetLine1} onChange={(value) => updateGuestForm({ ...guestForm, streetLine1: value })} placeholder="Strada, numărul, blocul, apartamentul" />
+                <AddressInput label="Adresă secundară (opțional)" value={guestForm.streetLine2} onChange={(value) => updateGuestForm({ ...guestForm, streetLine2: value })} placeholder="Alte detalii despre adresă" />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <AddressInput label="Oraș *" value={guestForm.city} onChange={(value) => setGuestForm({ ...guestForm, city: value })} placeholder="Oraș" />
-                    <AddressInput label="Județ (opțional)" value={guestForm.province} onChange={(value) => setGuestForm({ ...guestForm, province: value })} placeholder="Județ" />
+                    <AddressInput label="Oraș *" value={guestForm.city} onChange={(value) => updateGuestForm({ ...guestForm, city: value })} placeholder="Oraș" />
+                    <AddressInput label="Județ (opțional)" value={guestForm.province} onChange={(value) => updateGuestForm({ ...guestForm, province: value })} placeholder="Județ" />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <AddressInput label="Cod poștal *" value={guestForm.postalCode} onChange={(value) => setGuestForm({ ...guestForm, postalCode: value })} placeholder="Cod poștal" />
-                    <CountrySelect value={guestForm.countryCode} onChange={(value) => setGuestForm({ ...guestForm, countryCode: value })} countries={countries} />
+                    <AddressInput label="Cod poștal *" value={guestForm.postalCode} onChange={(value) => updateGuestForm({ ...guestForm, postalCode: value })} placeholder="Cod poștal" />
+                    <CountrySelect value={guestForm.countryCode} onChange={(value) => updateGuestForm({ ...guestForm, countryCode: value })} countries={countries} />
                 </div>
             </div>
         </div>
@@ -1104,16 +1187,20 @@ function CountrySelect({
 
 function PriceSummary({
                           productTotal,
+                          shipping,
                           vat,
                           total,
                           onPay,
                           isPreparingPayment,
+                          disabled,
                       }: {
     productTotal: string;
+    shipping: string;
     vat: string;
     total: string;
     onPay: () => void;
     isPreparingPayment: boolean;
+    disabled: boolean;
 }) {
 
 
@@ -1127,6 +1214,11 @@ function PriceSummary({
                 <div className="flex items-center justify-between text-[11px] text-neutral-500">
                     <span>Pret produse</span>
                     <span>{productTotal}</span>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-neutral-500">
+                    <span>Livrare</span>
+                    <span>{shipping}</span>
                 </div>
 
                 <div className="flex items-center justify-between text-[11px] text-neutral-500">
@@ -1148,7 +1240,7 @@ function PriceSummary({
             <button
                 type="button"
                 onClick={onPay}
-                disabled={isPreparingPayment}
+                disabled={isPreparingPayment || disabled}
                 className="w-full h-[46px] bg-black text-white text-[11px] font-Inter18Semibold uppercase tracking-[0.08em] hover:bg-[#1c1c1e] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {isPreparingPayment
