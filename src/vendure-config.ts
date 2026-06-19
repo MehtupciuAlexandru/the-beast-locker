@@ -16,6 +16,17 @@ import { RecaptchaProtectionPlugin } from './plugins/recaptcha-protection/recapt
 import {beastOrderConfirmationHandler} from "./plugins/email-transport/beast-order-confirmation.handler";
 import 'dotenv/config';
 import path from 'path';
+
+// Catch anything that would otherwise silently kill or wedge this process.
+// If the worker has ever been crashing/restarting without an obvious
+// "Starting Container" line in the logs, this will surface it.
+process.on('unhandledRejection', (reason) => {
+    console.error(`[process pid:${process.pid}] UNHANDLED REJECTION:`, reason);
+});
+process.on('uncaughtException', (err) => {
+    console.error(`[process pid:${process.pid}] UNCAUGHT EXCEPTION:`, err);
+});
+
 const IS_DEV = process.env.APP_ENV === 'dev';
 const serverPort = +process.env.PORT || 3000;
 import { ProductCustomizationPlugin } from './plugins/product-customization/product-customization.plugin';
