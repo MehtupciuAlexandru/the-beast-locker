@@ -37,7 +37,7 @@ export default function Hero() {
                         </p>
 
                         <Link
-                            href="/products?collection=equipment"
+                            href="/equipment"
                             className="inline-flex h-[38px] items-center justify-center bg-[#27F2EB] px-5 text-[12px] font-Inter18Semibold uppercase text-black md:h-[44px] md:px-6 md:text-[15px] lg:h-[48px] lg:px-7 lg:text-[12px]"
                         >
                             CUMPĂRĂ ACUM

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function UrbanBanner() {
     return (
@@ -33,12 +34,12 @@ export default function UrbanBanner() {
                     NOUA NOASTRĂ COLECȚIE, CONCEPUTĂ PENTRU CEI CARE SUNT SUFICIENT DE PUTERNICI SĂ NU DEA ÎNAPOI
                 </p>
 
-                <button
-                    type="button"
+                <Link
+                    href="/products?collection=no-plan-b"
                     className="mt-6 bg-[#27F2EB] text-black px-6 py-3 text-[10px] md:text-sm font-Inter18Semibold tracking-widest hover:bg-black hover:text-white cursor-pointer transition"
                 >
                     CUMPĂRĂ ACUM
-                </button>
+                </Link>
             </div>
         </section>
     );
