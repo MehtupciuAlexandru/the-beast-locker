@@ -1,4 +1,4 @@
-import { OrderStateTransitionEvent } from '@vendure/core';
+import { PaymentStateTransitionEvent } from '@vendure/core';
 import { EmailEventListener } from '@vendure/email-plugin';
 import { loadOrderEmailData } from './order-email-data';
 import { Logger } from '@vendure/core';
@@ -7,10 +7,19 @@ const loggerCtx = 'OrderConfirmationHandler';
 
 export const beastOrderConfirmationHandler =
     new EmailEventListener('order-confirmation')
-        .on(OrderStateTransitionEvent)
+        .on(PaymentStateTransitionEvent)
         .filter(event => {
-            const pass = event.toState === 'PaymentSettled';
-            Logger.info(`[Confirmation][Filter] Pass: ${pass} | Order: ${event.order?.code} | State: ${event.toState}`, loggerCtx);
+            // Fire when a Stripe payment settles. Using PaymentStateTransitionEvent
+            // (not OrderStateTransitionEvent) guarantees event.payment is already
+            // committed to the DB, eliminating the race condition where
+            // getOrderPayments() returned empty and silently dropped the email.
+            const pass =
+                event.toState === 'Settled' &&
+                event.payment?.method === 'stripe-card';
+            Logger.info(
+                `[Confirmation][Filter] Pass: ${pass} | Order: ${event.order?.code} | PaymentState: ${event.toState} | Method: ${event.payment?.method}`,
+                loggerCtx,
+            );
             return pass;
         })
         .loadData(async (context) => {
