@@ -12,7 +12,6 @@ import {AssetServerPlugin, configureS3AssetStorage} from '@vendure/asset-server-
 import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
 import { StripePlugin } from "@vendure/payments-plugin/package/stripe";
-import {SynchronizedTemplateLoader} from "./plugins/email-transport/synchronized-loader";
 import { RecaptchaProtectionPlugin } from './plugins/recaptcha-protection/recaptcha-protection.plugin';
 import { paymentReceiptHandler } from './plugins/email-transport/payment-receipt.handler';
 import {beastOrderConfirmationHandler} from "./plugins/email-transport/beast-order-confirmation.handler";
@@ -175,7 +174,7 @@ export const config: VendureConfig = {
                     outputPath: path.join(__dirname, '../static/email/test-emails'),
                     route: 'mailbox',
                     handlers: emailHandlers,
-                    templateLoader: new SynchronizedTemplateLoader(
+                    templateLoader: new FileBasedTemplateLoader(
                         path.join(__dirname, '../static/email/templates')
                     ),
                     globalTemplateVars: {
@@ -191,7 +190,7 @@ export const config: VendureConfig = {
                     emailSender: new ResendEmailSender(),
 
                     handlers: emailHandlers,
-                    templateLoader: new SynchronizedTemplateLoader(
+                    templateLoader: new FileBasedTemplateLoader(
                         path.join(__dirname, '../static/email/templates')
                     ),
                     globalTemplateVars: {
