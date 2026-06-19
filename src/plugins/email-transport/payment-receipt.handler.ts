@@ -4,7 +4,6 @@ import {
     OrderService,
     PaymentStateTransitionEvent,
 } from '@vendure/core';
-
 import {
     EmailEventListener,
     shippingLinesWithMethod,
@@ -15,27 +14,23 @@ const loggerCtx = 'PaymentReceiptHandler';
 export const paymentReceiptHandler =
     new EmailEventListener('payment-receipt')
         .on(PaymentStateTransitionEvent)
-        .filter(
-            event =>
-                event.toState === 'Settled' &&
-                event.payment.method === 'stripe-card',
-        )
+        .filter(event => {
+            const pass = event.toState === 'Settled' && event.payment?.method === 'stripe-card';
+            Logger.info(`[Receipt][Filter] Pass: ${pass} | Order: ${event.order?.code} | State: ${event.toState} | Method: ${event.payment?.method}`, loggerCtx);
+            return pass;
+        })
         .loadData(async ({ event, injector }) => {
+            Logger.info(`[Receipt][LoadData] Started | Order: ${event.order?.code}`, loggerCtx);
             const orderService = injector.get(OrderService);
             const entityHydrator = injector.get(EntityHydrator);
 
-            // Re-fetch fresh rather than hydrating event.order directly.
-            // EntityHydrator skips any relation already present on the
-            // entity, even a stale one — so if event.order already had a
-            // customer reference attached when this event was constructed,
-            // hydrate() would never refresh it. A fresh fetch guarantees
-            // we see the current assignment.
             const order = await orderService.findOne(
                 event.ctx,
                 event.order.id,
             );
 
             if (!order) {
+                Logger.error(`[Receipt][LoadData] Failed to find order | ID: ${event.order?.id}`, loggerCtx);
                 throw new Error(
                     `Unable to load order ${event.order.code} for payment receipt email`,
                 );
@@ -54,15 +49,13 @@ export const paymentReceiptHandler =
             });
 
             if (!order.customer?.emailAddress) {
-                Logger.warn(
-                    `payment-receipt: order ${order.code} has no customer email ` +
-                    `(customerId=${(order as any).customerId ?? 'none'})`,
-                    loggerCtx,
-                );
+                Logger.error(`[Receipt][LoadData] Missing email | Order: ${order.code} | CustomerID: ${(order as any).customerId ?? 'none'} | UserExists: ${!!order.customer?.user}`, loggerCtx);
                 throw new Error(
                     `Order ${order.code} does not have a customer email address`,
                 );
             }
+
+            Logger.info(`[Receipt][LoadData] Success | Email: ${order.customer.emailAddress} | UserExists: ${!!order.customer.user}`, loggerCtx);
 
             const shippingLines = shippingLinesWithMethod(order).map(
                 shippingLine => ({
@@ -166,16 +159,19 @@ export const paymentReceiptHandler =
                 shippingLines,
             };
         })
-        .setRecipient(
-            event => event.data.order.customer.emailAddress,
-        )
+        .setRecipient(event => {
+            const recipient = event.data.order.customer.emailAddress;
+            Logger.info(`[Receipt][Recipient] Resolved: ${recipient}`, loggerCtx);
+            return recipient;
+        })
         .setFrom('{{ fromAddress }}')
-        .setSubject(
-            'Chitanță plată pentru comanda #{{ order.code }}',
-        )
-        .setTemplateVars((event: any) => ({
-            order: event.data.order,
-            payment: event.data.payment,
-            payments: event.data.payments,
-            shippingLines: event.data.shippingLines,
-        }));
+        .setSubject('Chitanță plată pentru comanda #{{ order.code }}')
+        .setTemplateVars((event: any) => {
+            Logger.info(`[Receipt][Template] Processing vars | Order: ${event.data.order.code}`, loggerCtx);
+            return {
+                order: event.data.order,
+                payment: event.data.payment,
+                payments: event.data.payments,
+                shippingLines: event.data.shippingLines,
+            };
+        });
