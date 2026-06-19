@@ -7,7 +7,13 @@ import {
     LanguageCode,
 } from '@vendure/core';
 
-import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader } from '@vendure/email-plugin';
+import {
+    emailAddressChangeHandler,
+    emailVerificationHandler,
+    EmailPlugin,
+    FileBasedTemplateLoader,
+    passwordResetHandler,
+} from '@vendure/email-plugin';
 import {AssetServerPlugin, configureS3AssetStorage} from '@vendure/asset-server-plugin';
 import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
@@ -29,7 +35,13 @@ console.log("APP_ENV:", process.env.APP_ENV);
 console.log("S3_BUCKET:", process.env.S3_BUCKET);
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const ADMIN_UI_URL = process.env.ADMIN_UI_URL;
-const emailHandlers = [...defaultEmailHandlers, paymentReceiptHandler, beastOrderConfirmationHandler];
+const emailHandlers = [
+    beastOrderConfirmationHandler,
+    paymentReceiptHandler,
+    emailVerificationHandler,
+    passwordResetHandler,
+    emailAddressChangeHandler,
+];
 
 export const config: VendureConfig = {
     apiOptions: {
