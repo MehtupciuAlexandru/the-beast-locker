@@ -32,6 +32,7 @@ const serverPort = +process.env.PORT || 3000;
 import { ProductCustomizationPlugin } from './plugins/product-customization/product-customization.plugin';
 import {BeastLockerPlugin} from "./plugins/product-customization/beast-locker.plugin";
 import {AuthValidationPlugin} from "./plugins/auth-validation/auth-validation-plugin";
+import { ResendEmailSender } from './plugins/email-transport/resend-email.plugin';
 import { EventRegistrationPlugin } from './plugins/event-registration/event-registration.plugin';
 import {
     emailAddressChangeHandler,
@@ -203,6 +204,8 @@ export const config: VendureConfig = {
                             pass: process.env.RESEND_API_KEY,
                         },
                     },
+
+                    emailSender: new ResendEmailSender(),
 
                     handlers: emailHandlers,
                     templateLoader: new FileBasedTemplateLoader(
