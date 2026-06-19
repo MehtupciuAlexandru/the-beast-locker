@@ -1,9 +1,6 @@
-import { OrderService, OrderStateTransitionEvent } from '@vendure/core';
-import {
-    EmailEventListener,
-    shippingLinesWithMethod,
-    transformOrderLineAssetUrls,
-} from '@vendure/email-plugin';
+import { OrderStateTransitionEvent } from '@vendure/core';
+import { EmailEventListener } from '@vendure/email-plugin';
+import { loadOrderEmailData } from './order-email-data';
 
 export const beastOrderConfirmationHandler =
     new EmailEventListener('order-confirmation')
@@ -13,43 +10,17 @@ export const beastOrderConfirmationHandler =
                 event.toState === 'PaymentSettled' &&
                 !!event.order.customer?.emailAddress,
         )
-        .loadData(async ({ event, injector }) => {
-            const orderService = injector.get(OrderService);
-
-            const order = await orderService.findOne(
-                event.ctx,
-                event.order.id,
-                [
-                    'customer',
-                    'lines',
-                    'lines.productVariant',
-                    'lines.featuredAsset',
-                    'shippingLines',
-                    'shippingLines.shippingMethod',
-                ],
-            );
-
-            if (!order) {
-                throw new Error(
-                    `Unable to load order ${event.order.code} for confirmation`,
-                );
-            }
-
-            transformOrderLineAssetUrls(
-                event.ctx,
-                order,
-                injector,
-            );
-
-            return {
-                order,
-                shippingLines: shippingLinesWithMethod(order),
-            };
-        })
-        .setRecipient(event => event.order.customer!.emailAddress)
+        .loadData(loadOrderEmailData)
+        .setRecipient(
+            event => event.order.customer!.emailAddress,
+        )
         .setFrom('{{ fromAddress }}')
-        .setSubject('Confirmare comandă #{{ order.code }}')
+        .setSubject(
+            'Confirmare comandă #{{ order.code }}',
+        )
         .setTemplateVars((event: any) => ({
             order: event.data.order,
+            payment: event.data.payment,
+            payments: event.data.payments,
             shippingLines: event.data.shippingLines,
         }));

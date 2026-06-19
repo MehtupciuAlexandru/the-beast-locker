@@ -7,13 +7,7 @@ import {
     LanguageCode,
 } from '@vendure/core';
 
-import {
-    emailAddressChangeHandler,
-    emailVerificationHandler,
-    EmailPlugin,
-    FileBasedTemplateLoader,
-    passwordResetHandler,
-} from '@vendure/email-plugin';
+
 import {AssetServerPlugin, configureS3AssetStorage} from '@vendure/asset-server-plugin';
 import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
@@ -30,6 +24,12 @@ import {BeastLockerPlugin} from "./plugins/product-customization/beast-locker.pl
 import {AuthValidationPlugin} from "./plugins/auth-validation/auth-validation-plugin";
 import {ResendEmailSender} from "./plugins/email-transport/resend-email.plugin";
 import { EventRegistrationPlugin } from './plugins/event-registration/event-registration.plugin';
+import {
+    emailAddressChangeHandler,
+    EmailPlugin,
+    emailVerificationHandler, FileBasedTemplateLoader,
+    passwordResetHandler
+} from "@vendure/email-plugin";
 const useS3 = process.env.APP_ENV !== 'dev';
 console.log("APP_ENV:", process.env.APP_ENV);
 console.log("S3_BUCKET:", process.env.S3_BUCKET);
