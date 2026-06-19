@@ -130,4 +130,43 @@
     </mj-column>
 </mj-section>
 
+<mj-section background-color="#f5f5f5">
+    <mj-column>
+        <mj-text font-size="16px" color="#111111" font-weight="bold">
+            Detalii plată
+        </mj-text>
+
+        <mj-table cellpadding="6px" cellspacing="0">
+            <tr>
+                <td><strong>Status plată</strong></td>
+                <td>
+                    {{#if payment}}
+                        {{ payment.state }}
+                    {{else}}
+                        Confirmată
+                    {{/if}}
+                </td>
+            </tr>
+
+            <tr>
+                <td><strong>Total plătit</strong></td>
+                <td>
+                    {{ formatMoney order.totalWithTax order.currencyCode 'ro' }}
+                </td>
+            </tr>
+
+            {{#if payment.transactionId}}
+                <tr>
+                    <td><strong>ID tranzacție</strong></td>
+                    <td>{{ payment.transactionId }}</td>
+                </tr>
+            {{/if}}
+        </mj-table>
+
+        <mj-text font-size="13px" color="#777777">
+            Acest email confirmă atât înregistrarea comenzii, cât și primirea plății.
+        </mj-text>
+    </mj-column>
+</mj-section>
+
 {{> footer }}

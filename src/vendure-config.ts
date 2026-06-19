@@ -13,7 +13,6 @@ import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
 import { StripePlugin } from "@vendure/payments-plugin/package/stripe";
 import { RecaptchaProtectionPlugin } from './plugins/recaptcha-protection/recaptcha-protection.plugin';
-import { paymentReceiptHandler } from './plugins/email-transport/payment-receipt.handler';
 import {beastOrderConfirmationHandler} from "./plugins/email-transport/beast-order-confirmation.handler";
 import 'dotenv/config';
 import path from 'path';
@@ -37,7 +36,6 @@ const FRONTEND_URL = process.env.FRONTEND_URL;
 const ADMIN_UI_URL = process.env.ADMIN_UI_URL;
 const emailHandlers = [
     beastOrderConfirmationHandler,
-    paymentReceiptHandler,
     emailVerificationHandler,
     passwordResetHandler,
     emailAddressChangeHandler,
