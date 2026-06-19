@@ -1,6 +1,7 @@
 import {
     EntityHydrator,
     Injector,
+    Logger,
     OrderService,
     OrderStateTransitionEvent,
 } from '@vendure/core';
@@ -9,6 +10,8 @@ import {
     shippingLinesWithMethod,
     transformOrderLineAssetUrls,
 } from '@vendure/email-plugin';
+
+const loggerCtx = 'OrderConfirmationHandler';
 
 export async function loadOrderEmailData({
                                              event,
@@ -43,6 +46,11 @@ export async function loadOrderEmailData({
     });
 
     if (!order.customer?.emailAddress) {
+        Logger.warn(
+            `order-confirmation: order ${order.code} has no customer email ` +
+            `(customerId=${(order as any).customerId ?? 'none'})`,
+            loggerCtx,
+        );
         throw new Error(
             `Order ${order.code} does not have a customer email address`,
         );

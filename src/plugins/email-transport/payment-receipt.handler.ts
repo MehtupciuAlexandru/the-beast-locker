@@ -1,5 +1,7 @@
 import {
     EntityHydrator,
+    Logger,
+    OrderService,
     PaymentStateTransitionEvent,
 } from '@vendure/core';
 
@@ -7,6 +9,8 @@ import {
     EmailEventListener,
     shippingLinesWithMethod,
 } from '@vendure/email-plugin';
+
+const loggerCtx = 'PaymentReceiptHandler';
 
 export const paymentReceiptHandler =
     new EmailEventListener('payment-receipt')
@@ -17,8 +21,25 @@ export const paymentReceiptHandler =
                 event.payment.method === 'stripe-card',
         )
         .loadData(async ({ event, injector }) => {
+            const orderService = injector.get(OrderService);
             const entityHydrator = injector.get(EntityHydrator);
-            const order = event.order;
+
+            // Re-fetch fresh rather than hydrating event.order directly.
+            // EntityHydrator skips any relation already present on the
+            // entity, even a stale one — so if event.order already had a
+            // customer reference attached when this event was constructed,
+            // hydrate() would never refresh it. A fresh fetch guarantees
+            // we see the current assignment.
+            const order = await orderService.findOne(
+                event.ctx,
+                event.order.id,
+            );
+
+            if (!order) {
+                throw new Error(
+                    `Unable to load order ${event.order.code} for payment receipt email`,
+                );
+            }
 
             await entityHydrator.hydrate(event.ctx, order, {
                 relations: [
@@ -33,6 +54,11 @@ export const paymentReceiptHandler =
             });
 
             if (!order.customer?.emailAddress) {
+                Logger.warn(
+                    `payment-receipt: order ${order.code} has no customer email ` +
+                    `(customerId=${(order as any).customerId ?? 'none'})`,
+                    loggerCtx,
+                );
                 throw new Error(
                     `Order ${order.code} does not have a customer email address`,
                 );
