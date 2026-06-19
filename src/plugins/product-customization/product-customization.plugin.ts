@@ -11,5 +11,5 @@ import {BeastLockerShopResolver} from "./api/shop-api-resolver";
 })
 
 export class ProductCustomizationPlugin {}
-console.log('BeastLockerPlugin loaded');
+console.log('ProductCustomizationPlugin loaded');
 

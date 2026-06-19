@@ -1,11 +1,21 @@
 import { EmailSender, EmailDetails } from '@vendure/email-plugin';
+import { Injector } from '@vendure/core';
+import { EmailTransportOptions } from '@vendure/email-plugin/lib/src/types';
 
 function nowIso() {
     return new Date().toISOString();
 }
 
 export class ResendEmailSender implements EmailSender {
-    async send(email: EmailDetails): Promise<void> {
+    init(_injector: Injector): void {
+        if (!process.env.RESEND_API_KEY) {
+            console.error(`[ResendEmailSender][pid:${process.pid}] WARNING: RESEND_API_KEY is not set — emails will fail`);
+        } else {
+            console.log(`[ResendEmailSender][pid:${process.pid}] init() — sender active`);
+        }
+    }
+
+    async send(email: EmailDetails, _options: EmailTransportOptions): Promise<void> {
         const requestId = Math.random().toString(36).slice(2, 8);
         const pid = process.pid;
         const startedAt = Date.now();

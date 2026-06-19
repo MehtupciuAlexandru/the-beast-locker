@@ -21,9 +21,6 @@ export const paymentReceiptHandler =
             return pass;
         })
         .loadData(async ({ event, injector }) => {
-
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
             Logger.info(`[Receipt][LoadData] Started | Order: ${event.order?.code}`, loggerCtx);
             const orderService = injector.get(OrderService);
             const entityHydrator = injector.get(EntityHydrator);
