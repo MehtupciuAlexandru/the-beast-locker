@@ -170,11 +170,7 @@ export const paymentReceiptHandler =
         })
         .setFrom('{{ fromAddress }}')
         .setSubject('Chitanță plată pentru comanda #{{ order.code }}')
-        .setTemplateVars(async (event: any) => {
-            // Stagger the template compilation safely to avoid Handlebars EBUSY file crashes
-            Logger.info(`[Receipt][Template] Staggering execution by 1500ms | Order: ${event.data.order.code}`, loggerCtx);
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
+        .setTemplateVars((event: any) => {
             Logger.info(`[Receipt][Template] Processing vars | Order: ${event.data.order.code}`, loggerCtx);
             return {
                 order: event.data.order,
