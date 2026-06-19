@@ -3,6 +3,74 @@ import { getProductsForListing } from "@/lib/api/search";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const PAGE_SIZE = 100;
 
+const SIZE_ORDER = [
+    "KIDS XXS",
+    "KIDS XS",
+    "KIDS S",
+    "KIDS M",
+    "KIDS L",
+    "KIDS XL",
+    "XXS",
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL",
+    "XXXL",
+];
+
+function normalizeSize(value: string) {
+    return value
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, " ");
+}
+
+function getVariantSize(variant: any) {
+    const sizeOption = variant.options?.find((option: any) => {
+        const groupName = option.groupName?.toLowerCase() || "";
+        const groupCode = option.groupCode?.toLowerCase() || "";
+
+        return (
+            groupName.includes("size") ||
+            groupName.includes("mărime") ||
+            groupName.includes("marime") ||
+            groupCode.includes("size") ||
+            groupCode.includes("marime")
+        );
+    });
+
+    return normalizeSize(
+        sizeOption?.name ||
+        variant.options?.[0]?.name ||
+        variant.name ||
+        ""
+    );
+}
+
+function sortVariantsBySize(variants: any[]) {
+    return [...variants].sort((a, b) => {
+        const sizeA = getVariantSize(a);
+        const sizeB = getVariantSize(b);
+
+        const indexA = SIZE_ORDER.indexOf(sizeA);
+        const indexB = SIZE_ORDER.indexOf(sizeB);
+
+        const orderA = indexA === -1 ? Number.MAX_SAFE_INTEGER : indexA;
+        const orderB = indexB === -1 ? Number.MAX_SAFE_INTEGER : indexB;
+
+        if (orderA !== orderB) {
+            return orderA - orderB;
+        }
+
+        return sizeA.localeCompare(sizeB, undefined, {
+            numeric: true,
+            sensitivity: "base",
+        });
+    });
+}
+
 type ProductStockResult = {
     slug: string;
     variants: {
@@ -230,36 +298,28 @@ export async function getProductBySlug(slug: string) {
         return null;
     }
 
-    const variants =
+    const variants = sortVariantsBySize(
         product.variants?.map((variant: any) => ({
             id: variant.id,
             name: variant.name,
-            price:
-                (variant.priceWithTax || 0) / 100,
+            price: (variant.priceWithTax || 0) / 100,
             stockLevel: variant.stockLevel,
-            inStock:
-                variant.stockLevel !==
-                "OUT_OF_STOCK",
-            image:
-                variant.featuredAsset?.preview ||
-                "",
+            inStock: variant.stockLevel !== "OUT_OF_STOCK",
+            image: variant.featuredAsset?.preview || "",
             gallery:
                 variant.assets?.map(
                     (asset: any) => asset.preview
                 ) || [],
             options:
-                variant.options?.map(
-                    (option: any) => ({
-                        id: option.id,
-                        name: option.name,
-                        code: option.code,
-                        groupName:
-                        option.group?.name,
-                        groupCode:
-                        option.group?.code,
-                    })
-                ) || [],
-        })) || [];
+                variant.options?.map((option: any) => ({
+                    id: option.id,
+                    name: option.name,
+                    code: option.code,
+                    groupName: option.group?.name,
+                    groupCode: option.group?.code,
+                })) || [],
+        })) || []
+    );
 
     const firstAvailableVariant =
         variants.find(

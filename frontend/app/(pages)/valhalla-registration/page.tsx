@@ -58,26 +58,26 @@ export default function ValhallaRegistrationPage() {
                         Valhalla Registration
                     </h1>
                     <p className="mt-3 text-sm text-gray-500">
-                        Complete the form below to register for the event.
+                        Completează formularul de mai jos pentru a participa.
                     </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
-                    <div>
-                        <label className="mb-2 block text-xs font-bold uppercase tracking-widest">
-                            Event Name
-                        </label>
-                        <input
-                            value={eventName}
-                            onChange={(event) => setEventName(event.target.value)}
-                            required
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
-                        />
-                    </div>
+                    {/*<div>*/}
+                    {/*    <label className="mb-2 block text-xs font-bold uppercase tracking-widest">*/}
+                    {/*        Eveniment*/}
+                    {/*    </label>*/}
+                    {/*    <input*/}
+                    {/*        value={eventName}*/}
+                    {/*        onChange={(event) => setEventName(event.target.value)}*/}
+                    {/*        required*/}
+                    {/*        className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"*/}
+                    {/*    />*/}
+                    {/*</div>*/}
 
                     <div>
                         <label className="mb-2 block text-xs font-bold uppercase tracking-widest">
-                            Full Name
+                            Nume complet
                         </label>
                         <input
                             value={fullName}
@@ -89,7 +89,7 @@ export default function ValhallaRegistrationPage() {
 
                     <div>
                         <label className="mb-2 block text-xs font-bold uppercase tracking-widest">
-                            Sports Club
+                            Club sportiv
                         </label>
                         <input
                             value={sportsClub}
@@ -100,7 +100,7 @@ export default function ValhallaRegistrationPage() {
 
                     <div>
                         <label className="mb-2 block text-xs font-bold uppercase tracking-widest">
-                            Phone Number
+                            Telefon
                         </label>
                         <input
                             value={phoneNumber}
@@ -132,9 +132,8 @@ export default function ValhallaRegistrationPage() {
                             className="mt-1 h-4 w-4"
                         />
                         <span>
-                            I agree that Beast Team MMA SRL may process my personal data
-                            for registration and communication related to the selected
-                            competition/event.
+                            Sunt de acord ca Beast Locker S.R.L. să îmi prelucreze datele cu caracter personal
+                            în scopul înscrierii și al comunicării legate de competiția/evenimentul selectat.
                         </span>
                     </label>
 
