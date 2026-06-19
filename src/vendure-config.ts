@@ -14,6 +14,7 @@ import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
 import { StripePlugin } from "@vendure/payments-plugin/package/stripe";
 import { RecaptchaProtectionPlugin } from './plugins/recaptcha-protection/recaptcha-protection.plugin';
 import { paymentReceiptHandler } from './plugins/email-transport/payment-receipt.handler';
+import {beastOrderConfirmationHandler} from "./plugins/email-transport/beast-order-confirmation.handler";
 import 'dotenv/config';
 import path from 'path';
 const IS_DEV = process.env.APP_ENV === 'dev';
@@ -28,7 +29,7 @@ console.log("APP_ENV:", process.env.APP_ENV);
 console.log("S3_BUCKET:", process.env.S3_BUCKET);
 const FRONTEND_URL = process.env.FRONTEND_URL;
 const ADMIN_UI_URL = process.env.ADMIN_UI_URL;
-const emailHandlers = [...defaultEmailHandlers, paymentReceiptHandler];
+const emailHandlers = [...defaultEmailHandlers, paymentReceiptHandler, beastOrderConfirmationHandler];
 
 export const config: VendureConfig = {
     apiOptions: {
