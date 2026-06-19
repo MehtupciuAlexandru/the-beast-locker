@@ -5,10 +5,14 @@ import { loadOrderEmailData } from './order-email-data';
 export const beastOrderConfirmationHandler =
     new EmailEventListener('order-confirmation')
         .on(OrderStateTransitionEvent)
-        .filter(event => event.toState === 'PaymentSettled')
+        .filter(
+            event =>
+                event.toState === 'PaymentSettled' &&
+                !!event.order.customer?.emailAddress,
+        )
         .loadData(loadOrderEmailData)
         .setRecipient(
-            event => event.data.order.customer.emailAddress,
+            event => event.order.customer!.emailAddress,
         )
         .setFrom('{{ fromAddress }}')
         .setSubject(

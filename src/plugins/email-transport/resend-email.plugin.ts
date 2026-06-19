@@ -1,26 +1,16 @@
-import { Logger } from '@vendure/core';
 import { EmailSender, EmailDetails } from '@vendure/email-plugin';
-
-const loggerCtx = 'ResendEmailSender';
 
 export class ResendEmailSender implements EmailSender {
     async send(email: EmailDetails): Promise<void> {
-        Logger.info(
-            JSON.stringify({
-                pid: process.pid,
-                recipient: email.recipient,
-                subject: email.subject,
-            }),
-            loggerCtx,
-        );
+        console.log(`[Email] Attempting to send to ${email.recipient}...`);
 
         try {
             const res = await fetch('https://api.resend.com/emails', {
                 method: 'POST',
                 headers: {
-                    Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+                    'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
                     'Content-Type': 'application/json',
-                    'User-Agent': 'the-beast-locker/1.0',
+                    'User-Agent': 'the-beast-locker/1.0', // REQUIRED by Resend
                 },
                 body: JSON.stringify({
                     from: email.from,
@@ -33,25 +23,14 @@ export class ResendEmailSender implements EmailSender {
             const data = await res.json();
 
             if (!res.ok) {
-                Logger.error(JSON.stringify(data), loggerCtx);
+                console.error('[Resend Error Response]:', JSON.stringify(data));
                 throw new Error(`Resend failed: ${res.status} - ${JSON.stringify(data)}`);
             }
 
-            Logger.info(
-                JSON.stringify({
-                    pid: process.pid,
-                    recipient: email.recipient,
-                    subject: email.subject,
-                    resendId: data.id,
-                }),
-                loggerCtx,
-            );
+            console.log(`[Email] Successfully sent to ${email.recipient}. ID: ${data.id}`);
         } catch (error) {
-            Logger.error(
-                error instanceof Error ? error.stack || error.message : String(error),
-                loggerCtx,
-            );
-            throw error;
+            console.error('[Email Sender Crash]:', error);
+            throw error; // Re-throw that ERRRRRRRRRRRRROR so Vendure knows the job failed
         }
     }
 }
