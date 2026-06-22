@@ -66,7 +66,9 @@ export const beastOrderConfirmationHandler =
             return recipient;
         })
         .setFrom('{{ fromAddress }}')
-        .setSubject('[SENDER-PROBE] Confirmare comandă #{{ order.code }}')
+        .setSubject(
+            `[${HANDLER_BUILD}] Confirmare comandă #{{ order.code }}`,
+        )
         .setMetadata(event => ({
             handlerBuild: HANDLER_BUILD,
             orderId: event.data.order.id,

@@ -5,7 +5,7 @@ import {
 } from '@vendure/email-plugin';
 import { EmailTransportOptions } from '@vendure/email-plugin/lib/src/types';
 
-const SENDER_BUILD = 'RESEND_SENDER_PROBE_20260622';
+const SENDER_BUILD = 'RESEND_SENDER_DIAGNOSTICS_20260622';
 
 export class ResendEmailSender implements EmailSender {
     private readonly inner = new NodemailerEmailSender();
@@ -28,19 +28,36 @@ export class ResendEmailSender implements EmailSender {
         email: EmailDetails,
         options: EmailTransportOptions,
     ): Promise<void> {
+        const sendId = crypto.randomUUID();
+        const startedAt = Date.now();
+
         console.error(
-            `[RESEND_SENDER_REACHED] ${JSON.stringify({
+            `[RESEND_SEND_ATTEMPT] ${JSON.stringify({
+                sendId,
                 senderBuild: SENDER_BUILD,
                 pid: process.pid,
                 recipient: email.recipient,
                 subject: email.subject,
                 transport: options.type,
+                smtpHost:
+                    options.type === 'smtp'
+                        ? options.host
+                        : undefined,
+                smtpPort:
+                    options.type === 'smtp'
+                        ? options.port
+                        : undefined,
+                secure:
+                    options.type === 'smtp'
+                        ? options.secure
+                        : undefined,
+                timestamp: new Date().toISOString(),
             })}`,
         );
 
-        if (email.subject.includes('[SENDER-PROBE]')) {
+        if (options.type !== 'smtp') {
             throw new Error(
-                `SENDER_PROBE_REACHED build=${SENDER_BUILD} pid=${process.pid} transport=${options.type}`,
+                `Unexpected email transport: ${options.type}`,
             );
         }
 
@@ -48,10 +65,13 @@ export class ResendEmailSender implements EmailSender {
             await this.inner.send(email, options);
 
             console.error(
-                `[RESEND_SEND_COMPLETED] ${JSON.stringify({
+                `[RESEND_SEND_SUCCESS] ${JSON.stringify({
+                    sendId,
                     senderBuild: SENDER_BUILD,
                     pid: process.pid,
                     recipient: email.recipient,
+                    durationMs: Date.now() - startedAt,
+                    timestamp: new Date().toISOString(),
                 })}`,
             );
         } catch (error) {
@@ -60,13 +80,36 @@ export class ResendEmailSender implements EmailSender {
                     ? error
                     : new Error(String(error));
 
+            const smtpError = error as {
+                code?: string;
+                command?: string;
+                response?: string;
+                responseCode?: number;
+                errno?: string | number;
+                syscall?: string;
+                address?: string;
+                port?: number;
+            };
+
             console.error(
                 `[RESEND_SEND_FAILED] ${JSON.stringify({
+                    sendId,
                     senderBuild: SENDER_BUILD,
                     pid: process.pid,
                     recipient: email.recipient,
-                    error: err.message,
+                    durationMs: Date.now() - startedAt,
+                    errorName: err.name,
+                    errorMessage: err.message,
+                    code: smtpError.code,
+                    command: smtpError.command,
+                    response: smtpError.response,
+                    responseCode: smtpError.responseCode,
+                    errno: smtpError.errno,
+                    syscall: smtpError.syscall,
+                    address: smtpError.address,
+                    port: smtpError.port,
                     stack: err.stack,
+                    timestamp: new Date().toISOString(),
                 })}`,
             );
 
