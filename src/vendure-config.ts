@@ -203,6 +203,8 @@ export const config: VendureConfig = {
                             user: 'resend',
                             pass: process.env.RESEND_API_KEY,
                         },
+                        logging: true,
+                        debug: true,
                     },
 
                     emailSender: new ResendEmailSender(),
