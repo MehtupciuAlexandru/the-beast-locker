@@ -18,7 +18,7 @@ import {
 import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
 import { StripePlugin } from '@vendure/payments-plugin/package/stripe';
-
+import {ResendApiEmailSender} from "./plugins/email-transport/resend-api-email-sender";
 import {
     EmailPlugin,
     FileBasedTemplateLoader,
@@ -234,13 +234,12 @@ export const config: VendureConfig = {
                     ),
                     route: 'mailbox',
                     handlers: emailHandlers,
-                    templateLoader:
-                        new FileBasedTemplateLoader(
-                            path.join(
-                                __dirname,
-                                '../static/email/templates',
-                            ),
+                    templateLoader: new FileBasedTemplateLoader(
+                        path.join(
+                            __dirname,
+                            '../static/email/templates',
                         ),
+                    ),
                     globalTemplateVars: {
                         fromAddress:
                             'Beast Locker <noreply@beast-locker.ro>',
@@ -254,23 +253,20 @@ export const config: VendureConfig = {
                 }
                 : {
                     transport: {
-                        type: 'smtp',
-                        host: 'smtp.resend.com',
-                        port: 465,
-                        secure: true,
-                        auth: {
-                            user: 'resend',
-                            pass: process.env.RESEND_API_KEY!,
-                        },
+                        type: 'none',
                     },
+
+                    emailSender: new ResendApiEmailSender(),
+
                     handlers: emailHandlers,
-                    templateLoader:
-                        new FileBasedTemplateLoader(
-                            path.join(
-                                __dirname,
-                                '../static/email/templates',
-                            ),
+
+                    templateLoader: new FileBasedTemplateLoader(
+                        path.join(
+                            __dirname,
+                            '../static/email/templates',
                         ),
+                    ),
+
                     globalTemplateVars: {
                         fromAddress:
                             'Beast Locker <noreply@beast-locker.ro>',
