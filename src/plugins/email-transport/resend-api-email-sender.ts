@@ -12,16 +12,24 @@ import { Resend } from 'resend';
 const loggerCtx = 'ResendApiEmailSender';
 
 export class ResendApiEmailSender implements EmailSender {
-    private readonly resend: Resend;
+    private resend?: Resend;
 
-    constructor() {
+    private getClient(): Resend {
+        if (this.resend) {
+            return this.resend;
+        }
+
         const apiKey = process.env.RESEND_API_KEY;
 
         if (!apiKey) {
-            throw new Error('RESEND_API_KEY is not configured');
+            throw new Error(
+                'RESEND_API_KEY is not configured at runtime',
+            );
         }
 
         this.resend = new Resend(apiKey);
+
+        return this.resend;
     }
 
     async send(
@@ -33,28 +41,41 @@ export class ResendApiEmailSender implements EmailSender {
                 email.attachments,
             );
 
-            const { data, error } = await this.resend.emails.send({
-                from: email.from,
-                to: this.parseAddresses(email.recipient),
-                subject: email.subject,
-                html: email.body,
-                ...(email.cc
-                    ? { cc: this.parseAddresses(email.cc) }
-                    : {}),
-                ...(email.bcc
-                    ? { bcc: this.parseAddresses(email.bcc) }
-                    : {}),
-                ...(email.replyTo
-                    ? { replyTo: email.replyTo }
-                    : {}),
-                ...(attachments.length > 0
-                    ? { attachments }
-                    : {}),
-            });
+            const { data, error } =
+                await this.getClient().emails.send({
+                    from: email.from,
+                    to: this.parseAddresses(email.recipient),
+                    subject: email.subject,
+                    html: email.body,
+
+                    ...(email.cc
+                        ? {
+                            cc: this.parseAddresses(email.cc),
+                        }
+                        : {}),
+
+                    ...(email.bcc
+                        ? {
+                            bcc: this.parseAddresses(email.bcc),
+                        }
+                        : {}),
+
+                    ...(email.replyTo
+                        ? {
+                            replyTo: email.replyTo,
+                        }
+                        : {}),
+
+                    ...(attachments.length > 0
+                        ? {
+                            attachments,
+                        }
+                        : {}),
+                });
 
             if (error) {
                 throw new Error(
-                    `Resend rejected the email: ${error.name} - ${error.message}`,
+                    `Resend rejected the email: ${error.message}`,
                 );
             }
 
@@ -65,7 +86,7 @@ export class ResendApiEmailSender implements EmailSender {
             }
 
             Logger.info(
-                `Accepted by Resend | ID: ${data.id} | Recipient: ${email.recipient} | Subject: ${email.subject}`,
+                `Email accepted by Resend | ID: ${data.id} | Recipient: ${email.recipient} | Subject: ${email.subject}`,
                 loggerCtx,
             );
         } catch (error) {
@@ -75,7 +96,7 @@ export class ResendApiEmailSender implements EmailSender {
                     : new Error(String(error));
 
             Logger.error(
-                `Send failed | Recipient: ${email.recipient} | Subject: ${email.subject} | Error: ${err.message}`,
+                `Email failed | Recipient: ${email.recipient} | Subject: ${email.subject} | Error: ${err.message}`,
                 loggerCtx,
                 err.stack,
             );
@@ -95,8 +116,8 @@ export class ResendApiEmailSender implements EmailSender {
         attachments: EmailDetails['attachments'],
     ) {
         return Promise.all(
-            attachments.map(async attachment => {
-                const path =
+            (attachments ?? []).map(async attachment => {
+                const attachmentPath =
                     typeof attachment.path === 'string'
                         ? attachment.path
                         : undefined;
@@ -104,8 +125,8 @@ export class ResendApiEmailSender implements EmailSender {
                 const filename =
                     typeof attachment.filename === 'string'
                         ? attachment.filename
-                        : path
-                            ? basename(path)
+                        : attachmentPath
+                            ? basename(attachmentPath)
                             : 'attachment';
 
                 const contentId =
@@ -113,18 +134,19 @@ export class ResendApiEmailSender implements EmailSender {
                         ? attachment.cid
                         : undefined;
 
-                if (path) {
-                    if (/^https?:\/\//i.test(path)) {
+                if (attachmentPath) {
+                    if (/^https?:\/\//i.test(attachmentPath)) {
                         return {
                             filename,
-                            path,
+                            path: attachmentPath,
                             ...(contentId
                                 ? { contentId }
                                 : {}),
                         };
                     }
 
-                    const content = await readFile(path);
+                    const content =
+                        await readFile(attachmentPath);
 
                     return {
                         filename,
@@ -146,16 +168,13 @@ export class ResendApiEmailSender implements EmailSender {
                 }
 
                 if (typeof attachment.content === 'string') {
-                    const encoding =
-                        attachment.encoding === 'base64'
-                            ? 'base64'
-                            : 'utf8';
-
                     return {
                         filename,
                         content: Buffer.from(
                             attachment.content,
-                            encoding,
+                            attachment.encoding === 'base64'
+                                ? 'base64'
+                                : 'utf8',
                         ),
                         ...(contentId
                             ? { contentId }
