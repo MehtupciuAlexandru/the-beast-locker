@@ -253,9 +253,13 @@ export const config: VendureConfig = {
                 }
                 : {
                     transport: {
-                        type: 'none',
+                        type: 'testing',
+                        onSend: email => {
+                            throw new Error(
+                                `ResendApiEmailSender was bypassed for ${email.recipient}`,
+                            );
+                        },
                     },
-
                     emailSender: new ResendApiEmailSender(),
 
                     handlers: emailHandlers,
