@@ -1,50 +1,61 @@
-import {
-    dummyPaymentHandler,
-    DefaultJobQueuePlugin,
-    DefaultSchedulerPlugin,
-    DefaultSearchPlugin,
-    VendureConfig,
-    LanguageCode,
-} from '@vendure/core';
-
-
-import {AssetServerPlugin, configureS3AssetStorage} from '@vendure/asset-server-plugin';
-import { DashboardPlugin } from '@vendure/dashboard/plugin';
-import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
-import { StripePlugin } from "@vendure/payments-plugin/package/stripe";
-import { RecaptchaProtectionPlugin } from './plugins/recaptcha-protection/recaptcha-protection.plugin';
-import {beastOrderConfirmationHandler} from "./plugins/email-transport/beast-order-confirmation.handler";
 import 'dotenv/config';
 import path from 'path';
 
-// Catch anything that would otherwise silently kill or wedge this process.
-// If the worker has ever been crashing/restarting without an obvious
-// "Starting Container" line in the logs, this will surface it.
-process.on('unhandledRejection', (reason) => {
-    console.error(`[process pid:${process.pid}] UNHANDLED REJECTION:`, reason);
+import {
+    DefaultJobQueuePlugin,
+    DefaultSchedulerPlugin,
+    DefaultSearchPlugin,
+    LanguageCode,
+    VendureConfig,
+    dummyPaymentHandler,
+} from '@vendure/core';
+
+import {
+    AssetServerPlugin,
+    configureS3AssetStorage,
+} from '@vendure/asset-server-plugin';
+
+import { DashboardPlugin } from '@vendure/dashboard/plugin';
+import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
+import { StripePlugin } from '@vendure/payments-plugin/package/stripe';
+
+import {
+    EmailPlugin,
+    FileBasedTemplateLoader,
+    emailAddressChangeHandler,
+    emailVerificationHandler,
+    passwordResetHandler,
+} from '@vendure/email-plugin';
+
+import { ProductCustomizationPlugin } from './plugins/product-customization/product-customization.plugin';
+import { BeastLockerPlugin } from './plugins/product-customization/beast-locker.plugin';
+import { AuthValidationPlugin } from './plugins/auth-validation/auth-validation-plugin';
+import { RecaptchaProtectionPlugin } from './plugins/recaptcha-protection/recaptcha-protection.plugin';
+import { EventRegistrationPlugin } from './plugins/event-registration/event-registration.plugin';
+import { beastOrderConfirmationHandler } from './plugins/email-transport/beast-order-confirmation.handler';
+
+process.on('unhandledRejection', reason => {
+    console.error(
+        `[process pid:${process.pid}] UNHANDLED REJECTION:`,
+        reason,
+    );
+    process.exit(1);
 });
-process.on('uncaughtException', (err) => {
-    console.error(`[process pid:${process.pid}] UNCAUGHT EXCEPTION:`, err);
+
+process.on('uncaughtException', error => {
+    console.error(
+        `[process pid:${process.pid}] UNCAUGHT EXCEPTION:`,
+        error,
+    );
+    process.exit(1);
 });
 
 const IS_DEV = process.env.APP_ENV === 'dev';
-const serverPort = +process.env.PORT || 3000;
-import { ProductCustomizationPlugin } from './plugins/product-customization/product-customization.plugin';
-import {BeastLockerPlugin} from "./plugins/product-customization/beast-locker.plugin";
-import {AuthValidationPlugin} from "./plugins/auth-validation/auth-validation-plugin";
-import { ResendEmailSender } from './plugins/email-transport/resend-email.plugin';
-import { EventRegistrationPlugin } from './plugins/event-registration/event-registration.plugin';
-import {
-    emailAddressChangeHandler,
-    EmailPlugin,
-    emailVerificationHandler, FileBasedTemplateLoader,
-    passwordResetHandler
-} from "@vendure/email-plugin";
+const serverPort = Number(process.env.PORT) || 3000;
 const useS3 = process.env.APP_ENV !== 'dev';
-console.log("APP_ENV:", process.env.APP_ENV);
-console.log("S3_BUCKET:", process.env.S3_BUCKET);
-const FRONTEND_URL = process.env.FRONTEND_URL;
-const ADMIN_UI_URL = process.env.ADMIN_UI_URL;
+
+const FRONTEND_URL = process.env.FRONTEND_URL!;
+
 const emailHandlers = [
     beastOrderConfirmationHandler,
     emailVerificationHandler,
@@ -70,95 +81,120 @@ export const config: VendureConfig = {
             credentials: true,
         },
 
-        ...(IS_DEV ? {
-            adminApiDebug: true,
-            shopApiDebug: true,
-        } : {}),
+        ...(IS_DEV
+            ? {
+                adminApiDebug: true,
+                shopApiDebug: true,
+            }
+            : {}),
     },
+
     authOptions: {
         requireVerification: true,
         tokenMethod: 'cookie',
+
         superadminCredentials: {
             identifier: process.env.SUPERADMIN_USERNAME,
             password: process.env.SUPERADMIN_PASSWORD,
         },
+
         cookieOptions: {
             secret: process.env.COOKIE_SECRET,
             sameSite: IS_DEV ? 'lax' : 'none',
             secure: !IS_DEV,
         },
     },
+
     dbConnectionOptions: {
         type: 'postgres',
-        // See the README.md "Migrations" section for an explanation of
-        // the `synchronize` and `migrations` options.
         synchronize: true,
         migrations: [],
         logging: false,
         database: process.env.DB_NAME,
         schema: process.env.DB_SCHEMA,
         host: process.env.DB_HOST,
-        port: +process.env.DB_PORT,
+        port: Number(process.env.DB_PORT),
         username: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
     },
+
     paymentOptions: {
         paymentMethodHandlers: [dummyPaymentHandler],
     },
-    // When adding or altering custom field definitions, the database will
-    // need to be updated. See the "Migrations" section in README.md.
-    customFields: {
 
+    customFields: {
         Product: [
             {
                 name: 'seoTitle',
                 type: 'string',
                 nullable: true,
-                label: [{languageCode: LanguageCode.en, value: 'SEO Title'}],
+                label: [
+                    {
+                        languageCode: LanguageCode.en,
+                        value: 'SEO Title',
+                    },
+                ],
             },
-
             {
                 name: 'seoDescription',
                 type: 'text',
                 nullable: true,
-                label: [{languageCode: LanguageCode.en, value: 'SEO Description'}],
+                label: [
+                    {
+                        languageCode: LanguageCode.en,
+                        value: 'SEO Description',
+                    },
+                ],
             },
-
             {
                 name: 'searchKeywords',
                 type: 'text',
                 nullable: true,
-                label: [{languageCode: LanguageCode.en, value: 'Search Keywords'}],
+                label: [
+                    {
+                        languageCode: LanguageCode.en,
+                        value: 'Search Keywords',
+                    },
+                ],
                 description: [
                     {
                         languageCode: LanguageCode.en,
                         value: 'Internal search terms and synonyms used to improve product search.',
                     },
                 ],
-            }
+            },
         ],
     },
 
     plugins: [
         GraphiqlPlugin.init(),
+
         ProductCustomizationPlugin,
         BeastLockerPlugin,
         AuthValidationPlugin,
         EventRegistrationPlugin,
+
         StripePlugin.init({
             storeCustomersInStripe: true,
         }),
+
         RecaptchaProtectionPlugin,
+
         AssetServerPlugin.init(
             useS3
                 ? {
                     route: 'assets',
-                    assetUploadDir: path.join(__dirname, '../static/assets'),
+                    assetUploadDir: path.join(
+                        __dirname,
+                        '../static/assets',
+                    ),
                     storageStrategyFactory: configureS3AssetStorage({
                         bucket: process.env.S3_BUCKET!,
                         credentials: {
-                            accessKeyId: process.env.S3_ACCESS_KEY_ID!,
-                            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
+                            accessKeyId:
+                                process.env.S3_ACCESS_KEY_ID!,
+                            secretAccessKey:
+                                process.env.S3_SECRET_ACCESS_KEY!,
                         },
                         nativeS3Configuration: {
                             endpoint: process.env.S3_ENDPOINT!,
@@ -170,27 +206,50 @@ export const config: VendureConfig = {
                 }
                 : {
                     route: 'assets',
-                    assetUploadDir: path.join(__dirname, '../static/assets'),
-                }
+                    assetUploadDir: path.join(
+                        __dirname,
+                        '../static/assets',
+                    ),
+                },
         ),
+
         DefaultSchedulerPlugin.init(),
-        DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
-        DefaultSearchPlugin.init({ bufferUpdates: false, indexStockStatus: true }),
+
+        DefaultJobQueuePlugin.init({
+            useDatabaseForBuffer: true,
+        }),
+
+        DefaultSearchPlugin.init({
+            bufferUpdates: false,
+            indexStockStatus: true,
+        }),
+
         EmailPlugin.init(
             IS_DEV
                 ? {
                     devMode: true,
-                    outputPath: path.join(__dirname, '../static/email/test-emails'),
+                    outputPath: path.join(
+                        __dirname,
+                        '../static/email/test-emails',
+                    ),
                     route: 'mailbox',
                     handlers: emailHandlers,
-                    templateLoader: new FileBasedTemplateLoader(
-                        path.join(__dirname, '../static/email/templates')
-                    ),
+                    templateLoader:
+                        new FileBasedTemplateLoader(
+                            path.join(
+                                __dirname,
+                                '../static/email/templates',
+                            ),
+                        ),
                     globalTemplateVars: {
-                        fromAddress: '"example" <noreply@example.com>',
-                        verifyEmailAddressUrl: `${FRONTEND_URL}/verify`,
-                        passwordResetUrl: `${FRONTEND_URL}/password-reset`,
-                        changeEmailAddressUrl: `${FRONTEND_URL}/verify-email-address-change`,
+                        fromAddress:
+                            'Beast Locker <noreply@beast-locker.ro>',
+                        verifyEmailAddressUrl:
+                            `${FRONTEND_URL}/verify`,
+                        passwordResetUrl:
+                            `${FRONTEND_URL}/password-reset`,
+                        changeEmailAddressUrl:
+                            `${FRONTEND_URL}/verify-email-address-change`,
                     },
                 }
                 : {
@@ -201,26 +260,30 @@ export const config: VendureConfig = {
                         secure: true,
                         auth: {
                             user: 'resend',
-                            pass: process.env.RESEND_API_KEY,
+                            pass: process.env.RESEND_API_KEY!,
                         },
-                        logging: true,
-                        debug: true,
                     },
-
-                    emailSender: new ResendEmailSender(),
-
                     handlers: emailHandlers,
-                    templateLoader: new FileBasedTemplateLoader(
-                        path.join(__dirname, '../static/email/templates')
-                    ),
+                    templateLoader:
+                        new FileBasedTemplateLoader(
+                            path.join(
+                                __dirname,
+                                '../static/email/templates',
+                            ),
+                        ),
                     globalTemplateVars: {
-                        fromAddress: 'Beast Locker <noreply@beast-locker.ro>',
-                        verifyEmailAddressUrl: `${FRONTEND_URL}/verify`,
-                        passwordResetUrl: `${FRONTEND_URL}/password-reset`,
-                        changeEmailAddressUrl: `${FRONTEND_URL}/verify-email-address-change`,
+                        fromAddress:
+                            'Beast Locker <noreply@beast-locker.ro>',
+                        verifyEmailAddressUrl:
+                            `${FRONTEND_URL}/verify`,
+                        passwordResetUrl:
+                            `${FRONTEND_URL}/password-reset`,
+                        changeEmailAddressUrl:
+                            `${FRONTEND_URL}/verify-email-address-change`,
                     },
-                }
+                },
         ),
+
         DashboardPlugin.init({
             route: 'dashboard',
             appDir: IS_DEV
