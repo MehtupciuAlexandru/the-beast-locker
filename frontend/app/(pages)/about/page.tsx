@@ -66,7 +66,7 @@ export default function AboutUs() {
 
                         <div className="w-full h-[150px] md:h-[220px] relative my-12">
                             <Image
-                                src="/images/banners/dog.jpeg"
+                                src="/images/banners/dogNew.jpeg"
                                 alt="Separator"
                                 fill
                                 className="object-cover"
