@@ -16,7 +16,7 @@ export default function AboutUs() {
 
                 <div className="w-full max-w-[1400px] mx-auto px-4 pt-4 md:px-0 md:pt-12">
                     <div className="relative w-full overflow-hidden h-[550px] md:h-auto md:aspect-[1790/806]">
-                        <div className="absolute inset-0 origin-center scale-[1.78] translate-y-[-15%] md:scale-100 md:translate-y-0">
+                        <div className="absolute inset-0 origin-right scale-[1.78] translate-y-[-15%] md:scale-100 md:translate-y-0">
                             <Image
                                 src="/images/hero/hero-image.png"
                                 alt="Only for the motivated"
