@@ -14,11 +14,11 @@ export default function AboutUs() {
                     </div>
                 </div>
 
-                <div className="w-full max-w-[1790px] mx-auto px-4 pt-4 md:px-0 md:pt-12">
+                <div className="w-full max-w-[1400px] mx-auto px-4 pt-4 md:px-0 md:pt-12">
                     <div className="relative w-full overflow-hidden h-[550px] md:h-auto md:aspect-[1790/806]">
                         <div className="absolute inset-0 origin-center scale-[1.78] translate-y-[-15%] md:scale-100 md:translate-y-0">
                             <Image
-                                src="/images/hero/aboutUs.jpeg"
+                                src="/images/hero/hero-image.png"
                                 alt="Only for the motivated"
                                 fill
                                 className="object-cover object-center"
@@ -26,7 +26,7 @@ export default function AboutUs() {
                         </div>
                         <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                             <h1 className="px-4 text-center font-GemunuExtraBold text-5xl uppercase leading-tight tracking-wider text-white md:text-[128px]">
-                                ONLY FOR THE<br className="md:hidden" /> MOTIVATED
+                                BEAST<br className="md:hidden" /> LOCKER
                             </h1>
                         </div>
                     </div>
@@ -66,7 +66,7 @@ export default function AboutUs() {
 
                         <div className="w-full h-[150px] md:h-[220px] relative my-12">
                             <Image
-                                src="/images/banners/dogNew.jpeg"
+                                src="/images/banners/dogNEW.jpeg"
                                 alt="Separator"
                                 fill
                                 className="object-cover"
@@ -96,7 +96,7 @@ export default function AboutUs() {
 
                         <div className="w-full h-[150px] md:h-[220px] relative my-12">
                             <Image
-                                src="/images/banners/dog.jpeg"
+                                src="/images/banners/dogNEW.jpeg"
                                 alt="Separator"
                                 fill
                                 className="object-cover"
