@@ -385,7 +385,7 @@ export default function ProductDetails({ product }: Props) {
                     </div>
 
                     <div className="px-4 py-8 bg-white flex flex-col items-center text-center">
-                        <h1 className="text-4xl font-Inter mb-1 uppercase tracking-widest text-[#1a1a1a]">
+                        <h1 className="pb-2 text-4xl font-Inter mb-1 uppercase tracking-widest text-[#1a1a1a]">
                             {product.name}
                         </h1>
 
@@ -681,7 +681,7 @@ export default function ProductDetails({ product }: Props) {
                     </div>
 
                     <div className="flex flex-col w-[460px] bg-white pt-2">
-                        <h1 className="text-3xl font-Inter mb-2 uppercase tracking-wider text-[#1a1a1a] leading-tight">
+                        <h1 className=" -ml-[2.5px]  text-3xl font-Inter mb-2 uppercase tracking-wider text-[#1a1a1a] leading-tight">
                             {product.name}
                         </h1>
 

@@ -23,6 +23,7 @@ import {BeastLockerPlugin} from "./plugins/product-customization/beast-locker.pl
 import {AuthValidationPlugin} from "./plugins/auth-validation/auth-validation-plugin";
 import {ResendEmailSender} from "./plugins/email-transport/resend-email.plugin";
 import { EventRegistrationPlugin } from './plugins/event-registration/event-registration.plugin';
+import { ColeteShippingPlugin } from './plugins/colete-shipping/colete-shipping.plugin';
 import {
     emailAddressChangeHandler,
     EmailPlugin,
@@ -126,10 +127,143 @@ export const config: VendureConfig = {
                 ],
             }
         ],
+        Order: [
+            {
+                name: 'coletePackageWeightKg',
+                type: 'float',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Package weight (kg)'}],
+                description: [
+                    {
+                        languageCode: LanguageCode.en,
+                        value: 'Final parcel weight confirmed by the warehouse worker before AWB generation.',
+                    },
+                ],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coletePackageLengthCm',
+                type: 'float',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Package length (cm)'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coletePackageWidthCm',
+                type: 'float',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Package width (cm)'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coletePackageHeightCm',
+                type: 'float',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Package height (cm)'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coletePackageCount',
+                type: 'int',
+                nullable: true,
+                public: false,
+                defaultValue: 1,
+                label: [{languageCode: LanguageCode.en, value: 'Package count'}],
+                description: [
+                    {
+                        languageCode: LanguageCode.en,
+                        value: 'Initial integration assumes one parcel per order; keep this editable for future multi-parcel support.',
+                    },
+                ],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coletePackageContent',
+                type: 'string',
+                nullable: true,
+                public: false,
+                defaultValue: 'Sport equipment',
+                label: [{languageCode: LanguageCode.en, value: 'Package content'}],
+                ui: { tab: 'Colete Online', fullWidth: true },
+            },
+            {
+                name: 'coleteAwb',
+                type: 'string',
+                nullable: true,
+                public: true,
+                label: [{languageCode: LanguageCode.en, value: 'Colete AWB'}],
+                description: [
+                    {
+                        languageCode: LanguageCode.en,
+                        value: 'Future AWB/tracking number returned by Colete Online.',
+                    },
+                ],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteUniqueId',
+                type: 'string',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Colete unique ID'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteCourierName',
+                type: 'string',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Courier'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteServiceName',
+                type: 'string',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Courier service'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteEstimatedPickupDate',
+                type: 'string',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Estimated pickup date'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteAwbStatus',
+                type: 'string',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'AWB status'}],
+                description: [
+                    {
+                        languageCode: LanguageCode.en,
+                        value: 'Placeholder status for the future AWB generation job.',
+                    },
+                ],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteAwbError',
+                type: 'text',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'AWB error'}],
+                ui: { tab: 'Colete Online', fullWidth: true },
+            },
+        ],
     },
 
     plugins: [
         GraphiqlPlugin.init(),
+        ColeteShippingPlugin,
         ProductCustomizationPlugin,
         BeastLockerPlugin,
         AuthValidationPlugin,
