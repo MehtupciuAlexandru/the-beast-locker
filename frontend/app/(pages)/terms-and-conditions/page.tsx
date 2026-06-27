@@ -25,18 +25,22 @@ export default function TermsAndConditions() {
 
                     <div className="w-full text-[15px] font-Inter leading-relaxed text-[#6a6a6a] space-y-6 max-w-5xl">
                         <div>
-                            <p className="font-bold text-[#1c1c1E]">Ultima actualizare: / /2026</p>
+                            <p className="font-bold text-[#1c1c1E]">Ultima actualizare: 24.06.2026</p>
                             <p className="mt-4">Prezentele Termeni si Conditii reglementeaza utilizarea website-ului Beast Locker, precum si relatia contractuala dintre Beast Locker si orice persoana care acceseaza website-ul, plaseaza o comanda sau utilizeaza serviciile oferite prin intermediul acestuia.</p>
                             <p className="mt-4">Prin accesarea si utilizarea website-ului, utilizatorul confirma faptul ca a citit, inteles si acceptat integral prezentele Termeni si Conditii.</p>
                         </div>
 
                         <div>
                             <h2 className="font-bold text-[#1c1c1E] pt-4 text-base uppercase tracking-wider">
-                                1. INFORMATII DESPRE COMERCIAN
+                                1. INFORMATII DESPRE COMERCIANT
                             </h2>
-                            <p className="mt-2">Website-ul www._____.ro este administrat de:</p>
+                            <p className="mt-2">Website-ul www.beast-locker.ro este administrat de:</p>
                             <ul className="mt-2 list-none pl-0 space-y-1">
-                                <li>Denumire societate: _____ CUI: _____ Nr. Registrul Comertului: _____ Sediu social: _____ Email: _____ Telefon: _____</li>
+                                <li>Denumire societate: BEAST LOCKER SRL</li>
+                                <li>CUI: 54859107</li>
+                                <li>Nr. Registrul Comertului: J2026037508007</li>
+                                <li>Sediu social: Aleea Muzicii 5-8 Bl. RO5-RO6 Sc. RO5 Et. 12 Ap. 6, Ramnicu Valcea</li>
+                                <li>Email: thebeastlocker@gmail.com</li>
                             </ul>
                             <p className="mt-4">In cuprinsul prezentului document, societatea va fi denumita “Beast Locker”.</p>
                         </div>
@@ -60,8 +64,7 @@ export default function TermsAndConditions() {
                                 3. ACCEPTAREA TERMENILOR
                             </h2>
                             <p className="mt-2">Accesarea website-ului, crearea unui cont sau plasarea unei comenzi implica acceptarea neconditionata a prezentelor Termeni si Conditii.</p>
-                            <p className="mt-4">Beast Locker isi rezerva dreptul de a modifica continutul prezentului document in orice moment, fara notificare prealabila.</p>
-                            <p className="mt-4">Versiunea actualizata va fi publicata pe website si va produce efecte de la data publicarii.</p>
+                            <p className="mt-4">Beast Locker isi rezerva dreptul de a modifica continutul prezentului document in orice moment, fara notificare prealabila. Versiunea actualizata va fi publicata pe website si va produce efecte de la data publicarii.</p>
                         </div>
 
                         <div>
@@ -133,7 +136,7 @@ export default function TermsAndConditions() {
                                 8. DREPTUL DE RETRAGERE
                             </h2>
                             <p className="mt-2">Conform OUG nr. 34/2014, Clientii persoane fizice beneficiaza de dreptul de retragere din contract in termen de 14 zile calendaristice de la primirea produselor.</p>
-                            <p className="mt-4">Pentru exercitarea dreptului de retragere, Clientul trebuie sa notifice Beast Locker la: @</p>
+                            <p className="mt-4">Pentru exercitarea dreptului de retragere, Clientul trebuie sa notifice Beast Locker la thebeastlocker@gmail.com</p>
                             <p className="mt-4">Produsele returnate trebuie:</p>
                             <ul className="mt-2 list-disc space-y-1 pl-6">
                                 <li>sa fie in aceeasi stare;</li>
@@ -223,7 +226,8 @@ export default function TermsAndConditions() {
                             </h2>
                             <p className="mt-2">Pentru orice informatii sau solicitari:</p>
                             <ul className="mt-2 list-none pl-0 space-y-1">
-                                <li>BEAST LOCKER Email: _____ Telefon: _____ Adresa: _____</li>
+                                <li>BEAST LOCKER</li>
+                                <li>Email: thebeastlocker@gmail.com</li>
                             </ul>
                         </div>
                     </div>

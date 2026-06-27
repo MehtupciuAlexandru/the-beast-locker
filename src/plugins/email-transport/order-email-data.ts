@@ -3,7 +3,7 @@ import {
     Injector,
     Logger,
     OrderService,
-    OrderStateTransitionEvent,
+    PaymentStateTransitionEvent,
 } from '@vendure/core';
 
 import {
@@ -17,7 +17,7 @@ export async function loadOrderEmailData({
                                              event,
                                              injector,
                                          }: {
-    event: OrderStateTransitionEvent;
+    event: PaymentStateTransitionEvent;
     injector: Injector;
 }) {
     const orderService = injector.get(OrderService);
@@ -29,9 +29,9 @@ export async function loadOrderEmailData({
     );
 
     if (!order) {
-        throw new Error(
-            `Unable to load order ${event.order.code} for email`,
-        );
+        const msg = `[OrderEmail] Unable to load order ${event.order.code} — email will be dropped`;
+        console.error(msg);
+        throw new Error(msg);
     }
 
     await entityHydrator.hydrate(event.ctx, order, {
@@ -46,37 +46,24 @@ export async function loadOrderEmailData({
     });
 
     if (!order.customer?.emailAddress) {
-        Logger.warn(
-            `order-confirmation: order ${order.code} has no customer email ` +
-            `(customerId=${(order as any).customerId ?? 'none'})`,
-            loggerCtx,
-        );
-        throw new Error(
-            `Order ${order.code} does not have a customer email address`,
-        );
+        const msg = `[OrderEmail] Order ${order.code} has no customer email — email will be dropped`;
+        console.error(msg);
+        Logger.warn(msg, loggerCtx);
+        throw new Error(msg);
     }
 
-    const payments = await orderService.getOrderPayments(
-        event.ctx,
-        order.id,
-    );
-
-    const selectedPayment =
-        payments.find(
-            payment =>
-                payment.method === 'stripe-card' &&
-                payment.state === 'Settled',
-        ) ||
-        payments.find(
-            payment => payment.method === 'stripe-card',
-        ) ||
-        payments[0];
-
-    if (!selectedPayment) {
-        throw new Error(
-            `Unable to load payment for order ${order.code}`,
-        );
-    }
+    // Payment comes directly from the event — no separate DB query needed,
+    // so there is no race condition between the payment commit and this query.
+    const payment = event.payment;
+    const paymentData = {
+        id: payment.id,
+        method: payment.method,
+        state: payment.state,
+        amount: payment.amount,
+        transactionId: payment.transactionId || null,
+        errorMessage: payment.errorMessage || null,
+        metadata: payment.metadata || {},
+    };
 
     transformOrderLineAssetUrls(
         event.ctx,
@@ -167,36 +154,10 @@ export async function loadOrderEmailData({
         shippingLines,
     };
 
-    const paymentData = {
-        id: selectedPayment.id,
-        method: selectedPayment.method,
-        state: selectedPayment.state,
-        amount: selectedPayment.amount,
-        transactionId:
-            selectedPayment.transactionId || null,
-        errorMessage:
-            selectedPayment.errorMessage || null,
-        metadata:
-            selectedPayment.metadata || {},
-    };
-
-    const paymentsData = payments.map(payment => ({
-        id: payment.id,
-        method: payment.method,
-        state: payment.state,
-        amount: payment.amount,
-        transactionId:
-            payment.transactionId || null,
-        errorMessage:
-            payment.errorMessage || null,
-        metadata:
-            payment.metadata || {},
-    }));
-
     return {
         order: orderData,
         payment: paymentData,
-        payments: paymentsData,
+        payments: [paymentData],
         shippingLines,
     };
 }

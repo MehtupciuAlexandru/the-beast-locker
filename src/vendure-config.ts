@@ -23,7 +23,6 @@ import {BeastLockerPlugin} from "./plugins/product-customization/beast-locker.pl
 import {AuthValidationPlugin} from "./plugins/auth-validation/auth-validation-plugin";
 import {ResendEmailSender} from "./plugins/email-transport/resend-email.plugin";
 import { EventRegistrationPlugin } from './plugins/event-registration/event-registration.plugin';
-import { ColeteShippingPlugin } from './plugins/colete-shipping/colete-shipping.plugin';
 import {
     emailAddressChangeHandler,
     EmailPlugin,
@@ -263,7 +262,6 @@ export const config: VendureConfig = {
 
     plugins: [
         GraphiqlPlugin.init(),
-        ColeteShippingPlugin,
         ProductCustomizationPlugin,
         BeastLockerPlugin,
         AuthValidationPlugin,
@@ -317,9 +315,15 @@ export const config: VendureConfig = {
                     },
                 }
                 : {
-                    transport: { type: 'none' },
-
-                    emailSender: new ResendEmailSender(),
+                    transport: {
+                        type: 'testing',
+                        onSend: email => {
+                            throw new Error(
+                                `ResendApiEmailSender was bypassed for ${email.recipient}`,
+                            );
+                        },
+                    },
+                    emailSender: new ResendApiEmailSender(),
 
                     handlers: emailHandlers,
                     templateLoader: new FileBasedTemplateLoader(

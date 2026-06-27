@@ -1,36 +1,33 @@
-import { EmailSender, EmailDetails } from '@vendure/email-plugin';
+import { PaymentStateTransitionEvent } from '@vendure/core';
+import { EmailEventListener } from '@vendure/email-plugin';
+import { loadOrderEmailData } from './order-email-data';
 
-export class ResendEmailSender implements EmailSender {
-    async send(email: EmailDetails): Promise<void> {
-        console.log(`[Email] Attempting to send to ${email.recipient}...`);
+const HANDLER_BUILD = 'BEAST_ORDER_HANDLER_20260622_1';
 
-        try {
-            const res = await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'the-beast-locker/1.0', // REQUIRED by Resend
-                },
-                body: JSON.stringify({
-                    from: email.from,
-                    to: email.recipient,
-                    subject: email.subject,
-                    html: email.body,
-                }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                console.error('[Resend Error Response]:', JSON.stringify(data));
-                throw new Error(`Resend failed: ${res.status} - ${JSON.stringify(data)}`);
-            }
-
-            console.log(`[Email] Successfully sent to ${email.recipient}. ID: ${data.id}`);
-        } catch (error) {
-            console.error('[Email Sender Crash]:', error);
-            throw error; // Re-throw that ERRRRRRRRRRRRROR so Vendure knows the job failed
-        }
-    }
-}
+export const beastOrderConfirmationHandler =
+    new EmailEventListener('order-confirmation')
+        .on(PaymentStateTransitionEvent)
+        .filter(event => {
+            return (
+                event.toState === 'Settled' &&
+                event.payment?.method === 'stripe-card'
+            );
+        })
+        .loadData(context => loadOrderEmailData(context))
+        .setRecipient(event => {
+            return event.data.order.customer.emailAddress;
+        })
+        .setFrom('{{ fromAddress }}')
+        .setSubject('Confirmare comandă #{{ order.code }}')
+        .setMetadata(event => ({
+            handlerBuild: HANDLER_BUILD,
+            orderId: event.data.order.id,
+            orderCode: event.data.order.code,
+        }))
+        .setTemplateVars(event => ({
+            handlerBuild: HANDLER_BUILD,
+            order: event.data.order,
+            payment: event.data.payment,
+            payments: event.data.payments,
+            shippingLines: event.data.shippingLines,
+        }));

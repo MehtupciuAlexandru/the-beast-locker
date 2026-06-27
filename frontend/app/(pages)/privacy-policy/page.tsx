@@ -38,7 +38,11 @@ export default function PrivacyPolicy() {
                             <p className="mt-2">Beast Locker este un brand dedicat culturii sporturilor de contact, performantei si disciplinei, avand ca activitate comercializarea de echipamente sportive, apparel si accesorii.</p>
                             <p className="mt-4">Operatorul datelor cu caracter personal este:</p>
                             <ul className="mt-2 list-none pl-0 space-y-1">
-                                <li>Denumire firma: _____ CUI: _____ Nr. Registrul Comertului: _____ Sediu social: ____ Email: _____ Telefon: _____</li>
+                                <li>Denumire firma: BEAST LOCKER S.R.L.</li>
+                                <li>CUI: 54859107</li>
+                                <li>Nr. Registrul Comertului: J2026037508007</li>
+                                <li>Sediu social: Aleea Muzicii 5-8 Bl. RO5-RO6 Sc. RO5 Et. 12 Ap. 6, Ramnicu Valcea</li>
+                                <li>Email: thebeastlocker@gmail.com</li>
                             </ul>
                         </div>
 
@@ -51,7 +55,7 @@ export default function PrivacyPolicy() {
                             <ul className="mt-2 list-disc space-y-1 pl-6">
                                 <li>procesarea si livrarea comenzilor;</li>
                                 <li>oferirea serviciilor de suport clienti;</li>
-                                <li>imbunatatirea experiencei utilizatorilor pe website;</li>
+                                <li>imbunatatirea experientei utilizatorilor pe website;</li>
                                 <li>transmiterea de informatii comerciale si promotionale;</li>
                                 <li>administrarea campaniilor, giveaway-urilor sau evenimentelor;</li>
                                 <li>prevenirea fraudelor si protejarea platformei;</li>
@@ -137,7 +141,7 @@ export default function PrivacyPolicy() {
                                 <li>personalizarea continutului si reclamelor;</li>
                                 <li>imbunatatirea experientei utilizatorilor.</li>
                             </ul>
-                            <p className="mt-4">Utilizatorii isi pot modifică preferintele privind cookies din browser-ul utilizat.</p>
+                            <p className="mt-4">Utilizatorii isi pot modifica preferintele privind cookies din browser-ul utilizat.</p>
                         </div>
 
                         <div>
@@ -186,7 +190,7 @@ export default function PrivacyPolicy() {
                                 <li>dreptul de retragere a consimtamantului;</li>
                                 <li>dreptul de a depune o plangere la ANSPDCP.</li>
                             </ul>
-                            <p className="mt-4">Solicitarile privind datele personale pot fi trimise la: _____</p>
+                            <p className="mt-4">Solicitarile privind datele personale pot fi trimise la thebeastlocker@gmail.com</p>
                         </div>
 
                         <div>
@@ -203,13 +207,6 @@ export default function PrivacyPolicy() {
                             <p className="mt-2">Beast Locker isi rezerva dreptul de a modifica prezenta Politica de Confidentialitate. Orice modificare va fi publicata pe website.</p>
                         </div>
 
-                        <div>
-                            <h2 className="font-bold text-[#1c1c1E] pt-4 text-base uppercase tracking-wider">
-                                CONTACT
-                            </h2>
-                            <p className="mt-2">Pentru orice intrebare privind protectia datelor personale:</p>
-                            <p className="mt-2">BEAST LOCKER Email: _____ Telefon: _____ Adresa: _____</p>
-                        </div>
                     </div>
                 </section>
             </main>
