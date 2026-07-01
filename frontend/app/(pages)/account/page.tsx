@@ -12,6 +12,8 @@ import { updatePassword } from "@/lib/api/customer";
 import { createCustomerAddress } from "@/lib/api/customer";
 import { getAvailableCountries } from "@/lib/api/shop";
 import { CustomerOrder, getCustomerOrders } from "@/lib/api/orders";
+import { cleanSavedDeliveryAddress } from "@/lib/deliveryValidation";
+import { validateColeteAddress } from "@/lib/api/customer";
 
 export default function AccountPage() {
     const router = useRouter();
@@ -165,6 +167,14 @@ export default function AccountPage() {
     }, []);
 
     const handleAddAddress = async () => {
+        const normalizedAddress = cleanSavedDeliveryAddress(newAddress);
+
+        if (normalizedAddress.error || !normalizedAddress.address) {
+            setMessage(normalizedAddress.error || "Adresa este invalida.");
+            setMessageType("error");
+            return;
+        }
+
         if (
             !newAddress.fullName.trim() ||
             !newAddress.streetLine1.trim() ||
@@ -178,6 +188,8 @@ export default function AccountPage() {
         }
 
         try {
+            await validateColeteAddress(normalizedAddress.address);
+
             const cleanedAddress: any = {
                 fullName: newAddress.fullName.trim(),
                 streetLine1: newAddress.streetLine1.trim(),
@@ -201,6 +213,8 @@ export default function AccountPage() {
             if (newAddress.company?.trim()) {
                 cleanedAddress.company = newAddress.company.trim();
             }
+
+            Object.assign(cleanedAddress, normalizedAddress.address);
 
             if (editingAddressId) {
                 await updateCustomerAddress(editingAddressId, cleanedAddress);
@@ -937,9 +951,9 @@ export default function AccountPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-InterLight text-neutral-400 mb-1">Județ (opțional)</label>
+                                    <label className="block text-xs font-InterLight text-neutral-400 mb-1">Județ / sector *</label>
                                     <input
-                                        placeholder="Județ"
+                                        placeholder="Județ sau sector"
                                         value={newAddress.province}
                                         onChange={(e) => setNewAddress({ ...newAddress, province: e.target.value })}
                                         className="w-full border border-neutral-300 rounded-none px-3 py-2 text-sm outline-none bg-white focus:border-neutral-800 transition-colors duration-200 placeholder:text-neutral-300"
@@ -959,7 +973,7 @@ export default function AccountPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-InterLight text-neutral-400 mb-1">Telefon (opțional)</label>
+                                    <label className="block text-xs font-InterLight text-neutral-400 mb-1">Telefon *</label>
                                     <input
                                         placeholder="Număr de telefon"
                                         value={newAddress.phoneNumber}

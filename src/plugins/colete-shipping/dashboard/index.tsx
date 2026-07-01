@@ -1,5 +1,33 @@
-import { Badge, Button, defineDashboardExtension } from '@vendure/dashboard';
+import { api, Badge, Button, defineDashboardExtension, graphql } from '@vendure/dashboard';
+import { useMutation } from '@tanstack/react-query';
 import { FileText, PackageCheck } from 'lucide-react';
+import { toast } from 'sonner';
+
+const generateColeteAwbDocument = graphql(`
+    mutation GenerateColeteAwb($orderId: ID!) {
+        generateColeteAwb(orderId: $orderId) {
+            success
+            message
+            awb
+            uniqueId
+            courierName
+            serviceName
+            estimatedPickupDate
+            order {
+                id
+                customFields {
+                    coleteAwb
+                    coleteUniqueId
+                    coleteCourierName
+                    coleteServiceName
+                    coleteEstimatedPickupDate
+                    coleteAwbStatus
+                    coleteAwbError
+                }
+            }
+        }
+    }
+`);
 
 type ColeteCustomFields = {
     coletePackageWeightKg?: number | null;
@@ -27,6 +55,34 @@ function valueOrDash(value: unknown) {
 function ColeteAwbPanel({ context }: { context: any }) {
     const customFields: ColeteCustomFields =
         context.form?.watch?.('customFields') ?? context.entity?.customFields ?? {};
+    const orderId = context.entity?.id;
+    const isFormDirty = Boolean(context.form?.formState?.isDirty);
+
+    const generateAwbMutation = useMutation({
+        mutationFn: api.mutate(generateColeteAwbDocument),
+        onSuccess: data => {
+            const result = data.generateColeteAwb;
+            const nextCustomFields = result.order?.customFields;
+            if (nextCustomFields && context.form?.setValue) {
+                for (const [key, value] of Object.entries(nextCustomFields)) {
+                    context.form.setValue(`customFields.${key}`, value, {
+                        shouldDirty: false,
+                        shouldTouch: false,
+                    });
+                }
+            }
+
+            if (result.success) {
+                toast.success(result.message ?? 'AWB generat prin Colete Online.');
+                return;
+            }
+
+            toast.error(result.message ?? 'Generarea AWB a esuat.');
+        },
+        onError: error => {
+            toast.error(error instanceof Error ? error.message : 'Generarea AWB a esuat.');
+        },
+    });
 
     const missingPackageFields = [
         ['Greutate', customFields.coletePackageWeightKg],
@@ -40,6 +96,8 @@ function ColeteAwbPanel({ context }: { context: any }) {
 
     const hasAwb = Boolean(customFields.coleteAwb);
     const packageCount = customFields.coletePackageCount ?? 1;
+    const canGenerateAwb = Boolean(orderId) && !hasAwb && !isFormDirty && missingPackageFields.length === 0;
+    const buttonLabel = generateAwbMutation.isPending ? 'Se genereaza...' : 'Genereaza AWB';
 
     return (
         <div className="space-y-4">
@@ -103,31 +161,50 @@ function ColeteAwbPanel({ context }: { context: any }) {
                 </div>
             </div>
 
-            <Button disabled className="w-full">
-                Genereaza AWB
+            <Button
+                disabled={!canGenerateAwb || generateAwbMutation.isPending}
+                className="w-full"
+                onClick={() => {
+                    if (!orderId) {
+                        toast.error('Comanda nu are ID.');
+                        return;
+                    }
+                    generateAwbMutation.mutate({ orderId });
+                }}
+                type="button"
+            >
+                {buttonLabel}
             </Button>
             <p className="text-[11px] text-muted-foreground">
-                Buton placeholder: conectarea la Colete Online va fi adaugata in pasul urmator.
+                {hasAwb
+                    ? 'AWB-ul este deja generat pentru aceasta comanda.'
+                    : isFormDirty
+                      ? 'Salveaza mai intai campurile Colete Online, apoi genereaza AWB.'
+                      : 'Trimite comanda catre Colete Online staging si salveaza raspunsul pe comanda.'}
             </p>
         </div>
     );
 }
 
+function coleteAwbPanel(pageId: 'order-detail' | 'seller-order-detail') {
+    return {
+        id: `colete-awb-panel-${pageId}`,
+        title: 'Colete Online',
+        location: {
+            pageId,
+            column: 'side' as const,
+            position: {
+                blockId: 'fulfillment-details',
+                order: 'after' as const,
+            },
+        },
+        component: ColeteAwbPanel,
+    };
+}
+
 defineDashboardExtension({
     pageBlocks: [
-        {
-            id: 'colete-awb-panel',
-            title: 'Colete Online',
-            location: {
-                pageId: 'order-detail',
-                column: 'side',
-                position: {
-                    blockId: 'fulfillment-details',
-                    order: 'after',
-                },
-            },
-            component: ColeteAwbPanel,
-            requiresPermission: 'UpdateOrder',
-        },
+        coleteAwbPanel('order-detail'),
+        coleteAwbPanel('seller-order-detail'),
     ],
 });

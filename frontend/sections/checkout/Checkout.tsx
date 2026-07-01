@@ -3,18 +3,22 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getActiveCustomer } from "@/lib/api/auth";
-import { createCustomerAddress, updateCustomerAddress } from "@/lib/api/customer";
+import { createCustomerAddress, updateCustomerAddress, validateColeteAddress } from "@/lib/api/customer";
 import { getAvailableCountries } from "@/lib/api/shop";
 import { adjustOrderLine, getActiveOrder, removeOrderLine } from "@/lib/api/cart";
 import { createStripePaymentIntent } from "@/lib/api/stripe";
 import { getRecaptchaToken } from "@/lib/recaptcha/client";
 import StripePaymentForm from "@/components/checkout/StripePaymentForm";
 import {
+    getColeteCheckoutAddressQuote,
+    getColeteCheckoutShippingPoints,
     getEligibleShippingMethods,
+    setColeteCheckoutSelection,
     setCheckoutCustomer,
     setCheckoutShippingAddress,
     setCheckoutShippingMethod,
 } from "@/lib/api/checkout";
+import { cleanGuestCheckoutDetails, cleanSavedDeliveryAddress } from "@/lib/deliveryValidation";
 
 type PaymentMethod = "card" | "paypal" | "apple-pay";
 
@@ -79,6 +83,24 @@ type ActiveOrder = {
     lines: ActiveOrderLine[];
 };
 
+type ColeteDeliveryOption = {
+    deliveryType: "address" | "locker";
+    priceWithTax: number;
+    priceWithoutTax?: number | null;
+    courierName?: string | null;
+    serviceName?: string | null;
+    serviceId?: number | null;
+    activationId?: string | null;
+    shippingPointId?: number | null;
+    shippingPointName?: string | null;
+    shippingPointType?: string | null;
+    shippingPointAddress?: string | null;
+    shippingPointLat?: number | null;
+    shippingPointLng?: number | null;
+    shippingPointCounty?: string | null;
+    distanceKm?: number | null;
+};
+
 export default function Checkout() {
     const [loading, setLoading] = useState(true);
     const [orderLoading, setOrderLoading] = useState(true);
@@ -109,6 +131,11 @@ export default function Checkout() {
     const [shippingMethods, setShippingMethods] = useState<any[]>([]);
     const [selectedShippingMethodId, setSelectedShippingMethodId] = useState<string | null>(null);
     const [shippingMethodsLoaded, setShippingMethodsLoaded] = useState(false);
+    const [coleteOptions, setColeteOptions] = useState<ColeteDeliveryOption[]>([]);
+    const [selectedColeteOptionKey, setSelectedColeteOptionKey] = useState<string | null>(null);
+    const [focusedColeteOptionKey, setFocusedColeteOptionKey] = useState<string | null>(null);
+    const [coleteOptionsLoading, setColeteOptionsLoading] = useState(false);
+    const [checkoutDetailsSaved, setCheckoutDetailsSaved] = useState(false);
 
     const [guestForm, setGuestForm] = useState({
         firstName: "",
@@ -243,7 +270,37 @@ export default function Checkout() {
         return shippingMethods.find((method: any) => method.id === selectedShippingMethodId) || null;
     }, [shippingMethods, selectedShippingMethodId]);
 
+    const coleteOptionKey = (option: ColeteDeliveryOption) => {
+        return option.deliveryType === "locker"
+            ? `locker-${option.shippingPointId}-${option.activationId}`
+            : `address-${option.serviceId}-${option.activationId || "best"}`;
+    };
+
+    const selectedColeteOption = useMemo(() => {
+        return coleteOptions.find((option) => coleteOptionKey(option) === selectedColeteOptionKey) || null;
+    }, [coleteOptions, selectedColeteOptionKey]);
+
+    const addressDeliveryOption = useMemo(() => {
+        return coleteOptions.find((option) => option.deliveryType === "address") || null;
+    }, [coleteOptions]);
+
+    const lockerDeliveryOptions = useMemo(() => {
+        return coleteOptions.filter(
+            (option) =>
+                option.deliveryType === "locker" &&
+                typeof option.shippingPointLat === "number" &&
+                typeof option.shippingPointLng === "number"
+        );
+    }, [coleteOptions]);
+
+    const focusedColeteOption = useMemo(() => {
+        return coleteOptions.find((option) => coleteOptionKey(option) === focusedColeteOptionKey) || null;
+    }, [coleteOptions, focusedColeteOptionKey]);
+
     const shippingValue =
+        selectedColeteOption?.priceWithTax != null
+            ? Math.round(selectedColeteOption.priceWithTax * 100)
+            :
         selectedShippingMethod?.priceWithTax ||
         (order?.shippingWithTax && order.shippingWithTax > 0 ? order.shippingWithTax : 0);
 
@@ -251,6 +308,14 @@ export default function Checkout() {
         if (value === undefined || value === null) return "0,00 lei";
 
         return `${(value / 100).toFixed(2).replace(".", ",")} lei`;
+    };
+
+    const resetCheckoutCalculation = () => {
+        setClientSecret(null);
+        setColeteOptions([]);
+        setSelectedColeteOptionKey(null);
+        setFocusedColeteOptionKey(null);
+        setCheckoutDetailsSaved(false);
     };
 
     const getLineTotal = (line: ActiveOrderLine) => {
@@ -323,6 +388,7 @@ export default function Checkout() {
             setUpdatingLine(orderLineId);
             await adjustOrderLine(orderLineId, quantity + 1);
             await fetchOrder(false);
+            resetCheckoutCalculation();
         } catch (err: any) {
             setMessage(err.message || "Nu am putut actualiza cantitatea.");
             setMessageType("error");
@@ -338,6 +404,7 @@ export default function Checkout() {
             setUpdatingLine(orderLineId);
             await adjustOrderLine(orderLineId, quantity - 1);
             await fetchOrder(false);
+            resetCheckoutCalculation();
         } catch (err: any) {
             setMessage(err.message || "Nu am putut actualiza cantitatea.");
             setMessageType("error");
@@ -357,6 +424,7 @@ export default function Checkout() {
             }
 
             await fetchOrder(false);
+            resetCheckoutCalculation();
 
             setMessage("Produsul a fost eliminat din comandă.");
             setMessageType("success");
@@ -369,6 +437,7 @@ export default function Checkout() {
     };
 
     const validateSavedAddressForm = () => {
+        return cleanSavedDeliveryAddress(newAddress).error || "";
         if (!newAddress.fullName.trim()) return "Introduceți numele complet.";
         if (!newAddress.streetLine1.trim()) return "Introduceți adresa.";
         if (!newAddress.city.trim()) return "Introduceți orașul.";
@@ -388,6 +457,13 @@ export default function Checkout() {
         }
 
         try {
+            const normalizedAddress = cleanSavedDeliveryAddress(newAddress);
+            if (normalizedAddress.error || !normalizedAddress.address) {
+                throw new Error(normalizedAddress.error || "Adresa este invalida.");
+            }
+
+            await validateColeteAddress(normalizedAddress.address);
+
             const cleanedAddress: any = {
                 fullName: newAddress.fullName.trim(),
                 streetLine1: newAddress.streetLine1.trim(),
@@ -412,6 +488,8 @@ export default function Checkout() {
                 cleanedAddress.company = newAddress.company.trim();
             }
 
+            Object.assign(cleanedAddress, normalizedAddress.address);
+
             if (editingAddressId) {
                 await updateCustomerAddress(editingAddressId, cleanedAddress);
             } else {
@@ -423,6 +501,7 @@ export default function Checkout() {
 
             resetAddressForm();
             await fetchUser();
+            resetCheckoutCalculation();
         } catch (err: any) {
             setMessage(err.message || "Eroare la salvarea adresei");
             setMessageType("error");
@@ -430,6 +509,7 @@ export default function Checkout() {
     };
 
     const validateGuestForm = () => {
+        return cleanGuestCheckoutDetails(guestForm).error || "";
         if (!guestForm.firstName.trim()) return "Introduceți prenumele.";
         if (!guestForm.lastName.trim()) return "Introduceți numele.";
         if (!guestForm.emailAddress.trim()) return "Introduceți adresa de email.";
@@ -472,7 +552,14 @@ export default function Checkout() {
             countryCode: selectedAddress.country?.code || "RO",
         };
 
-        return setCheckoutShippingAddress(input, recaptchaToken);
+        const cleaned = cleanSavedDeliveryAddress(input);
+        if (cleaned.error || !cleaned.address) {
+            throw new Error(cleaned.error || "Adresa selectata este invalida.");
+        }
+
+        await validateColeteAddress(cleaned.address);
+
+        return setCheckoutShippingAddress(cleaned.address, recaptchaToken);
     };
 
     const setGuestOrderDetails = async () => {
@@ -482,14 +569,19 @@ export default function Checkout() {
             throw new Error(validationError);
         }
 
+        const cleanedGuest = cleanGuestCheckoutDetails(guestForm);
+        if (cleanedGuest.error || !cleanedGuest.customer || !cleanedGuest.address) {
+            throw new Error(cleanedGuest.error || "Datele de livrare sunt invalide.");
+        }
+
         const customerRecaptchaToken = await getRecaptchaToken("checkout");
 
         await setCheckoutCustomer(
             {
-                firstName: guestForm.firstName.trim(),
-                lastName: guestForm.lastName.trim(),
-                emailAddress: guestForm.emailAddress.trim(),
-                phoneNumber: guestForm.phoneNumber.trim(),
+                firstName: cleanedGuest.customer.firstName,
+                lastName: cleanedGuest.customer.lastName,
+                emailAddress: cleanedGuest.customer.emailAddress,
+                phoneNumber: cleanedGuest.customer.phoneNumber || undefined,
             },
             customerRecaptchaToken
         );
@@ -497,19 +589,68 @@ export default function Checkout() {
         const addressRecaptchaToken = await getRecaptchaToken("checkout");
 
         return setCheckoutShippingAddress(
-            {
-                fullName: `${guestForm.firstName.trim()} ${guestForm.lastName.trim()}`,
-                company: guestForm.company.trim() || undefined,
-                streetLine1: guestForm.streetLine1.trim(),
-                streetLine2: guestForm.streetLine2.trim() || undefined,
-                city: guestForm.city.trim(),
-                province: guestForm.province.trim() || undefined,
-                postalCode: guestForm.postalCode.trim(),
-                phoneNumber: guestForm.phoneNumber.trim(),
-                countryCode: guestForm.countryCode,
-            },
+            cleanedGuest.address,
             addressRecaptchaToken
         );
+    };
+
+    const ensureCheckoutDetailsOnOrder = async () => {
+        if (checkoutDetailsSaved) {
+            return order;
+        }
+
+        const updatedOrder = isAuthenticated
+            ? await setLoggedInOrderAddress(await getRecaptchaToken("checkout"))
+            : await setGuestOrderDetails();
+
+        setOrder(updatedOrder);
+        setCheckoutDetailsSaved(true);
+        return updatedOrder;
+    };
+
+    const loadColeteDeliveryOptions = async () => {
+        try {
+            setMessage(null);
+            setMessageType(null);
+            setColeteOptionsLoading(true);
+
+            await ensureCheckoutDetailsOnOrder();
+
+            const [addressResult, pointsResult] = await Promise.allSettled([
+                getColeteCheckoutAddressQuote(),
+                getColeteCheckoutShippingPoints(),
+            ]);
+
+            const options: ColeteDeliveryOption[] = [];
+
+            if (addressResult.status === "fulfilled" && addressResult.value) {
+                options.push(addressResult.value);
+            }
+
+            if (pointsResult.status === "fulfilled") {
+                options.push(...pointsResult.value.slice(0, 12));
+            }
+
+            if (!options.length) {
+                const error =
+                    addressResult.status === "rejected"
+                        ? addressResult.reason?.message
+                        : "Nu am primit optiuni de livrare de la Colete Online.";
+                throw new Error(error || "Nu am primit optiuni de livrare de la Colete Online.");
+            }
+
+            setColeteOptions(options);
+
+            const preferredOption = options.find((option) => option.deliveryType === "locker") || options[0];
+            setFocusedColeteOptionKey(preferredOption ? coleteOptionKey(preferredOption) : null);
+            setSelectedColeteOptionKey(null);
+            setClientSecret(null);
+        } catch (err: any) {
+            setMessage(err.message || "Nu am putut calcula livrarea prin Colete Online.");
+            setMessageType("error");
+        } finally {
+            setColeteOptionsLoading(false);
+        }
     };
 
     // const setFirstAvailableShippingMethod = async () => {
@@ -557,17 +698,19 @@ export default function Checkout() {
                 return;
             }
 
-            if (!selectedShippingMethodId) {
+            if (!selectedColeteOption) {
                 setMessage("Alege o metodă de livrare.");
                 setMessageType("error");
                 return;
             }
 
-            const updatedOrder = isAuthenticated
-                ? await setLoggedInOrderAddress(await getRecaptchaToken("checkout"))
-                : await setGuestOrderDetails();
+            await ensureCheckoutDetailsOnOrder();
 
-            setOrder(updatedOrder);
+            const { distanceKm, ...coleteSelectionInput } = selectedColeteOption;
+            await setColeteCheckoutSelection({
+                ...coleteSelectionInput,
+                shippingPointDistanceKm: distanceKm ?? null,
+            });
 
             const methods = await getEligibleShippingMethods();
 
@@ -578,13 +721,17 @@ export default function Checkout() {
             setShippingMethods(methods);
             setShippingMethodsLoaded(true);
 
-            const methodStillAvailable = methods.some(
-                (method: any) => method.id === selectedShippingMethodId
-            );
+            const methodStillAvailable =
+                selectedShippingMethodId &&
+                methods.some((method: any) => method.id === selectedShippingMethodId);
 
             const shippingMethodId = methodStillAvailable
                 ? selectedShippingMethodId
-                : methods[0].id;
+                : (
+                    methods.find((method: any) => method.code === "colete-online") ||
+                    methods.find((method: any) => method.code === "standard-shipping") ||
+                    methods[0]
+                ).id;
 
             setSelectedShippingMethodId(shippingMethodId);
 
@@ -618,15 +765,6 @@ export default function Checkout() {
             setIsPreparingPayment(false);
         }
     };
-
-
-    useEffect(() => {
-        if (orderLoading || !order?.lines?.length || shippingMethodsLoaded) return;
-
-        loadShippingMethodsForOrder().catch((err) => {
-            console.error("Failed to load shipping methods", err);
-        });
-    }, [orderLoading, order?.id, shippingMethodsLoaded]);
 
 
     if (loading || orderLoading) {
@@ -795,7 +933,7 @@ export default function Checkout() {
                                                     key={address.id}
                                                     onClick={() => {
                                                         setSelectedAddressId(address.id);
-                                                        setClientSecret(null);
+                                                        resetCheckoutCalculation();
                                                     }}
                                                     className={`relative border p-4 md:p-5 cursor-pointer transition-colors ${
     isSelected
@@ -871,11 +1009,170 @@ export default function Checkout() {
                                 guestForm={guestForm}
                                 setGuestForm={setGuestForm}
                                 countries={countries}
-                                onResetPayment={() => setClientSecret(null)}
+                                onResetPayment={resetCheckoutCalculation}
                             />
                         )}
 
-                        {shippingMethodsLoaded && shippingMethods.length > 0 && (
+                        <div className="bg-white border border-[#d8d8d8] px-4 md:px-6 py-5">
+                            <div className="flex items-center justify-between gap-4 mb-5">
+                                <h2 className="text-[12px] font-Inter18Semibold uppercase">
+                                    MetodÄƒ de livrare
+                                </h2>
+
+                                <button
+                                    type="button"
+                                    onClick={loadColeteDeliveryOptions}
+                                    disabled={coleteOptionsLoading || !!clientSecret}
+                                    className="h-[34px] px-4 border border-[#1c1c1e] text-[10px] uppercase tracking-wide text-[#1c1c1e] hover:bg-[#1c1c1e] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                                >
+                                    {coleteOptionsLoading ? "Se calculeaza..." : "Calculeaza livrarea"}
+                                </button>
+                            </div>
+
+                            {coleteOptions.length > 0 ? (
+                                <div className="flex flex-col gap-4">
+                                    {addressDeliveryOption ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedColeteOptionKey(coleteOptionKey(addressDeliveryOption));
+                                                setFocusedColeteOptionKey(null);
+                                                setClientSecret(null);
+                                            }}
+                                            className={`w-full border p-4 text-left cursor-pointer transition-colors ${
+                                                selectedColeteOptionKey === coleteOptionKey(addressDeliveryOption)
+                                                    ? "border-[#1c1c1e]"
+                                                    : "border-[#d8d8d8] hover:border-neutral-500"
+                                            }`}
+                                        >
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div>
+                                                    <p className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
+                                                        Livrare la adresa
+                                                    </p>
+                                                    <p className="mt-1 text-[10px] text-neutral-500">
+                                                        {[addressDeliveryOption.courierName, addressDeliveryOption.serviceName].filter(Boolean).join(" - ")}
+                                                    </p>
+                                                </div>
+                                                <span className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
+                                                    {formatPrice(Math.round(addressDeliveryOption.priceWithTax * 100))}
+                                                </span>
+                                            </div>
+                                        </button>
+                                    ) : null}
+
+                                    {lockerDeliveryOptions.length > 0 ? (
+                                        <LockerMapPicker
+                                            lockers={lockerDeliveryOptions}
+                                            selectedKey={selectedColeteOptionKey}
+                                            focusedKey={focusedColeteOptionKey}
+                                            focusedOption={focusedColeteOption}
+                                            getOptionKey={coleteOptionKey}
+                                            formatPrice={formatPrice}
+                                            onFocus={(option) => {
+                                                setFocusedColeteOptionKey(coleteOptionKey(option));
+                                            }}
+                                            onConfirm={(option) => {
+                                                setSelectedColeteOptionKey(coleteOptionKey(option));
+                                                setFocusedColeteOptionKey(coleteOptionKey(option));
+                                                setClientSecret(null);
+                                            }}
+                                        />
+                                    ) : null}
+                                </div>
+                            ) : null}
+
+                            {false && coleteOptions.length > 0 ? (
+                                <div className="flex flex-col gap-3">
+                                    {coleteOptions.map((option) => {
+                                        const optionKey = coleteOptionKey(option);
+                                        const isSelected = selectedColeteOptionKey === optionKey;
+                                        const title =
+                                            option.deliveryType === "locker"
+                                                ? option.shippingPointName || "Locker"
+                                                : "Livrare la adresa";
+                                        const subtitle =
+                                            option.deliveryType === "locker"
+                                                ? option.shippingPointAddress
+                                                : [option.courierName, option.serviceName].filter(Boolean).join(" - ");
+
+                                        return (
+                                            <button
+                                                key={optionKey}
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedColeteOptionKey(optionKey);
+                                                    setClientSecret(null);
+                                                }}
+                                                className={`w-full border p-4 text-left cursor-pointer transition-colors ${
+                                                    isSelected
+                                                        ? "border-[#1c1c1e]"
+                                                        : "border-[#d8d8d8] hover:border-neutral-500"
+                                                }`}
+                                            >
+                                                <div className="flex items-start justify-between gap-4">
+                                                    <div className="min-w-0">
+                                                        <p className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
+                                                            {title}
+                                                        </p>
+
+                                                        {subtitle ? (
+                                                            <p className="mt-1 text-[10px] text-neutral-500 leading-relaxed">
+                                                                {subtitle}
+                                                            </p>
+                                                        ) : null}
+
+                                                        <p className="mt-1 text-[10px] text-neutral-400 uppercase tracking-wide">
+                                                            {option.deliveryType === "locker" ? "Ridicare din locker" : "Curier la adresa"}
+                                                            {option.serviceName ? ` - ${option.serviceName}` : ""}
+                                                        </p>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-3 shrink-0">
+                                                        <span className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
+                                                            {formatPrice(Math.round(option.priceWithTax * 100))}
+                                                        </span>
+
+                                                        <span
+                                                            className={`w-3.5 h-3.5 rounded-full border ${
+                                                                isSelected
+                                                                    ? "border-[#1c1c1e] bg-[#1c1c1e]"
+                                                                    : "border-neutral-300 bg-white"
+                                                            }`}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+
+                                    {selectedColeteOption?.deliveryType === "locker" &&
+                                    selectedColeteOption?.shippingPointLat &&
+                                    selectedColeteOption?.shippingPointLng ? (
+                                        <div className="mt-2 border border-[#d8d8d8] overflow-hidden">
+                                            <iframe
+                                                title="Locker map"
+                                                src={`https://www.openstreetmap.org/export/embed.html?bbox=${
+                                                    (selectedColeteOption?.shippingPointLng || 0) - 0.01
+                                                }%2C${(selectedColeteOption?.shippingPointLat || 0) - 0.01}%2C${
+                                                    (selectedColeteOption?.shippingPointLng || 0) + 0.01
+                                                }%2C${(selectedColeteOption?.shippingPointLat || 0) + 0.01}&layer=mapnik&marker=${
+                                                    selectedColeteOption?.shippingPointLat || 0
+                                                }%2C${selectedColeteOption?.shippingPointLng || 0}`}
+                                                className="w-full h-[260px] border-0"
+                                                loading="lazy"
+                                            />
+                                        </div>
+                                    ) : null}
+                                </div>
+                            ) : coleteOptions.length === 0 ? (
+                                <p className="text-[11px] text-neutral-500 leading-relaxed">
+                                    Completeaza adresa si calculeaza livrarea pentru a vedea pretul Colete Online si lockerele apropiate.
+                                </p>
+                            ) : null}
+                        </div>
+
+                        {false && shippingMethodsLoaded && shippingMethods.length > 0 && (
                             <div className="bg-white border border-[#d8d8d8] px-4 md:px-6 py-5">
                                 <h2 className="text-[12px] font-Inter18Semibold uppercase mb-5">
                                     Metodă de livrare
@@ -952,7 +1249,7 @@ export default function Checkout() {
                                 total={formatPrice(totalValue)}
                                 onPay={handlePayNow}
                                 isPreparingPayment={isPreparingPayment}
-                                disabled={!selectedShippingMethodId || !!clientSecret}
+                                disabled={!selectedColeteOption || !!clientSecret}
                             />
                         </div>
                     </div>
@@ -965,7 +1262,7 @@ export default function Checkout() {
                             total={formatPrice(totalValue)}
                             onPay={handlePayNow}
                             isPreparingPayment={isPreparingPayment}
-                            disabled={!selectedShippingMethodId || !!clientSecret}
+                            disabled={!selectedColeteOption || !!clientSecret}
                         />
                     </div>
                 </div>
@@ -1019,12 +1316,12 @@ export default function Checkout() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <AddressInput label="Oraș *" value={newAddress.city} onChange={(value) => setNewAddress({ ...newAddress, city: value })} placeholder="Oraș" />
-                                <AddressInput label="Județ (opțional)" value={newAddress.province} onChange={(value) => setNewAddress({ ...newAddress, province: value })} placeholder="Județ" />
+                                <AddressInput label="Județ / sector *" value={newAddress.province} onChange={(value) => setNewAddress({ ...newAddress, province: value })} placeholder="Județ sau sector" />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <AddressInput label="Cod poștal *" value={newAddress.postalCode} onChange={(value) => setNewAddress({ ...newAddress, postalCode: value })} placeholder="Cod poștal" />
-                                <AddressInput label="Telefon (opțional)" value={newAddress.phoneNumber} onChange={(value) => setNewAddress({ ...newAddress, phoneNumber: value })} placeholder="Număr de telefon" />
+                                <AddressInput label="Telefon *" value={newAddress.phoneNumber} onChange={(value) => setNewAddress({ ...newAddress, phoneNumber: value })} placeholder="07xx xxx xxx" />
                             </div>
 
                             <CountrySelect
@@ -1057,6 +1354,161 @@ export default function Checkout() {
             )}
         </section>
     );
+}
+
+function LockerMapPicker({
+                             lockers,
+                             selectedKey,
+                             focusedKey,
+                             focusedOption,
+                             getOptionKey,
+                             formatPrice,
+                             onFocus,
+                             onConfirm,
+                         }: {
+    lockers: ColeteDeliveryOption[];
+    selectedKey: string | null;
+    focusedKey: string | null;
+    focusedOption: ColeteDeliveryOption | null;
+    getOptionKey: (option: ColeteDeliveryOption) => string;
+    formatPrice: (value?: number) => string;
+    onFocus: (option: ColeteDeliveryOption) => void;
+    onConfirm: (option: ColeteDeliveryOption) => void;
+}) {
+    const zoom = 14;
+    const tileSize = 256;
+    const mapWidth = 760;
+    const mapHeight = 340;
+    const validLockers = lockers.filter(
+        (locker) =>
+            typeof locker.shippingPointLat === "number" &&
+            typeof locker.shippingPointLng === "number"
+    );
+
+    const centerLat =
+        validLockers.reduce((sum, locker) => sum + (locker.shippingPointLat || 0), 0) /
+        Math.max(validLockers.length, 1);
+    const centerLng =
+        validLockers.reduce((sum, locker) => sum + (locker.shippingPointLng || 0), 0) /
+        Math.max(validLockers.length, 1);
+    const center = latLngToWorld(centerLat, centerLng, zoom);
+    const focused =
+        focusedOption?.deliveryType === "locker"
+            ? focusedOption
+            : validLockers[0] || null;
+    const startTileX = Math.floor((center.x - mapWidth / 2) / tileSize);
+    const endTileX = Math.floor((center.x + mapWidth / 2) / tileSize);
+    const startTileY = Math.floor((center.y - mapHeight / 2) / tileSize);
+    const endTileY = Math.floor((center.y + mapHeight / 2) / tileSize);
+    const tiles = [];
+
+    for (let x = startTileX; x <= endTileX; x += 1) {
+        for (let y = startTileY; y <= endTileY; y += 1) {
+            tiles.push({ x, y });
+        }
+    }
+
+    return (
+        <div className="border border-[#d8d8d8]">
+            <div className="relative h-[340px] overflow-hidden bg-[#e8ecef]">
+                {tiles.map((tile) => (
+                    <img
+                        key={`${tile.x}-${tile.y}`}
+                        src={`https://tile.openstreetmap.org/${zoom}/${tile.x}/${tile.y}.png`}
+                        alt=""
+                        draggable={false}
+                        className="absolute w-[256px] h-[256px] select-none"
+                        style={{
+                            left: `calc(50% + ${tile.x * tileSize - center.x}px)`,
+                            top: `calc(50% + ${tile.y * tileSize - center.y}px)`,
+                        }}
+                    />
+                ))}
+
+                <div className="absolute inset-0 bg-white/10" />
+
+                {validLockers.map((locker) => {
+                    const key = getOptionKey(locker);
+                    const point = latLngToWorld(locker.shippingPointLat || 0, locker.shippingPointLng || 0, zoom);
+                    const isSelected = selectedKey === key;
+                    const isFocused = focusedKey === key;
+
+                    return (
+                        <button
+                            key={key}
+                            type="button"
+                            onClick={() => onFocus(locker)}
+                            className={`absolute z-10 w-5 h-5 -translate-x-1/2 -translate-y-full rotate-45 border border-white shadow-md cursor-pointer ${
+                                isSelected
+                                    ? "bg-[#1c1c1e]"
+                                    : isFocused
+                                        ? "bg-[#0ea5e9]"
+                                        : "bg-red-600"
+                            }`}
+                            style={{
+                                left: `calc(50% + ${point.x - center.x}px)`,
+                                top: `calc(50% + ${point.y - center.y}px)`,
+                            }}
+                            aria-label={locker.shippingPointName || "Locker"}
+                            title={locker.shippingPointName || "Locker"}
+                        >
+                            <span className="absolute left-1/2 top-1/2 block w-1.5 h-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />
+                        </button>
+                    );
+                })}
+
+                <a
+                    href="https://www.openstreetmap.org/copyright"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="absolute bottom-1 right-2 text-[9px] text-neutral-500 bg-white/80 px-1"
+                >
+                    OpenStreetMap
+                </a>
+            </div>
+
+            {focused ? (
+                <div className="p-4 border-t border-[#d8d8d8] bg-white">
+                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                        <div className="min-w-0">
+                            <p className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
+                                {focused.shippingPointName || "Locker"}
+                            </p>
+                            <p className="mt-1 text-[10px] text-neutral-500 leading-relaxed">
+                                {focused.shippingPointAddress}
+                            </p>
+                            <p className="mt-1 text-[10px] text-neutral-400 uppercase tracking-wide">
+                                {[focused.courierName, focused.serviceName].filter(Boolean).join(" - ")}
+                            </p>
+                        </div>
+
+                        <div className="flex items-center gap-3 shrink-0">
+                            <span className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
+                                {formatPrice(Math.round(focused.priceWithTax * 100))}
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() => onConfirm(focused)}
+                                className="h-[34px] px-4 bg-[#1c1c1e] text-white text-[10px] uppercase tracking-wide hover:bg-black transition-colors cursor-pointer"
+                            >
+                                Confirma
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
+        </div>
+    );
+}
+
+function latLngToWorld(lat: number, lng: number, zoom: number) {
+    const sinLat = Math.sin((lat * Math.PI) / 180);
+    const scale = 256 * 2 ** zoom;
+
+    return {
+        x: ((lng + 180) / 360) * scale,
+        y: (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * scale,
+    };
 }
 
 function GuestCheckoutForm({
@@ -1106,7 +1558,7 @@ function GuestCheckoutForm({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <AddressInput label="Oraș *" value={guestForm.city} onChange={(value) => updateGuestForm({ ...guestForm, city: value })} placeholder="Oraș" />
-                    <AddressInput label="Județ (opțional)" value={guestForm.province} onChange={(value) => updateGuestForm({ ...guestForm, province: value })} placeholder="Județ" />
+                    <AddressInput label="Județ / sector *" value={guestForm.province} onChange={(value) => updateGuestForm({ ...guestForm, province: value })} placeholder="Județ sau sector" />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -22,6 +22,8 @@ import { ProductCustomizationPlugin } from './plugins/product-customization/prod
 import {BeastLockerPlugin} from "./plugins/product-customization/beast-locker.plugin";
 import {AuthValidationPlugin} from "./plugins/auth-validation/auth-validation-plugin";
 import { EventRegistrationPlugin } from './plugins/event-registration/event-registration.plugin';
+import { ColeteShippingPlugin } from './plugins/colete-shipping/colete-shipping.plugin';
+import { coleteSelectedQuoteCalculator } from './plugins/colete-shipping/colete-selected-quote.calculator';
 import {
     emailAddressChangeHandler,
     EmailPlugin,
@@ -29,6 +31,7 @@ import {
     passwordResetHandler
 } from "@vendure/email-plugin";
 import {ResendApiEmailSender} from "./plugins/email-transport/resend-api-email-sender";
+import { defaultShippingCalculator } from '@vendure/core/dist/config/shipping-method/default-shipping-calculator';
 const useS3 = process.env.APP_ENV !== 'dev';
 console.log("APP_ENV:", process.env.APP_ENV);
 console.log("S3_BUCKET:", process.env.S3_BUCKET);
@@ -93,6 +96,9 @@ export const config: VendureConfig = {
     },
     paymentOptions: {
         paymentMethodHandlers: [dummyPaymentHandler],
+    },
+    shippingOptions: {
+        shippingCalculators: [defaultShippingCalculator, coleteSelectedQuoteCalculator],
     },
     // When adding or altering custom field definitions, the database will
     // need to be updated. See the "Migrations" section in README.md.
@@ -257,6 +263,126 @@ export const config: VendureConfig = {
                 label: [{languageCode: LanguageCode.en, value: 'AWB error'}],
                 ui: { tab: 'Colete Online', fullWidth: true },
             },
+            {
+                name: 'coleteDeliveryType',
+                type: 'string',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Colete delivery type'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteCheckoutPriceWithTax',
+                type: 'int',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Checkout shipping price with tax'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteCheckoutPriceWithoutTax',
+                type: 'int',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Checkout shipping price without tax'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteCheckoutCourierName',
+                type: 'string',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Checkout courier'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteCheckoutServiceName',
+                type: 'string',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Checkout courier service'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteCheckoutServiceId',
+                type: 'int',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Checkout service ID'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteCheckoutActivationId',
+                type: 'string',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Checkout activation ID'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteShippingPointId',
+                type: 'int',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Locker/shipping point ID'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteShippingPointName',
+                type: 'string',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Locker/shipping point name'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteShippingPointType',
+                type: 'string',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Locker/shipping point type'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteShippingPointAddress',
+                type: 'string',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Locker/shipping point address'}],
+                ui: { tab: 'Colete Online', fullWidth: true },
+            },
+            {
+                name: 'coleteShippingPointLat',
+                type: 'float',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Locker latitude'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteShippingPointLng',
+                type: 'float',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Locker longitude'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteShippingPointCounty',
+                type: 'string',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Locker county'}],
+                ui: { tab: 'Colete Online' },
+            },
+            {
+                name: 'coleteShippingPointDistanceKm',
+                type: 'float',
+                nullable: true,
+                public: false,
+                label: [{languageCode: LanguageCode.en, value: 'Locker distance (km)'}],
+                ui: { tab: 'Colete Online' },
+            },
         ],
     },
 
@@ -266,6 +392,7 @@ export const config: VendureConfig = {
         BeastLockerPlugin,
         AuthValidationPlugin,
         EventRegistrationPlugin,
+        ColeteShippingPlugin,
         StripePlugin.init({
             storeCustomersInStripe: true,
         }),

@@ -113,3 +113,28 @@ export async function deleteCustomerAddress(id: string) {
 
     return graphqlRequest(mutation, { id }, true);
 }
+
+export async function validateColeteAddress(input: any) {
+    const query = `
+        query ValidateColeteAddress($input: ColeteAddressValidationInput!) {
+            validateColeteAddress(input: $input) {
+                valid
+                message
+                city
+                county
+                countyCode
+                street
+                phoneNumber
+            }
+        }
+    `;
+
+    const data = await graphqlRequest(query, { input }, true);
+    const result = data.validateColeteAddress;
+
+    if (!result?.valid) {
+        throw new Error(result?.message || "Adresa nu poate fi validata pentru Colete Online.");
+    }
+
+    return result;
+}

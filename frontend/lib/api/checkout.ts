@@ -157,3 +157,71 @@ export async function setCheckoutShippingMethod(shippingMethodId: string) {
     return result;
 }
 
+export async function getColeteCheckoutAddressQuote() {
+    const data = await graphqlRequest(
+        `
+        query ColeteCheckoutAddressQuote {
+            coleteCheckoutAddressQuote {
+                deliveryType
+                priceWithTax
+                priceWithoutTax
+                courierName
+                serviceName
+                serviceId
+                activationId
+            }
+        }
+        `,
+        {},
+        true
+    );
+
+    return data.coleteCheckoutAddressQuote;
+}
+
+export async function getColeteCheckoutShippingPoints() {
+    const data = await graphqlRequest(
+        `
+        query ColeteCheckoutShippingPoints {
+            coleteCheckoutShippingPoints {
+                deliveryType
+                priceWithTax
+                priceWithoutTax
+                courierName
+                serviceName
+                serviceId
+                activationId
+                shippingPointId
+                shippingPointName
+                shippingPointType
+                shippingPointAddress
+                shippingPointLat
+                shippingPointLng
+                shippingPointCounty
+                distanceKm
+            }
+        }
+        `,
+        {},
+        true
+    );
+
+    return data.coleteCheckoutShippingPoints || [];
+}
+
+export async function setColeteCheckoutSelection(input: any) {
+    const data = await graphqlRequest(
+        `
+        mutation SetColeteCheckoutSelection($input: ColeteCheckoutSelectionInput!) {
+            setColeteCheckoutSelection(input: $input) {
+                ${CHECKOUT_ORDER_FIELDS}
+            }
+        }
+        `,
+        { input },
+        true
+    );
+
+    return data.setColeteCheckoutSelection;
+}
+

@@ -5,18 +5,30 @@ const PAGE_SIZE = 100;
 
 const SIZE_ORDER = [
     "KIDS XXS",
+    "KIDS XXS/XS",
     "KIDS XS",
+    "KIDS XS/S",
     "KIDS S",
+    "KIDS S/M",
     "KIDS M",
+    "KIDS M/L",
     "KIDS L",
+    "KIDS L/XL",
     "KIDS XL",
     "XXS",
+    "XXS/XS",
     "XS",
+    "XS/S",
     "S",
+    "S/M",
     "M",
+    "M/L",
     "L",
+    "L/XL",
     "XL",
+    "XL/XXL",
     "XXL",
+    "XXL/XXXL",
     "XXXL",
 ];
 
@@ -24,6 +36,7 @@ function normalizeSize(value: string) {
     return value
         .trim()
         .toUpperCase()
+        .replace(/\s*\/\s*/g, "/")
         .replace(/\s+/g, " ");
 }
 
