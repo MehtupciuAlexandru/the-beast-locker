@@ -41,13 +41,40 @@ export function normalizePostalCode(value?: string): string {
     return (value || "").replace(/\D/g, "");
 }
 
+export function normalizeRomanianProvince(value?: string, city?: string): string {
+    const cleaned = cleanText(value);
+    const normalizedCity = normalizeAddressToken(city);
+    const normalizedProvince = normalizeAddressToken(cleaned);
+
+    if (normalizedCity === "bucuresti" || normalizedCity === "bucharest") {
+        const sectorMatch = normalizedProvince.match(/^(?:s|sector|sectorul)?\s*([1-6])$/);
+        if (sectorMatch) {
+            return `Sectorul ${sectorMatch[1]}`;
+        }
+
+        const sectorTextMatch = normalizedProvince.match(/sector(?:ul)?\s*([1-6])/);
+        if (sectorTextMatch) {
+            return `Sectorul ${sectorTextMatch[1]}`;
+        }
+
+        if (["bucuresti", "municipiul bucuresti", "mun bucuresti"].includes(normalizedProvince)) {
+            return "Bucuresti";
+        }
+    }
+
+    return cleaned
+        .replace(/\b(judetul|judet|jud\.|county|mun\.|municipiul)\b/gi, "")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
 export function cleanSavedDeliveryAddress(input: DeliveryAddressForm) {
     const fullName = cleanText(input.fullName);
     const phoneNumber = normalizeRomanianPhone(input.phoneNumber);
     const streetLine1 = cleanText(input.streetLine1);
     const streetLine2 = cleanText(input.streetLine2);
     const city = cleanText(input.city);
-    const province = cleanText(input.province);
+    const province = normalizeRomanianProvince(input.province, city);
     const postalCode = normalizePostalCode(input.postalCode);
     const company = cleanText(input.company);
     const countryCode = cleanText(input.countryCode || "RO").toUpperCase();
@@ -151,7 +178,7 @@ function validateCommonAddress(input: {
         return "Introduceti un oras valid.";
     }
 
-    if (!LOCATION_PATTERN.test(input.province)) {
+    if (!input.province || input.province.length < 1 || input.province.length > 80 || hasControlChars(input.province)) {
         return "Introduceti judetul sau sectorul.";
     }
 
@@ -176,6 +203,15 @@ function validateCommonAddress(input: {
 
 function cleanText(value?: string): string {
     return (value || "").replace(/\s+/g, " ").trim();
+}
+
+function normalizeAddressToken(value?: string): string {
+    return cleanText(value)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
 }
 
 function hasControlChars(value: string): boolean {

@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ActiveOrderService, ID, Order, OrderService, RequestContext } from '@vendure/core';
+import { ActiveOrderService, ID, Logger, Order, OrderService, RequestContext } from '@vendure/core';
 import { ColeteOnlineClient, ColeteShippingPointsResponse } from './colete-online.client';
+
+const loggerCtx = 'ColeteShippingService';
 
 type OrderCustomFields = {
     coletePackageWeightKg?: number | null;
@@ -63,10 +65,11 @@ export class ColeteShippingService {
         const order = await this.activeOrder(ctx);
         const payload = await this.buildColetePricePayload(order, 'address');
         const result = await this.coleteClient.getPrice(payload);
-        const selected = result.selected ?? result.list?.[0];
+        const selected = this.addressPriceItem(result);
+        this.logAddressPriceResult(order, payload.service, result, selected);
 
         if (!selected?.price?.total || !selected.service) {
-            throw new Error('Colete Online did not return a usable address delivery price.');
+            throw new Error('Colete Online did not return a usable direct-to-address delivery price.');
         }
 
         return this.priceItemToQuote('address', selected);
@@ -194,6 +197,26 @@ export class ColeteShippingService {
         const order = await this.orderService.findOne(ctx, orderId, ['customer']);
         if (!order) {
             throw new Error(`Order ${orderId} was not found.`);
+        }
+
+        if (process.env.COLETE_AWB_GENERATION_ENABLED === 'false') {
+            const message = 'Colete Online AWB generation is disabled by COLETE_AWB_GENERATION_ENABLED=false.';
+            const updatedOrder = await this.orderService.updateCustomFields(ctx, order.id, {
+                ...(order.customFields as OrderCustomFields),
+                coleteAwbStatus: 'disabled',
+                coleteAwbError: message,
+            });
+
+            return {
+                success: false,
+                message,
+                awb: null,
+                uniqueId: null,
+                courierName: null,
+                serviceName: null,
+                estimatedPickupDate: null,
+                order: updatedOrder,
+            };
         }
 
         try {
@@ -406,7 +429,9 @@ export class ColeteShippingService {
     private serviceSelection(order?: Order) {
         const customFields = order?.customFields as OrderCustomFields | undefined;
         const activationId = customFields?.coleteCheckoutActivationId ?? process.env.COLETE_ONLINE_ACTIVATION_ID;
-        const serviceIds = this.serviceIds();
+        const serviceIds = customFields?.coleteCheckoutServiceId
+            ? [customFields.coleteCheckoutServiceId]
+            : this.addressServiceIds(this.serviceIds());
 
         if (activationId) {
             if (customFields?.coleteDeliveryType === 'locker') {
@@ -438,7 +463,20 @@ export class ColeteShippingService {
     }
 
     private serviceIds(): number[] {
-        const value = process.env.COLETE_ONLINE_SERVICE_IDS ?? '';
+        return this.parseServiceIds(process.env.COLETE_ONLINE_SERVICE_IDS, 'COLETE_ONLINE_SERVICE_IDS');
+    }
+
+    private addressServiceIds(fallback: number[] = []): number[] {
+        const configured = process.env.COLETE_ONLINE_ADDRESS_SERVICE_IDS;
+        if (configured == null) {
+            return fallback;
+        }
+
+        return this.parseServiceIds(configured, 'COLETE_ONLINE_ADDRESS_SERVICE_IDS');
+    }
+
+    private parseServiceIds(value: string | undefined, envName: string): number[] {
+        value = value ?? '';
         if (!value.trim()) {
             return [];
         }
@@ -449,17 +487,23 @@ export class ColeteShippingService {
             .filter(id => Number.isFinite(id));
 
         if (!ids.length) {
-            throw new Error('COLETE_ONLINE_SERVICE_IDS must contain numeric service ids or be left empty.');
+            throw new Error(`${envName} must contain numeric service ids or be left empty.`);
         }
 
         return ids;
     }
 
     private addressServiceSearch() {
-        return {
+        const serviceIds = this.addressServiceIds();
+        const service: any = {
             selectionType: process.env.COLETE_ONLINE_SELECTION_TYPE ?? 'bestPrice',
-            serviceIds: this.serviceIds(),
         };
+
+        if (serviceIds.length) {
+            service.serviceIds = serviceIds;
+        }
+
+        return service;
     }
 
     private lockerServiceSearch() {
@@ -523,6 +567,67 @@ export class ColeteShippingService {
             shippingPointLng: shippingPoint?.address?.coordinate?.lng ?? null,
             distanceKm: shippingPoint?.extendedData?.approximateDistance ?? null,
         };
+    }
+
+    private addressPriceItem(result: any) {
+        const items = [result.selected, ...(result.list ?? [])].filter(Boolean);
+
+        return items.find((item: any) => {
+            const service = item.service ?? {};
+            return item.price?.total && service.id && !this.isPointDeliveryService(service);
+        });
+    }
+
+    private isPointDeliveryService(service: any) {
+        if (service.shippingPoint) {
+            return true;
+        }
+
+        const label = `${service.displayName ?? ''} ${service.name ?? ''}`.toLowerCase();
+        return ['locker', '2locker', 'pickup', 'pick-up', 'point', 'easybox', 'pachetomat'].some(term =>
+            label.includes(term),
+        );
+    }
+
+    private logAddressPriceResult(order: Order, serviceSelection: any, result: any, selected: any) {
+        const services = [result?.selected, ...(result?.list ?? [])]
+            .filter(Boolean)
+            .map((item: any, index: number) => {
+                const service = item.service ?? {};
+                return {
+                    index,
+                    id: service.id ?? null,
+                    courierName: service.courierName ?? null,
+                    name: service.name ?? null,
+                    displayName: service.displayName ?? null,
+                    activationId: service.activationId ? '[present]' : null,
+                    priceTotal: item.price?.total ?? null,
+                    priceNoVat: item.price?.noVat ?? null,
+                    hasShippingPoint: !!service.shippingPoint,
+                    rejectedAsPointDelivery: this.isPointDeliveryService(service),
+                };
+            });
+
+        const selectedService = selected?.service;
+        Logger.info(
+            `[Colete][AddressPrice] ${JSON.stringify({
+                orderCode: order.code,
+                env: process.env.COLETE_ONLINE_ENV ?? 'production',
+                serviceSelection,
+                selectedDirectService: selectedService
+                    ? {
+                          id: selectedService.id ?? null,
+                          courierName: selectedService.courierName ?? null,
+                          name: selectedService.name ?? null,
+                          displayName: selectedService.displayName ?? null,
+                          priceTotal: selected?.price?.total ?? null,
+                      }
+                    : null,
+                returnedServiceCount: services.length,
+                returnedServices: services,
+            })}`,
+            loggerCtx,
+        );
     }
 
     private shippingPointToQuote(county: string, point: NonNullable<ColeteShippingPointsResponse['points']>[number]) {

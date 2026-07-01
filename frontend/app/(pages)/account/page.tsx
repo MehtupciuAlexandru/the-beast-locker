@@ -45,6 +45,7 @@ export default function AccountPage() {
 
     const [message, setMessage] = useState<string | null>(null);
     const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
+    const [addressModalError, setAddressModalError] = useState<string | null>(null);
 
     const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
 
@@ -83,6 +84,7 @@ export default function AccountPage() {
             countryCode: "RO",
         });
 
+        setAddressModalError(null);
         setIsAddAddressOpen(false);
     };
 
@@ -170,8 +172,7 @@ export default function AccountPage() {
         const normalizedAddress = cleanSavedDeliveryAddress(newAddress);
 
         if (normalizedAddress.error || !normalizedAddress.address) {
-            setMessage(normalizedAddress.error || "Adresa este invalida.");
-            setMessageType("error");
+            setAddressModalError(normalizedAddress.error || "Adresa este invalida.");
             return;
         }
 
@@ -182,12 +183,12 @@ export default function AccountPage() {
             !newAddress.postalCode.trim() ||
             !newAddress.countryCode.trim()
         ) {
-            setMessage("Completează câmpurile obligatorii");
-            setMessageType("error");
+            setAddressModalError("Completează câmpurile obligatorii");
             return;
         }
 
         try {
+            setAddressModalError(null);
             await validateColeteAddress(normalizedAddress.address);
 
             const cleanedAddress: any = {
@@ -246,8 +247,7 @@ export default function AccountPage() {
             setEditingAddressId(null);
         } catch (err) {
             console.error(err);
-            setMessage("Eroare la adăugarea adresei");
-            setMessageType("error");
+            setAddressModalError(err instanceof Error ? err.message : "Eroare la salvarea adresei");
         }
     };
 
@@ -653,6 +653,7 @@ export default function AccountPage() {
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         setEditingAddressId(addr.id);
+                                                        setAddressModalError(null);
                                                         setNewAddress({
                                                             fullName: addr.fullName || "",
                                                             company: addr.company || "",
@@ -875,7 +876,7 @@ export default function AccountPage() {
                 <div className="fixed inset-0 z-[9999] font-Inter flex items-center justify-center p-4 font-Inter">
                     <div
                         className="absolute inset-0 bg-neutral-800/50 backdrop-blur-xs transition-opacity"
-                        onClick={() => setIsAddAddressOpen(false)}
+                        onClick={resetAddressForm}
                     />
 
                     <div className="relative bg-white text-neutral-800 w-full max-w-lg p-8 md:p-10 rounded-none font-Inter shadow-2xl overflow-y-auto max-h-[90vh]">
@@ -897,6 +898,12 @@ export default function AccountPage() {
                                 Completați datele dumneavoastră mai jos:
                             </p>
                         </div>
+
+                        {addressModalError && (
+                            <div className="mb-5 border border-red-200 bg-red-50 px-4 py-3 text-xs leading-relaxed text-red-700">
+                                {addressModalError}
+                            </div>
+                        )}
 
                         <div className="space-y-4 font-Inter">
                             <div>

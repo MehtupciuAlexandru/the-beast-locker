@@ -124,6 +124,7 @@ export default function Checkout() {
 
     const [message, setMessage] = useState<string | null>(null);
     const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
+    const [addressModalError, setAddressModalError] = useState<string | null>(null);
 
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [isPreparingPayment, setIsPreparingPayment] = useState(false);
@@ -135,6 +136,7 @@ export default function Checkout() {
     const [selectedColeteOptionKey, setSelectedColeteOptionKey] = useState<string | null>(null);
     const [focusedColeteOptionKey, setFocusedColeteOptionKey] = useState<string | null>(null);
     const [coleteOptionsLoading, setColeteOptionsLoading] = useState(false);
+    const [coleteAddressQuoteError, setColeteAddressQuoteError] = useState<string | null>(null);
     const [checkoutDetailsSaved, setCheckoutDetailsSaved] = useState(false);
 
     const [guestForm, setGuestForm] = useState({
@@ -177,6 +179,7 @@ export default function Checkout() {
         });
 
         setEditingAddressId(null);
+        setAddressModalError(null);
         setIsAddAddressOpen(false);
     };
 
@@ -315,6 +318,7 @@ export default function Checkout() {
         setColeteOptions([]);
         setSelectedColeteOptionKey(null);
         setFocusedColeteOptionKey(null);
+        setColeteAddressQuoteError(null);
         setCheckoutDetailsSaved(false);
     };
 
@@ -367,6 +371,7 @@ export default function Checkout() {
 
     const openEditAddress = (address: CheckoutAddress) => {
         setEditingAddressId(address.id);
+        setAddressModalError(null);
 
         setNewAddress({
             fullName: address.fullName || "",
@@ -451,12 +456,12 @@ export default function Checkout() {
         const validationError = validateSavedAddressForm();
 
         if (validationError) {
-            setMessage(validationError);
-            setMessageType("error");
+            setAddressModalError(validationError);
             return;
         }
 
         try {
+            setAddressModalError(null);
             const normalizedAddress = cleanSavedDeliveryAddress(newAddress);
             if (normalizedAddress.error || !normalizedAddress.address) {
                 throw new Error(normalizedAddress.error || "Adresa este invalida.");
@@ -503,8 +508,7 @@ export default function Checkout() {
             await fetchUser();
             resetCheckoutCalculation();
         } catch (err: any) {
-            setMessage(err.message || "Eroare la salvarea adresei");
-            setMessageType("error");
+            setAddressModalError(err.message || "Eroare la salvarea adresei");
         }
     };
 
@@ -612,6 +616,7 @@ export default function Checkout() {
         try {
             setMessage(null);
             setMessageType(null);
+            setColeteAddressQuoteError(null);
             setColeteOptionsLoading(true);
 
             await ensureCheckoutDetailsOnOrder();
@@ -625,10 +630,12 @@ export default function Checkout() {
 
             if (addressResult.status === "fulfilled" && addressResult.value) {
                 options.push(addressResult.value);
+            } else if (addressResult.status === "rejected") {
+                setColeteAddressQuoteError(addressResult.reason?.message || "Colete nu a returnat un pret pentru livrarea la adresa.");
             }
 
             if (pointsResult.status === "fulfilled") {
-                options.push(...pointsResult.value.slice(0, 12));
+                options.push(...pointsResult.value);
             }
 
             if (!options.length) {
@@ -1016,7 +1023,7 @@ export default function Checkout() {
                         <div className="bg-white border border-[#d8d8d8] px-4 md:px-6 py-5">
                             <div className="flex items-center justify-between gap-4 mb-5">
                                 <h2 className="text-[12px] font-Inter18Semibold uppercase">
-                                    MetodÄƒ de livrare
+                                    Metode de livrare
                                 </h2>
 
                                 <button
@@ -1025,7 +1032,7 @@ export default function Checkout() {
                                     disabled={coleteOptionsLoading || !!clientSecret}
                                     className="h-[34px] px-4 border border-[#1c1c1e] text-[10px] uppercase tracking-wide text-[#1c1c1e] hover:bg-[#1c1c1e] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                                 >
-                                    {coleteOptionsLoading ? "Se calculeaza..." : "Calculeaza livrarea"}
+                                    {coleteOptionsLoading ? "Se calculează..." : "Calculează livrarea"}
                                 </button>
                             </div>
 
@@ -1048,7 +1055,7 @@ export default function Checkout() {
                                             <div className="flex items-start justify-between gap-4">
                                                 <div>
                                                     <p className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
-                                                        Livrare la adresa
+                                                        Livrare la adresă
                                                     </p>
                                                     <p className="mt-1 text-[10px] text-neutral-500">
                                                         {[addressDeliveryOption.courierName, addressDeliveryOption.serviceName].filter(Boolean).join(" - ")}
@@ -1059,6 +1066,22 @@ export default function Checkout() {
                                                 </span>
                                             </div>
                                         </button>
+                                    ) : coleteAddressQuoteError ? (
+                                        <div className="w-full border border-red-200 bg-red-50 p-4 text-left">
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div>
+                                                    <p className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
+                                                        Livrare la adresă
+                                                    </p>
+                                                    <p className="mt-1 text-[10px] text-red-700 leading-relaxed">
+                                                        Momentan nu am putut calcula pretul pentru livrarea la adresă: {coleteAddressQuoteError}
+                                                    </p>
+                                                </div>
+                                                <span className="text-[10px] uppercase tracking-wide text-red-700">
+                                                    Indisponibil
+                                                </span>
+                                            </div>
+                                        </div>
                                     ) : null}
 
                                     {lockerDeliveryOptions.length > 0 ? (
@@ -1167,7 +1190,7 @@ export default function Checkout() {
                                 </div>
                             ) : coleteOptions.length === 0 ? (
                                 <p className="text-[11px] text-neutral-500 leading-relaxed">
-                                    Completeaza adresa si calculeaza livrarea pentru a vedea pretul Colete Online si lockerele apropiate.
+                                    Completeaza adresa si calculează livrarea pentru a vedea pretul Colete Online si lockerele apropiate.
                                 </p>
                             ) : null}
                         </div>
@@ -1284,7 +1307,7 @@ export default function Checkout() {
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 font-Inter">
                     <div
                         className="absolute inset-0 bg-neutral-800/50 backdrop-blur-xs transition-opacity"
-                        onClick={() => setIsAddAddressOpen(false)}
+                        onClick={resetAddressForm}
                     />
 
                     <div className="relative bg-white text-neutral-800 w-full max-w-lg p-8 md:p-10 rounded-none shadow-2xl overflow-y-auto max-h-[90vh]">
@@ -1307,6 +1330,12 @@ export default function Checkout() {
                                 Completați datele dumneavoastră mai jos:
                             </p>
                         </div>
+
+                        {addressModalError && (
+                            <div className="mb-5 border border-red-200 bg-red-50 px-4 py-3 text-xs leading-relaxed text-red-700">
+                                {addressModalError}
+                            </div>
+                        )}
 
                         <div className="space-y-4 font-Inter">
                             <AddressInput label="Nume complet *" value={newAddress.fullName} onChange={(value) => setNewAddress({ ...newAddress, fullName: value })} placeholder="ex: Popescu Andrei" />
@@ -1379,6 +1408,11 @@ function LockerMapPicker({
     const tileSize = 256;
     const mapWidth = 760;
     const mapHeight = 340;
+    const [pan, setPan] = useState({ x: 0, y: 0 });
+    const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+    const [locationStatus, setLocationStatus] = useState<"idle" | "loading" | "allowed" | "denied">("idle");
+    const [locationError, setLocationError] = useState<string | null>(null);
+    const dragStartRef = useRef<{ pointerId: number; x: number; y: number; panX: number; panY: number; moved: boolean } | null>(null);
     const validLockers = lockers.filter(
         (locker) =>
             typeof locker.shippingPointLat === "number" &&
@@ -1396,10 +1430,15 @@ function LockerMapPicker({
         focusedOption?.deliveryType === "locker"
             ? focusedOption
             : validLockers[0] || null;
-    const startTileX = Math.floor((center.x - mapWidth / 2) / tileSize);
-    const endTileX = Math.floor((center.x + mapWidth / 2) / tileSize);
-    const startTileY = Math.floor((center.y - mapHeight / 2) / tileSize);
-    const endTileY = Math.floor((center.y + mapHeight / 2) / tileSize);
+    const viewCenter = {
+        x: center.x - pan.x,
+        y: center.y - pan.y,
+    };
+    const tileBuffer = tileSize;
+    const startTileX = Math.floor((viewCenter.x - mapWidth / 2 - tileBuffer) / tileSize);
+    const endTileX = Math.floor((viewCenter.x + mapWidth / 2 + tileBuffer) / tileSize);
+    const startTileY = Math.floor((viewCenter.y - mapHeight / 2 - tileBuffer) / tileSize);
+    const endTileY = Math.floor((viewCenter.y + mapHeight / 2 + tileBuffer) / tileSize);
     const tiles = [];
 
     for (let x = startTileX; x <= endTileX; x += 1) {
@@ -1408,9 +1447,108 @@ function LockerMapPicker({
         }
     }
 
+    const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+        event.currentTarget.setPointerCapture(event.pointerId);
+        dragStartRef.current = {
+            pointerId: event.pointerId,
+            x: event.clientX,
+            y: event.clientY,
+            panX: pan.x,
+            panY: pan.y,
+            moved: false,
+        };
+    };
+
+    const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+        const dragStart = dragStartRef.current;
+        if (!dragStart || dragStart.pointerId !== event.pointerId) return;
+
+        const deltaX = event.clientX - dragStart.x;
+        const deltaY = event.clientY - dragStart.y;
+
+        if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) {
+            dragStart.moved = true;
+        }
+
+        setPan({
+            x: dragStart.panX + deltaX,
+            y: dragStart.panY + deltaY,
+        });
+    };
+
+    const handlePointerEnd = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (dragStartRef.current?.pointerId === event.pointerId) {
+            dragStartRef.current = null;
+        }
+    };
+
+    const focusLocker = (locker: ColeteDeliveryOption) => {
+        onFocus(locker);
+    };
+
+    const requestUserLocation = () => {
+        if (!navigator.geolocation) {
+            setLocationStatus("denied");
+            setLocationError("Browserul nu suporta localizarea.");
+            return;
+        }
+
+        setLocationStatus("loading");
+        setLocationError(null);
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const nextLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                };
+                const userPoint = latLngToWorld(nextLocation.lat, nextLocation.lng, zoom);
+                const nearestLocker = validLockers
+                    .map((locker) => ({
+                        locker,
+                        distance: distanceKmBetween(
+                            nextLocation.lat,
+                            nextLocation.lng,
+                            locker.shippingPointLat || 0,
+                            locker.shippingPointLng || 0
+                        ),
+                    }))
+                    .sort((a, b) => a.distance - b.distance)[0]?.locker;
+
+                setUserLocation(nextLocation);
+                setPan({
+                    x: center.x - userPoint.x,
+                    y: center.y - userPoint.y,
+                });
+                setLocationStatus("allowed");
+
+                if (nearestLocker) {
+                    onFocus(nearestLocker);
+                }
+            },
+            () => {
+                setLocationStatus("denied");
+                setLocationError("Nu am putut accesa locatia. Puteti alege lockerul manual.");
+            },
+            {
+                enableHighAccuracy: false,
+                timeout: 8000,
+                maximumAge: 300000,
+            }
+        );
+    };
+
+    const userPoint = userLocation ? latLngToWorld(userLocation.lat, userLocation.lng, zoom) : null;
+
     return (
         <div className="border border-[#d8d8d8]">
-            <div className="relative h-[340px] overflow-hidden bg-[#e8ecef]">
+            <div
+                className="relative h-[340px] overflow-hidden bg-[#e8ecef] cursor-grab active:cursor-grabbing touch-none"
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerEnd}
+                onPointerCancel={handlePointerEnd}
+            >
                 {tiles.map((tile) => (
                     <img
                         key={`${tile.x}-${tile.y}`}
@@ -1419,13 +1557,42 @@ function LockerMapPicker({
                         draggable={false}
                         className="absolute w-[256px] h-[256px] select-none"
                         style={{
-                            left: `calc(50% + ${tile.x * tileSize - center.x}px)`,
-                            top: `calc(50% + ${tile.y * tileSize - center.y}px)`,
+                            left: `calc(50% + ${tile.x * tileSize - viewCenter.x}px)`,
+                            top: `calc(50% + ${tile.y * tileSize - viewCenter.y}px)`,
                         }}
                     />
                 ))}
 
-                <div className="absolute inset-0 bg-white/10" />
+                <div className="absolute inset-0 bg-white/10 pointer-events-none" />
+
+                <div className="absolute left-3 top-3 z-20 flex flex-col items-start gap-2">
+                    <button
+                        type="button"
+                        onPointerDown={(event) => event.stopPropagation()}
+                        onClick={requestUserLocation}
+                        disabled={locationStatus === "loading"}
+                        className="bg-white border border-[#d8d8d8] px-3 py-2 text-[10px] uppercase tracking-wide text-[#1c1c1e] shadow-sm hover:border-[#1c1c1e] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                        {locationStatus === "loading" ? "Se cauta..." : "Foloseste locatia mea"}
+                    </button>
+
+                    {locationError ? (
+                        <div className="max-w-[220px] bg-white/95 border border-red-200 px-3 py-2 text-[10px] leading-relaxed text-red-700 shadow-sm">
+                            {locationError}
+                        </div>
+                    ) : null}
+                </div>
+
+                {userPoint ? (
+                    <div
+                        className="absolute z-10 w-4 h-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-[#0ea5e9] shadow-md"
+                        style={{
+                            left: `calc(50% + ${userPoint.x - viewCenter.x}px)`,
+                            top: `calc(50% + ${userPoint.y - viewCenter.y}px)`,
+                        }}
+                        title="Locatia ta"
+                    />
+                ) : null}
 
                 {validLockers.map((locker) => {
                     const key = getOptionKey(locker);
@@ -1437,7 +1604,8 @@ function LockerMapPicker({
                         <button
                             key={key}
                             type="button"
-                            onClick={() => onFocus(locker)}
+                            onPointerDown={(event) => event.stopPropagation()}
+                            onClick={() => focusLocker(locker)}
                             className={`absolute z-10 w-5 h-5 -translate-x-1/2 -translate-y-full rotate-45 border border-white shadow-md cursor-pointer ${
                                 isSelected
                                     ? "bg-[#1c1c1e]"
@@ -1446,8 +1614,8 @@ function LockerMapPicker({
                                         : "bg-red-600"
                             }`}
                             style={{
-                                left: `calc(50% + ${point.x - center.x}px)`,
-                                top: `calc(50% + ${point.y - center.y}px)`,
+                                left: `calc(50% + ${point.x - viewCenter.x}px)`,
+                                top: `calc(50% + ${point.y - viewCenter.y}px)`,
                             }}
                             aria-label={locker.shippingPointName || "Locker"}
                             title={locker.shippingPointName || "Locker"}
@@ -1491,7 +1659,7 @@ function LockerMapPicker({
                                 onClick={() => onConfirm(focused)}
                                 className="h-[34px] px-4 bg-[#1c1c1e] text-white text-[10px] uppercase tracking-wide hover:bg-black transition-colors cursor-pointer"
                             >
-                                Confirma
+                                Confirmă
                             </button>
                         </div>
                     </div>
@@ -1509,6 +1677,20 @@ function latLngToWorld(lat: number, lng: number, zoom: number) {
         x: ((lng + 180) / 360) * scale,
         y: (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * scale,
     };
+}
+
+function distanceKmBetween(latA: number, lngA: number, latB: number, lngB: number) {
+    const earthRadiusKm = 6371;
+    const toRadians = (value: number) => (value * Math.PI) / 180;
+    const deltaLat = toRadians(latB - latA);
+    const deltaLng = toRadians(lngB - lngA);
+    const a =
+        Math.sin(deltaLat / 2) ** 2 +
+        Math.cos(toRadians(latA)) *
+            Math.cos(toRadians(latB)) *
+            Math.sin(deltaLng / 2) ** 2;
+
+    return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 function GuestCheckoutForm({
