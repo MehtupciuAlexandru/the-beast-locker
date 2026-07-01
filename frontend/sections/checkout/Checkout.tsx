@@ -728,21 +728,29 @@ export default function Checkout() {
             setShippingMethods(methods);
             setShippingMethodsLoaded(true);
 
-            const methodStillAvailable =
-                selectedShippingMethodId &&
-                methods.some((method: any) => method.id === selectedShippingMethodId);
+            const expectedShippingWithTax = Math.round(selectedColeteOption.priceWithTax * 100);
+            const coletePricedMethods = methods.filter((method: any) => {
+                return Math.abs(Number(method.priceWithTax) - expectedShippingWithTax) <= 1;
+            });
+            const shippingMethod =
+                coletePricedMethods.find((method: any) => method.code === "colete-online") ||
+                coletePricedMethods.find((method: any) => method.code === "standard-shipping") ||
+                coletePricedMethods.find((method: any) => method.code === "express-shipping") ||
+                coletePricedMethods[0] ||
+                methods.find((method: any) => method.code === "colete-online") ||
+                methods.find((method: any) => method.code === "standard-shipping") ||
+                methods[0];
 
-            const shippingMethodId = methodStillAvailable
-                ? selectedShippingMethodId
-                : (
-                    methods.find((method: any) => method.code === "colete-online") ||
-                    methods.find((method: any) => method.code === "standard-shipping") ||
-                    methods[0]
-                ).id;
+            setSelectedShippingMethodId(shippingMethod.id);
 
-            setSelectedShippingMethodId(shippingMethodId);
+            const orderWithShipping = await setCheckoutShippingMethod(shippingMethod.id);
+            const appliedShippingWithTax = Number(orderWithShipping?.shippingWithTax ?? 0);
 
-            const orderWithShipping = await setCheckoutShippingMethod(shippingMethodId);
+            if (Math.abs(appliedShippingWithTax - expectedShippingWithTax) > 1) {
+                throw new Error(
+                    `Pretul livrarii nu a fost aplicat corect. Colete: ${formatPrice(expectedShippingWithTax)}, Vendure: ${formatPrice(appliedShippingWithTax)}. Plata a fost oprita pentru a evita o suma gresita.`
+                );
+            }
 
             setOrder(orderWithShipping);
 
