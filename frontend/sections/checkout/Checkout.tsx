@@ -304,6 +304,8 @@ export default function Checkout() {
         return coleteOptions.find((option) => coleteOptionKey(option) === focusedColeteOptionKey) || null;
     }, [coleteOptions, focusedColeteOptionKey]);
 
+    const hasCheckoutItems = (order?.lines?.length ?? 0) > 0;
+
     const rawSelectedShippingValue =
         selectedColeteOption?.priceWithTax != null
             ? Math.round(selectedColeteOption.priceWithTax * 100)
@@ -335,6 +337,32 @@ export default function Checkout() {
         setColeteAddressQuoteError(null);
         setCheckoutDetailsSaved(false);
     };
+
+    useEffect(() => {
+        if (orderLoading || hasCheckoutItems) return;
+
+        if (
+            clientSecret ||
+            coleteOptions.length > 0 ||
+            selectedColeteOptionKey ||
+            focusedColeteOptionKey ||
+            checkoutDetailsSaved
+        ) {
+            resetCheckoutCalculation();
+        }
+
+        setShippingMethods([]);
+        setSelectedShippingMethodId(null);
+        setShippingMethodsLoaded(false);
+    }, [
+        orderLoading,
+        hasCheckoutItems,
+        clientSecret,
+        coleteOptions.length,
+        selectedColeteOptionKey,
+        focusedColeteOptionKey,
+        checkoutDetailsSaved,
+    ]);
 
     const getLineTotal = (line: ActiveOrderLine) => {
         return (line.productVariant.priceWithTax || 0) * line.quantity;
@@ -631,6 +659,14 @@ export default function Checkout() {
             setMessage(null);
             setMessageType(null);
             setColeteAddressQuoteError(null);
+
+            if (!hasCheckoutItems) {
+                resetCheckoutCalculation();
+                setMessage("CoÈ™ul este gol.");
+                setMessageType("error");
+                return;
+            }
+
             setColeteOptionsLoading(true);
 
             await ensureCheckoutDetailsOnOrder();
@@ -713,7 +749,7 @@ export default function Checkout() {
             setMessageType(null);
             setIsPreparingPayment(true);
 
-            if (!order || order.lines.length === 0) {
+            if (!hasCheckoutItems) {
                 setMessage("Coșul este gol.");
                 setMessageType("error");
                 return;
@@ -1060,7 +1096,7 @@ export default function Checkout() {
                                 <button
                                     type="button"
                                     onClick={loadColeteDeliveryOptions}
-                                    disabled={coleteOptionsLoading || !!clientSecret}
+                                    disabled={!hasCheckoutItems || coleteOptionsLoading || !!clientSecret}
                                     className="h-[34px] px-4 border border-[#1c1c1e] text-[10px] uppercase tracking-wide text-[#1c1c1e] hover:bg-[#1c1c1e] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                                 >
                                     {coleteOptionsLoading ? "Se calculează..." : "Calculează livrarea"}
@@ -1070,8 +1106,7 @@ export default function Checkout() {
                             {coleteOptions.length > 0 ? (
                                 <div className="flex flex-col gap-4">
                                     {addressDeliveryOption ? (
-                                        <button
-                                            type="button"
+                                        <label
                                             onClick={() => {
                                                 setSelectedColeteOptionKey(coleteOptionKey(addressDeliveryOption));
                                                 setFocusedColeteOptionKey(null);
@@ -1084,19 +1119,32 @@ export default function Checkout() {
                                             }`}
                                         >
                                             <div className="flex items-start justify-between gap-4">
-                                                <div>
+                                                <div className="flex items-start gap-3 min-w-0">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedColeteOptionKey === coleteOptionKey(addressDeliveryOption)}
+                                                        onChange={() => {
+                                                            setSelectedColeteOptionKey(coleteOptionKey(addressDeliveryOption));
+                                                            setFocusedColeteOptionKey(null);
+                                                            setClientSecret(null);
+                                                        }}
+                                                        className="mt-0.5 h-4 w-4 accent-[#1c1c1e] cursor-pointer shrink-0"
+                                                        aria-label="Selecteaza livrarea la adresa"
+                                                    />
+                                                    <div className="min-w-0">
                                                     <p className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
                                                         Livrare la adresă
                                                     </p>
                                                     <p className="mt-1 text-[10px] text-neutral-500">
                                                         {[addressDeliveryOption.courierName, addressDeliveryOption.serviceName].filter(Boolean).join(" - ")}
                                                     </p>
+                                                    </div>
                                                 </div>
                                                 <span className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
                                                     {formatColeteOptionPrice(addressDeliveryOption)}
                                                 </span>
                                             </div>
-                                        </button>
+                                        </label>
                                     ) : coleteAddressQuoteError ? (
                                         <div className="w-full border border-red-200 bg-red-50 p-4 text-left">
                                             <div className="flex items-start justify-between gap-4">
@@ -1282,7 +1330,7 @@ export default function Checkout() {
                             </div>
                         )}
 
-                        {clientSecret && (
+                        {clientSecret && hasCheckoutItems && (
                             <div
                                 ref={paymentSectionRef}
                                 className="bg-white border border-[#d8d8d8] px-4 md:px-6 py-5"
@@ -1303,7 +1351,7 @@ export default function Checkout() {
                                 total={formatPrice(totalValue)}
                                 onPay={handlePayNow}
                                 isPreparingPayment={isPreparingPayment}
-                                disabled={!selectedColeteOption || !acceptedTerms || !acceptedPrivacyPolicy || !!clientSecret}
+                                disabled={!hasCheckoutItems || !selectedColeteOption || !acceptedTerms || !acceptedPrivacyPolicy || !!clientSecret}
                                 acceptedTerms={acceptedTerms}
                                 acceptedPrivacyPolicy={acceptedPrivacyPolicy}
                                 onAcceptedTermsChange={setAcceptedTerms}
@@ -1321,7 +1369,7 @@ export default function Checkout() {
                             total={formatPrice(totalValue)}
                             onPay={handlePayNow}
                             isPreparingPayment={isPreparingPayment}
-                            disabled={!selectedColeteOption || !acceptedTerms || !acceptedPrivacyPolicy || !!clientSecret}
+                            disabled={!hasCheckoutItems || !selectedColeteOption || !acceptedTerms || !acceptedPrivacyPolicy || !!clientSecret}
                             acceptedTerms={acceptedTerms}
                             acceptedPrivacyPolicy={acceptedPrivacyPolicy}
                             onAcceptedTermsChange={setAcceptedTerms}
@@ -1695,6 +1743,16 @@ function LockerMapPicker({
                             <span className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
                                 {formatOptionPrice(focused)}
                             </span>
+                            <label className="flex items-center gap-2 text-[10px] uppercase tracking-wide text-[#1c1c1e] cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedKey === getOptionKey(focused)}
+                                    onChange={() => onConfirm(focused)}
+                                    className="h-4 w-4 accent-[#1c1c1e] cursor-pointer"
+                                    aria-label="Selecteaza acest locker"
+                                />
+                                Alege
+                            </label>
                             <button
                                 type="button"
                                 onClick={() => onConfirm(focused)}

@@ -5,6 +5,7 @@ import {
     DefaultSearchPlugin,
     VendureConfig,
     LanguageCode,
+    UserInputError,
 } from '@vendure/core';
 
 
@@ -395,6 +396,13 @@ export const config: VendureConfig = {
         ColeteShippingPlugin,
         StripePlugin.init({
             storeCustomersInStripe: true,
+            paymentIntentCreateParams: (_injector, _ctx, order) => {
+                if (Array.isArray(order.lines) && order.lines.length === 0) {
+                    throw new UserInputError('Cannot create a payment intent for an empty order');
+                }
+
+                return {};
+            },
         }),
         RecaptchaProtectionPlugin,
         AssetServerPlugin.init(
