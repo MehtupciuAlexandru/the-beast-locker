@@ -3,6 +3,7 @@ import { ActiveOrderService, ID, Logger, Order, OrderService, RequestContext } f
 import { ColeteOnlineClient, ColeteShippingPointsResponse } from './colete-online.client';
 
 const loggerCtx = 'ColeteShippingService';
+const FREE_SHIPPING_THRESHOLD = 29900;
 
 type OrderCustomFields = {
     coletePackageWeightKg?: number | null;
@@ -96,11 +97,15 @@ export class ColeteShippingService {
         }
 
         const customFields = order.customFields as OrderCustomFields;
+        const coletePriceWithTax = this.moneyToMinorUnits(input.priceWithTax);
+        const coletePriceWithoutTax = input.priceWithoutTax == null ? null : this.moneyToMinorUnits(input.priceWithoutTax);
+        const hasFreeShipping = order.subTotalWithTax > FREE_SHIPPING_THRESHOLD;
+
         return this.orderService.updateCustomFields(ctx, order.id, {
             ...customFields,
             coleteDeliveryType: input.deliveryType,
-            coleteCheckoutPriceWithTax: this.moneyToMinorUnits(input.priceWithTax),
-            coleteCheckoutPriceWithoutTax: input.priceWithoutTax == null ? null : this.moneyToMinorUnits(input.priceWithoutTax),
+            coleteCheckoutPriceWithTax: hasFreeShipping ? 0 : coletePriceWithTax,
+            coleteCheckoutPriceWithoutTax: hasFreeShipping ? 0 : coletePriceWithoutTax,
             coleteCheckoutCourierName: input.courierName ?? null,
             coleteCheckoutServiceName: input.serviceName ?? null,
             coleteCheckoutServiceId: input.serviceId ?? null,

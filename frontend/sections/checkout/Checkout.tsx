@@ -22,6 +22,8 @@ import { cleanGuestCheckoutDetails, cleanSavedDeliveryAddress } from "@/lib/deli
 
 type PaymentMethod = "card" | "paypal" | "apple-pay";
 
+const FREE_SHIPPING_THRESHOLD = 29900;
+
 type CheckoutAddress = {
     id: string;
     fullName?: string;
@@ -302,17 +304,27 @@ export default function Checkout() {
         return coleteOptions.find((option) => coleteOptionKey(option) === focusedColeteOptionKey) || null;
     }, [coleteOptions, focusedColeteOptionKey]);
 
-    const shippingValue =
+    const rawSelectedShippingValue =
         selectedColeteOption?.priceWithTax != null
             ? Math.round(selectedColeteOption.priceWithTax * 100)
-            :
-        selectedShippingMethod?.priceWithTax ||
-        (order?.shippingWithTax && order.shippingWithTax > 0 ? order.shippingWithTax : 0);
+            : selectedShippingMethod?.priceWithTax ||
+            (order?.shippingWithTax && order.shippingWithTax > 0 ? order.shippingWithTax : 0);
+    const qualifiesForFreeShipping = (order?.subTotalWithTax ?? 0) > FREE_SHIPPING_THRESHOLD;
+    const shippingValue =
+        selectedColeteOption && qualifiesForFreeShipping ? 0 : rawSelectedShippingValue;
 
     const formatPrice = (value?: number) => {
         if (value === undefined || value === null) return "0,00 lei";
 
         return `${(value / 100).toFixed(2).replace(".", ",")} lei`;
+    };
+
+    const getEffectiveColeteShippingWithTax = (option: ColeteDeliveryOption) => {
+        return qualifiesForFreeShipping ? 0 : Math.round(option.priceWithTax * 100);
+    };
+
+    const formatColeteOptionPrice = (option: ColeteDeliveryOption) => {
+        return qualifiesForFreeShipping ? "Gratis" : formatPrice(getEffectiveColeteShippingWithTax(option));
     };
 
     const resetCheckoutCalculation = () => {
@@ -736,7 +748,7 @@ export default function Checkout() {
             setShippingMethods(methods);
             setShippingMethodsLoaded(true);
 
-            const expectedShippingWithTax = Math.round(selectedColeteOption.priceWithTax * 100);
+            const expectedShippingWithTax = getEffectiveColeteShippingWithTax(selectedColeteOption);
             const coletePricedMethods = methods.filter((method: any) => {
                 return Math.abs(Number(method.priceWithTax) - expectedShippingWithTax) <= 1;
             });
@@ -744,10 +756,13 @@ export default function Checkout() {
                 coletePricedMethods.find((method: any) => method.code === "colete-online") ||
                 coletePricedMethods.find((method: any) => method.code === "standard-shipping") ||
                 coletePricedMethods.find((method: any) => method.code === "express-shipping") ||
-                coletePricedMethods[0] ||
-                methods.find((method: any) => method.code === "colete-online") ||
-                methods.find((method: any) => method.code === "standard-shipping") ||
-                methods[0];
+                coletePricedMethods[0];
+
+            if (!shippingMethod) {
+                throw new Error(
+                    `Nu există o metodă de livrare Vendure care să aplice prețul ${formatPrice(expectedShippingWithTax)}. Verifică în dashboard ca metoda activă să folosească calculatorul Colete Online, nu flat-rate.`
+                );
+            }
 
             setSelectedShippingMethodId(shippingMethod.id);
 
@@ -1078,7 +1093,7 @@ export default function Checkout() {
                                                     </p>
                                                 </div>
                                                 <span className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
-                                                    {formatPrice(Math.round(addressDeliveryOption.priceWithTax * 100))}
+                                                    {formatColeteOptionPrice(addressDeliveryOption)}
                                                 </span>
                                             </div>
                                         </button>
@@ -1107,7 +1122,7 @@ export default function Checkout() {
                                             focusedKey={focusedColeteOptionKey}
                                             focusedOption={focusedColeteOption}
                                             getOptionKey={coleteOptionKey}
-                                            formatPrice={formatPrice}
+                                            formatOptionPrice={formatColeteOptionPrice}
                                             onFocus={(option) => {
                                                 setFocusedColeteOptionKey(coleteOptionKey(option));
                                             }}
@@ -1169,7 +1184,7 @@ export default function Checkout() {
 
                                                     <div className="flex items-center gap-3 shrink-0">
                                                         <span className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
-                                                            {formatPrice(Math.round(option.priceWithTax * 100))}
+                                                            {formatColeteOptionPrice(option)}
                                                         </span>
 
                                                         <span
@@ -1417,7 +1432,7 @@ function LockerMapPicker({
                              focusedKey,
                              focusedOption,
                              getOptionKey,
-                             formatPrice,
+                             formatOptionPrice,
                              onFocus,
                              onConfirm,
                          }: {
@@ -1426,7 +1441,7 @@ function LockerMapPicker({
     focusedKey: string | null;
     focusedOption: ColeteDeliveryOption | null;
     getOptionKey: (option: ColeteDeliveryOption) => string;
-    formatPrice: (value?: number) => string;
+    formatOptionPrice: (option: ColeteDeliveryOption) => string;
     onFocus: (option: ColeteDeliveryOption) => void;
     onConfirm: (option: ColeteDeliveryOption) => void;
 }) {
@@ -1678,7 +1693,7 @@ function LockerMapPicker({
 
                         <div className="flex items-center gap-3 shrink-0">
                             <span className="text-[12px] font-Inter18Semibold text-[#1c1c1e]">
-                                {formatPrice(Math.round(focused.priceWithTax * 100))}
+                                {formatOptionPrice(focused)}
                             </span>
                             <button
                                 type="button"

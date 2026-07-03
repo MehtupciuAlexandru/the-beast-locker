@@ -19,7 +19,7 @@ export const coleteSelectedQuoteCalculator = new ShippingCalculator({
         };
 
         const price = Number(customFields.coleteCheckoutPriceWithTax);
-        if (!Number.isFinite(price) || price <= 0) {
+        if (!Number.isFinite(price) || price < 0) {
             return;
         }
 
