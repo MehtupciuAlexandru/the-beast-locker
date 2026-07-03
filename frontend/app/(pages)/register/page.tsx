@@ -7,6 +7,12 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/footer";
 import { useRouter } from "next/navigation";
 import { getRecaptchaToken } from "@/lib/recaptcha/client";
+import {
+    clearCookieConsent,
+    hasNecessaryCookieConsent,
+    necessaryCookiePreferences,
+    saveCookieConsent,
+} from "@/lib/cookieConsent";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -28,33 +34,16 @@ export default function RegisterPage() {
 
     const hasAcceptedNecessaryCookies = () => {
         if (typeof window === "undefined") return false;
-
-        const consent = localStorage.getItem("cookieConsent");
-
-        if (!consent) return false;
-
-        try {
-            const parsedConsent = JSON.parse(consent);
-            return parsedConsent.necessary === true;
-        } catch {
-            return false;
-        }
+        return hasNecessaryCookieConsent();
     };
 
     const handleCookieCheckboxChange = (checked: boolean) => {
         setAcceptedCookies(checked);
 
         if (checked) {
-            const allPreferences = {
-                necessary: true,
-                analytics: true,
-                marketing: true,
-                functional: true,
-            };
-
-            localStorage.setItem("cookieConsent", JSON.stringify(allPreferences));
+            saveCookieConsent(necessaryCookiePreferences());
         } else {
-            localStorage.removeItem("cookieConsent");
+            clearCookieConsent();
         }
     };
 

@@ -125,6 +125,8 @@ export default function Checkout() {
     const [message, setMessage] = useState<string | null>(null);
     const [messageType, setMessageType] = useState<"success" | "error" | null>(null);
     const [addressModalError, setAddressModalError] = useState<string | null>(null);
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const [acceptedPrivacyPolicy, setAcceptedPrivacyPolicy] = useState(false);
 
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [isPreparingPayment, setIsPreparingPayment] = useState(false);
@@ -711,6 +713,12 @@ export default function Checkout() {
                 return;
             }
 
+            if (!acceptedTerms || !acceptedPrivacyPolicy) {
+                setMessage("Trebuie să accepți Termenii și condițiile și Politica de confidențialitate înainte de plată.");
+                setMessageType("error");
+                return;
+            }
+
             await ensureCheckoutDetailsOnOrder();
 
             const { distanceKm, ...coleteSelectionInput } = selectedColeteOption;
@@ -1280,7 +1288,12 @@ export default function Checkout() {
                                 total={formatPrice(totalValue)}
                                 onPay={handlePayNow}
                                 isPreparingPayment={isPreparingPayment}
-                                disabled={!selectedColeteOption || !!clientSecret}
+                                disabled={!selectedColeteOption || !acceptedTerms || !acceptedPrivacyPolicy || !!clientSecret}
+                                acceptedTerms={acceptedTerms}
+                                acceptedPrivacyPolicy={acceptedPrivacyPolicy}
+                                onAcceptedTermsChange={setAcceptedTerms}
+                                onAcceptedPrivacyPolicyChange={setAcceptedPrivacyPolicy}
+                                agreementsDisabled={!!clientSecret || isPreparingPayment}
                             />
                         </div>
                     </div>
@@ -1293,7 +1306,12 @@ export default function Checkout() {
                             total={formatPrice(totalValue)}
                             onPay={handlePayNow}
                             isPreparingPayment={isPreparingPayment}
-                            disabled={!selectedColeteOption || !!clientSecret}
+                            disabled={!selectedColeteOption || !acceptedTerms || !acceptedPrivacyPolicy || !!clientSecret}
+                            acceptedTerms={acceptedTerms}
+                            acceptedPrivacyPolicy={acceptedPrivacyPolicy}
+                            onAcceptedTermsChange={setAcceptedTerms}
+                            onAcceptedPrivacyPolicyChange={setAcceptedPrivacyPolicy}
+                            agreementsDisabled={!!clientSecret || isPreparingPayment}
                         />
                     </div>
                 </div>
@@ -1835,6 +1853,11 @@ function PriceSummary({
                           onPay,
                           isPreparingPayment,
                           disabled,
+                          acceptedTerms,
+                          acceptedPrivacyPolicy,
+                          onAcceptedTermsChange,
+                          onAcceptedPrivacyPolicyChange,
+                          agreementsDisabled,
                       }: {
     productTotal: string;
     shipping: string;
@@ -1843,6 +1866,11 @@ function PriceSummary({
     onPay: () => void;
     isPreparingPayment: boolean;
     disabled: boolean;
+    acceptedTerms: boolean;
+    acceptedPrivacyPolicy: boolean;
+    onAcceptedTermsChange: (value: boolean) => void;
+    onAcceptedPrivacyPolicyChange: (value: boolean) => void;
+    agreementsDisabled: boolean;
 }) {
 
 
@@ -1877,6 +1905,42 @@ function PriceSummary({
                 <span className="text-[13px] font-Inter18Semibold">
                     {total}
                 </span>
+            </div>
+
+            <div className="mb-5 space-y-3 border-b border-[#e5e5e5] pb-5">
+                <label className="flex items-start gap-3 text-[11px] leading-relaxed text-neutral-600 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={acceptedTerms}
+                        disabled={agreementsDisabled}
+                        onChange={(event) => onAcceptedTermsChange(event.target.checked)}
+                        className="mt-0.5 h-4 w-4 shrink-0 accent-black disabled:cursor-not-allowed disabled:opacity-60"
+                    />
+                    <span>
+                        Sunt de acord cu{" "}
+                        <Link href="/terms-and-conditions" className="underline text-[#1c1c1e] hover:opacity-70">
+                            Termenii și condițiile
+                        </Link>
+                        .
+                    </span>
+                </label>
+
+                <label className="flex items-start gap-3 text-[11px] leading-relaxed text-neutral-600 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={acceptedPrivacyPolicy}
+                        disabled={agreementsDisabled}
+                        onChange={(event) => onAcceptedPrivacyPolicyChange(event.target.checked)}
+                        className="mt-0.5 h-4 w-4 shrink-0 accent-black disabled:cursor-not-allowed disabled:opacity-60"
+                    />
+                    <span>
+                        Sunt de acord cu{" "}
+                        <Link href="/privacy-policy" className="underline text-[#1c1c1e] hover:opacity-70">
+                            Politica de confidențialitate
+                        </Link>
+                        .
+                    </span>
+                </label>
             </div>
 
             <button

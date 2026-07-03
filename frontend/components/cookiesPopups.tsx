@@ -1,6 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getActiveCustomer } from "@/lib/api/auth";
+import {
+    clearCookieConsent,
+    hasNecessaryCookieConsent,
+    necessaryCookiePreferences,
+    readCookieConsent,
+    saveCookieConsent,
+} from "@/lib/cookieConsent";
 
 interface CookiesPopupProps {
     devMode?: boolean;
@@ -17,29 +25,42 @@ export default function CookiesPopup({ devMode = false }: CookiesPopupProps) {
     });
 
     useEffect(() => {
+        let cancelled = false;
+
         if (devMode) {
             setTimeout(() => setShowBanner(true), 500);
             return;
         }
 
-        const cookieConsent = localStorage.getItem("cookieConsent");
-        if (!cookieConsent) {
-            setTimeout(() => setShowBanner(true), 500);
+        if (hasNecessaryCookieConsent()) {
+            return;
         }
-    }, [devMode]);
 
-    useEffect(() => {
-        const handleKeyPress = (e: KeyboardEvent) => {
-            if (e.ctrlKey && e.key === 'r') {
-                localStorage.removeItem("cookieConsent");
-                setShowBanner(true);
-                console.log("Cookie consent reset! Banner will show again.");
+        const syncAuthenticatedNecessaryConsent = async () => {
+            try {
+                const data = await getActiveCustomer();
+
+                if (cancelled) return;
+
+                if (data?.activeCustomer) {
+                    saveCookieConsent(necessaryCookiePreferences());
+                    return;
+                }
+            } catch {
+                // If the auth check fails, fall through to the banner.
+            }
+
+            if (!cancelled) {
+                setTimeout(() => setShowBanner(true), 500);
             }
         };
 
-        window.addEventListener('keydown', handleKeyPress);
-        return () => window.removeEventListener('keydown', handleKeyPress);
-    }, []);
+        syncAuthenticatedNecessaryConsent();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [devMode]);
 
     const handleAcceptAll = () => {
         const allPreferences = {
@@ -51,7 +72,7 @@ export default function CookiesPopup({ devMode = false }: CookiesPopupProps) {
         setPreferences(allPreferences);
 
         if (!devMode) {
-            localStorage.setItem("cookieConsent", JSON.stringify(allPreferences));
+            saveCookieConsent(allPreferences);
         }
 
         setShowBanner(false);
@@ -62,7 +83,7 @@ export default function CookiesPopup({ devMode = false }: CookiesPopupProps) {
 
     const handleSavePreferences = () => {
         if (!devMode) {
-            localStorage.setItem("cookieConsent", JSON.stringify(preferences));
+            saveCookieConsent(preferences);
         }
 
         setShowBanner(false);
@@ -72,16 +93,11 @@ export default function CookiesPopup({ devMode = false }: CookiesPopupProps) {
     };
 
     const handleRejectAll = () => {
-        const minimalPreferences = {
-            necessary: true,
-            analytics: false,
-            marketing: false,
-            functional: false,
-        };
+        const minimalPreferences = necessaryCookiePreferences();
         setPreferences(minimalPreferences);
 
         if (!devMode) {
-            localStorage.setItem("cookieConsent", JSON.stringify(minimalPreferences));
+            saveCookieConsent(minimalPreferences);
         }
 
         setShowBanner(false);
@@ -296,11 +312,10 @@ export default function CookiesPopup({ devMode = false }: CookiesPopupProps) {
 }
 
 export function resetCookieConsent() {
-    localStorage.removeItem("cookieConsent");
+    clearCookieConsent();
     console.log("🍪 Cookie consent has been reset!");
 }
 
 export function getCookieConsent() {
-    const consent = localStorage.getItem("cookieConsent");
-    return consent ? JSON.parse(consent) : null;
+    return readCookieConsent();
 }

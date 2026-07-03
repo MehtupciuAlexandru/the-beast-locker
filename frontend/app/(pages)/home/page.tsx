@@ -8,22 +8,20 @@ import SocialFavorites from "@/sections/home/SocialFavorites";
 import Newsletter from "@/sections/home/Newsletter";
 import Footer from "@/components/layout/footer";
 import BannerPopup from "@/components/bannerPopup";
-import CookiesPopup from "@/components/cookiesPopups";
 import { mockProducts } from "@/lib/mocks/products";
 
 
 export default function HomePage() {
     return (
         <>
-            <><BannerPopup/></>
-            <CookiesPopup />
+            {/*<><BannerPopup/></>*/}
             <Hero />
             <PlatformDetails />
             <Categories />
             <FeaturedProducts />
             <BannerSection />
             <Story />
-            <Newsletter />
+            {/*<Newsletter />*/}
             <Footer />
         </>
     );
