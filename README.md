@@ -82,6 +82,8 @@ Local catalog/dashboard development does not require Railway, Supabase or Resend
 
 ### 1. Install dependencies and start PostgreSQL
 
+### IMPORTANT: Remember to create your own .env file based on .env.example
+
 Install Git, npm, Docker with Compose and Node.js compatible with the locked dependencies. The checked-in Dockerfile uses Node 20; for a new environment choose a supported release satisfying dependency engine requirements and verify both builds before deployment.
 
 Clone the repository, then run from its root:
