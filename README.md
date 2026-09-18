@@ -42,7 +42,6 @@ Redis, MySQL, MariaDB, Typesense and Elasticsearch in Docker Compose are generat
 - Colete quotes, locker selection, parcel/delivery order fields, a quote-based shipping calculator and dashboard AWB actions.
 - Vendure's default scheduler, search and job queue.
 
-`BeastLockerPlugin` is currently an empty extension placeholder. Implemented source flows still require service configuration and validation on your deployment. Neither package defines an automated test script; this README does not claim that all integrations have been tested on a fresh installation.
 
 ## Repository map
 
@@ -66,15 +65,11 @@ Redis, MySQL, MariaDB, Typesense and Elasticsearch in Docker Compose are generat
 
 | Service | Your setup |
 | --- | --- |
-| GitHub | Repository access or your own copy, connected to deployment services |
 | Railway | Backend API/worker services, PostgreSQL, environment variables and domain |
 | Supabase or another S3 provider | Storage project/bucket, endpoint, region and S3 credentials |
 | Resend | API key and verified sending domain |
 | Google reCAPTCHA | v3 site registration, site/secret keys and allowed hostnames |
-| Stripe | Account, test keys, webhook and Vendure payment-method configuration |
-| Colete Online | API client credentials, appropriate environment, courier services and sender address |
 | Vercel or another Next.js host | Storefront deployment rooted at `frontend/` |
-| Domain/DNS provider | DNS access for storefront/backend domains and email verification |
 
 Local catalog/dashboard development does not require Railway, Supabase or Resend. Use Docker PostgreSQL, local uploads and the development mailbox. Protected auth/checkout operations still require reCAPTCHA: the middleware has no development bypass. Full payment/shipping testing requires those service accounts.
 
@@ -97,8 +92,7 @@ Root and frontend dependencies must be installed separately.
 
 ### 2. Create the backend environment
 
-Create a private root `.env`, using `.env.example` as a reference. Copy commands are `Copy-Item .env.example .env` in PowerShell or `cp .env.example .env` on Unix shells.
-
+Create a private root `.env`, using `.env.example` as a reference.
 
 Set `APP_ENV=dev` explicitly. Any other value, including unset, selects production asset/email behavior and secure cookies. Add Colete credentials when testing integrated shipping.
 
@@ -114,9 +108,8 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=replace-with-your-stripe-test-publishable-key
 
 Never put backend secrets in `NEXT_PUBLIC_*` variables; they are public browser configuration. Restart local servers after environment changes and rebuild production frontend deployments after public-variable changes.
 
-There is no committed frontend template currently. To add `frontend/.env.example`, add `!.env.example` after `.env*` in `frontend/.gitignore`.
+Find .env.example for the template.
 
-**API URL issue:** most requests expect the full `/shop-api` endpoint. Two requests in `frontend/lib/api/auth.ts` append `/shop-api` again. Normalize those callers to use the complete endpoint before testing all account flows. Removing the path from the environment variable would break other requests.
 
 ### 4. Start the applications
 
@@ -162,11 +155,9 @@ Development CORS expects port 3001. Initial admin credentials come from `SUPERAD
 | `RESEND_API_KEY` | Production email delivery |
 | `S3_BUCKET`, `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Production asset storage |
 
-Frontend variables are the three `NEXT_PUBLIC_*` entries in the local example above. The repository also has a server-side reCAPTCHA helper under `frontend/lib/recaptcha/server.ts`, but no caller was found; the active middleware verifies tokens in Vendure.
 
 Vendure reads individual `DB_*` fields, not `DATABASE_URL` or `DATABASE_PUBLIC_URL`. Railway expressions such as `${{Postgres.PGHOST}}` resolve in Railway, not automatically in a local `.env`. `PGDATA` and `POSTGRES_*` configure database infrastructure rather than Vendure directly.
 
-`APP_URL`, `VENDURE_SHOP_API_URL`, `SSL_CERT_DAYS` and `S3_FORCE_PATH_STYLE` are not read by the inspected application code. S3 path-style access is hardcoded to true. `ADMIN_UI_URL` is read into an unused constant and currently has no effect.
 
 ### Colete Online settings
 
@@ -213,7 +204,7 @@ Register your hostnames, including localhost for local development as appropriat
 
 ### Stripe
 
-Start with test credentials. Create an enabled Vendure payment method with code **`stripe-card`**, select the Stripe handler and enter the secret API key and webhook signing secret in its dashboard settings. These secrets are stored in the Vendure database; this implementation does not read a backend `STRIPE_SECRET_KEY` variable.
+Start with test credentials. Create an enabled Vendure payment method with code **`stripe-card`**, select the Stripe handler and enter the secret API key and webhook signing secret in its dashboard settings. These secrets have to be stored in the Vendure database; this implementation does not read a backend `STRIPE_SECRET_KEY` variable.
 
 Configure `https://YOUR_BACKEND/payments/stripe` as a webhook for `payment_intent.succeeded` and `payment_intent.payment_failed`. Set the frontend publishable key from the same account and test/live mode. For local testing:
 
@@ -320,10 +311,3 @@ Check these on your own infrastructure:
 
 This guide was written from source/configuration inspection. Writing it did not perform a fresh install, deploy services or validate live integrations. Successful builds and the checklist above are the confirmation for your environment.
 
-## Handoff and credentials
-
-Share code, lockfiles, sanitized environment examples and this guide. New developers create their own service accounts and keys. Private root `.env` and frontend `.env.local` do not travel with a clone if never committed. `.gitignore` does not untrack files or remove secrets from history.
-
-Replace actual values in tracked examples with placeholders and revoke/rotate any previously exposed secrets. Review GitHub workflow secrets and hosting connections when transferring access. Sanitize Stripe settings and personal data if sharing a database in the future.
-
-For this handoff, no previous deployed data is intended to be preserved. Once all required code is committed, old Railway/database/storage resources are not needed to recreate the implementation. Deleting them stops the old site and removes any unexported hosted data/assets. If preservation becomes necessary, export a sanitized database and download uploaded assets before deletion; Git includes neither automatically.
