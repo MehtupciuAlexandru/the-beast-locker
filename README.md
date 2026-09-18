@@ -155,7 +155,6 @@ Development CORS expects port 3001. Initial admin credentials come from `SUPERAD
 | `RESEND_API_KEY` | Production email delivery |
 | `S3_BUCKET`, `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | Production asset storage |
 
-
 Vendure reads individual `DB_*` fields, not `DATABASE_URL` or `DATABASE_PUBLIC_URL`. Railway expressions such as `${{Postgres.PGHOST}}` resolve in Railway, not automatically in a local `.env`. `PGDATA` and `POSTGRES_*` configure database infrastructure rather than Vendure directly.
 
 
@@ -191,6 +190,14 @@ Omit optional overrides to use built-in defaults. Empty strings can override def
 Create a bucket and generate server-side S3 access credentials. Copy the provider's endpoint, region and credential pair into the backend `S3_*` variables. Use S3 access credentials, not a frontend Supabase anonymous key. See [Supabase S3 authentication](https://supabase.com/docs/guides/storage/s3/authentication).
 
 Asset storage and the Vendure PostgreSQL database are separate resources. Using Supabase for assets does not require using its database for commerce. Development uploads use `static/assets`; production uploads must persist through the configured bucket. Test upload and retrieval through Vendure after configuration.
+
+### How assets, S3 buckets and the database relate
+
+Product images and other uploaded files are Vendure assets, but the actual image bytes are not stored directly in PostgreSQL. The database stores asset records: IDs, filenames, dimensions, preview/source URLs and the relationships that connect assets to products, variants and collections. The file itself lives in asset storage.
+
+In development, that storage is the local `static/assets` folder. In production, `APP_ENV` values other than `dev` switch Vendure to S3-compatible storage using `S3_BUCKET`, `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY`. The bucket is simply the remote container where uploaded asset files are placed.
+
+This split is intentional. Databases are good at structured commerce data and relationships; object storage is better for large binary files, image delivery, caching and persistence across redeploys. Keeping product photos out of the DB keeps backups and queries smaller, avoids bloating order/catalog data, and lets the storefront load assets from storage URLs instead of pulling heavy binary data through database rows.
 
 ### Resend
 
@@ -307,6 +314,56 @@ Check these on your own infrastructure:
 - Stripe test payment settles in Vendure through the webhook and sends an order email.
 - Event registration and authorized CSV export work.
 - AWB generation is deliberately tested in the appropriate environment with correct sender and parcel data.
+
+
+
+
+### Channel, zones, and tax
+
+- In the default production channel, make sure the currency is `RON`.
+- Make sure product prices are configured consistently as tax-inclusive, because the storefront displays prices as final customer-facing RON amounts.
+- Enable Romania as an available country.
+- Configure the default tax zone and default shipping zone so Romanian addresses are included.
+- Create/verify the product VAT tax category used by all sellable product variants. For the current shop flow this should be the standard Romanian VAT rate, `21%`.
+- Create/verify the shipping tax rate. The Colete shipping calculator returns shipping prices as tax-inclusive and uses `21%`, so dashboard tax setup should match that.
+
+### Stripe card payment method
+
+- Create one enabled production payment method using the `Stripe payments` handler.
+- In the payment method `API Key` field, use the live Stripe secret key, not the publishable key and not a test key.
+- In the payment method `Webhook secret` field, use the signing secret from the live Stripe webhook endpoint.
+- In Stripe Dashboard, the live webhook endpoint should point to the Vendure backend route:
+
+```text
+https://the-beast-locker-production.up.railway.app/payments/stripe
+```
+
+- The webhook must include at least `payment_intent.succeeded` and `payment_intent.payment_failed`. Without this webhook, Stripe may charge successfully but Vendure will not settle the order.
+- Do not use the test-mode Stripe customer/payment objects with live keys. If switching from test to live, use real live-mode Stripe customers/payment methods.
+
+### Colete Online shipping method
+
+- Create one enabled shipping method for Colete Online.
+- Use code `colete-online`.
+- Use the calculator `Uses the Colete Online checkout quote stored on the active order` / `colete-selected-quote-calculator`.
+- The calculator has no manual price field. It reads the live Colete checkout quote saved on the order.
+- Keep `priceIncludesTax` behavior aligned with the calculator: the selected quote is stored and applied as tax-inclusive.
+
+### Products, variants, and stock
+
+- Every storefront product must be enabled and assigned to the production channel.
+- Every sellable variant must be enabled, have a valid SKU, have a RON price, use the correct VAT tax category, and have stock configured.
+- Variant option names should be clean customer-facing labels, for example `XS/S`, `L/XL`, `S`, `M`, `L`, `XL`. The product page depends on variant options to show the size selector clearly.
+- Attach product assets and set featured assets so product listing and product detail pages have usable images.
+- Fill the product custom fields used by the frontend where relevant: `SEO Title`, `SEO Description`, and `Search Keywords`.
+
+### Colete Online order workflow
+
+- Paid orders should be handled from the order detail page in the Vendure Dashboard.
+- The `Colete Online` order tab/side panel must be visible after deployment. It is provided by the custom Colete dashboard extension.
+- Before clicking `Genereaza AWB`, the warehouse worker must complete and save the package fields on the order: weight, length, width, height, package count, and content.
+- The AWB button sends the order to Colete Online and saves the returned AWB, Colete unique ID, courier, courier service, pickup date when returned, status, and any error on the order custom fields.
+- Locker orders depend on the locker/shipping-point data saved during checkout. Direct delivery orders use the customer's shipping address.
 
 
 This guide was written from source/configuration inspection. Writing it did not perform a fresh install, deploy services or validate live integrations. Successful builds and the checklist above are the confirmation for your environment.
